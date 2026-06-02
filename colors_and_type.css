@@ -1,0 +1,368 @@
+/* JDS 3.1 — Jio Design System
+ * Core color + type tokens, distilled from @jds/tokens@3.0.5.
+ * Use these CSS vars wherever raw <div>/inline-CSS prototypes are made.
+ * Production code MUST go through @jds/react components instead.
+ */
+
+@font-face {
+  font-family: "JioType Var";
+  src: url("./fonts/JioTypeVar.woff2") format("woff2-variations"),
+       url("./fonts/JioTypeVar.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ============================================================
+   * BRAND — Reliance Blue is the Jio signature.
+   * ============================================================ */
+  --reliance-base:     oklch(40.10% 0.218 264.38);   /* primary CTA, brand */
+  --reliance-light:    oklch(56.00% 0.205 264.38);   /* hover, secondary surfaces */
+  --reliance-midnight: oklch(36.00% 0.210 264.38);   /* dark mode primary */
+  --reliance-50:       oklch(96.50% 0.020 264.38);   /* tinted background */
+  --reliance-100:      oklch(91.50% 0.045 264.38);
+  --reliance-200:      oklch(83.00% 0.090 264.38);
+
+  /* ============================================================
+   * SEMANTIC / FUNCTIONAL — never use brand colors for status.
+   * ============================================================ */
+  --positive:        oklch(70.10% 0.2002 142.55);    /* success */
+  --positive-light:  oklch(94.00% 0.0700 142.55);
+  --negative:        oklch(67.06% 0.2169 23.57);     /* error */
+  --negative-light:  oklch(94.00% 0.0700 23.57);
+  --warning:         oklch(72.88% 0.171 47.42);      /* caution */
+  --warning-light:   oklch(94.00% 0.0700 47.42);
+  --informative:     oklch(66.98% 0.1827 249.22);    /* neutral info */
+  --informative-light:oklch(94.00% 0.0500 249.22);
+  --sparkle:         oklch(54.00% 0.255 295.00);     /* premium / AI */
+  --sparkle-light:   oklch(94.00% 0.0700 295.00);
+
+  /* ============================================================
+   * NEUTRALS — content / surface / stroke scale.
+   * Values approximate the JDS neutral.* family (hue ~270).
+   * ============================================================ */
+  --neutral-100: oklch(0% 0 0);
+  --neutral-200: oklch(15.93% 0.0065 270.98);  /* near-black, body text base */
+  --neutral-400: oklch(27.05% 0.0065 270.98);
+  --neutral-600: oklch(40.00% 0.0065 270.98);
+  --neutral-800: oklch(53.00% 0.0065 270.98);
+  --neutral-1000:oklch(64.00% 0.0050 270.98);  /* tertiary text, icons */
+  --neutral-1200:oklch(75.00% 0.0035 270.98);
+  --neutral-1400:oklch(85.00% 0.0025 270.98);  /* heavy stroke */
+  --neutral-1600:oklch(91.00% 0.0020 270.98);  /* moderate stroke */
+  --neutral-1800:oklch(94.50% 0.0018 270.98);  /* minimal stroke */
+  --neutral-2000:oklch(96.50% 0.0015 270.98);  /* subtle surface */
+  --neutral-2200:oklch(98.00% 0.0010 270.98);  /* minimal surface */
+  --neutral-2400:oklch(99.20% 0.0006 270.98);
+  --neutral-2500:oklch(100% 0 0);
+
+  /* ============================================================
+   * SEMANTIC SURFACE TOKENS (light theme — JioBase / default mode)
+   * ============================================================ */
+  /* Surfaces — backgrounds */
+  --surface-ghost:           transparent;
+  --surface-minimal:         var(--neutral-2500);   /* page bg */
+  --surface-minimal-decreased: var(--neutral-2400);
+  --surface-subtle:          var(--neutral-2200);   /* cards, list rows */
+  --surface-moderate:        var(--neutral-2000);   /* panels */
+  --surface-bold:            var(--reliance-base);
+  --surface-heavy:           var(--neutral-200);
+  --surface-contrasting:     var(--neutral-100);
+  --surface-elevated-low:    var(--neutral-2500);
+  --surface-elevated-medium: var(--neutral-2500);
+  --surface-elevated-high:   var(--neutral-2500);
+
+  /* Content — text / icons */
+  --content-heavy:    var(--neutral-200);    /* primary text */
+  --content-moderate: var(--neutral-600);    /* secondary text */
+  --content-minimal:  var(--neutral-1000);   /* tertiary text, placeholders */
+  --content-on-bold:  var(--neutral-2500);   /* text on Reliance Blue */
+
+  /* Stroke — borders / dividers */
+  --stroke-minimal:     var(--neutral-1800);
+  --stroke-moderate:    var(--neutral-1600);
+  --stroke-heavy:       var(--neutral-1400);
+  --stroke-bold:        var(--neutral-200);
+  --stroke-contrasting: var(--neutral-100);
+
+  /* ============================================================
+   * SHAPE / RADII — values pulled from spacing.fig (dimension.scale)
+   *   spacing & radius share the same f(n) scale: value = base × (n/4)
+   *   default density at S(360) uses base=16, so f(4)=16 → "comp m / s4".
+   * ============================================================ */
+  /* unified dimension scale (default S/360, base 16) */
+  --dim-0:    0px;
+  --dim-0_5:  2px;
+  --dim-1:    4px;
+  --dim-1_5:  6px;
+  --dim-2:    8px;
+  --dim-2_5:  10px;
+  --dim-3:    12px;
+  --dim-3_5:  14px;
+  --dim-4:    16px;
+  --dim-4_5:  18px;
+  --dim-5:    20px;
+  --dim-5_5:  22px;
+  --dim-6:    24px;
+  --dim-7:    28px;
+  --dim-8:    32px;
+  --dim-9:    36px;
+  --dim-10:   40px;
+  --dim-12:   48px;
+  --dim-14:   56px;
+  --dim-16:   64px;
+  --dim-18:   72px;
+  --dim-20:   80px;
+  --dim-24:   96px;
+  --dim-28:   112px;
+  --dim-32:   128px;
+  --dim-40:   160px;
+
+  /* radius scope aliases — map onto the dimension scale */
+  --radius-component-s:  var(--dim-1);    /* 4 — chip, small input */
+  --radius-component-m:  var(--dim-2);    /* 8 — buttons, inputs */
+  --radius-component-l:  var(--dim-3);    /* 12 — large buttons */
+  --radius-pattern-s:    var(--dim-3);    /* 12 — small cards */
+  --radius-pattern-m:    var(--dim-4);    /* 16 — default card / sheet */
+  --radius-pattern-l:    var(--dim-6);    /* 24 — hero cards */
+  --radius-layout-m:     var(--dim-6);    /* 24 — full-bleed regions */
+  --radius-layout-l:     var(--dim-8);    /* 32 — large layout region */
+  --radius-pill:         9999px;
+
+  /* ============================================================
+   * STROKE WIDTHS
+   * ============================================================ */
+  --stroke-w-floor:    1px;
+  --stroke-w-default:  1px;
+  --stroke-w-static:   1px;
+  --stroke-w-bold:     2px;
+  --stroke-w-ceiling:  3px;
+
+  /* ============================================================
+   * SPACING — three scopes (component / pattern / layout).
+   * Values shown for `default` density. Compact = ~0.75x, Open = ~1.25x.
+   * ============================================================ */
+  --space-component-xs: 2px;
+  --space-component-s:  4px;
+  --space-component-m:  8px;
+  --space-component-l:  12px;
+  --space-component-xl: 16px;
+
+  --space-pattern-xs:   8px;
+  --space-pattern-s:    12px;
+  --space-pattern-m:    16px;
+  --space-pattern-l:    20px;
+  --space-pattern-xl:   24px;
+
+  --space-layout-xs:    16px;
+  --space-layout-s:     24px;
+  --space-layout-m:     32px;
+  --space-layout-l:     48px;
+  --space-layout-xl:    64px;
+
+  /* ============================================================
+   * MOTION — keep subtle.
+   * ============================================================ */
+  --motion-reduced:    100ms;
+  --motion-discreet:   200ms;
+  --motion-expressive: 300ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-enter:    cubic-bezier(0, 0, 0, 1);
+  --motion-easing-exit:     cubic-bezier(0.3, 0, 1, 1);
+
+  /* ============================================================
+   * ELEVATION — soft, neutral, no color tint.
+   * ============================================================ */
+  --shadow-elevated-low:    0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-elevated-medium: 0 4px 8px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-elevated-high:   0 12px 24px rgba(15, 23, 42, 0.10), 0 4px 8px rgba(15, 23, 42, 0.06);
+
+  /* ============================================================
+   * TYPOGRAPHY — JioType Var (variable axis: 400–900)
+   * ============================================================ */
+  --font-sans: "JioType Var", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Weight tokens — direct map from JDS typography.fontweight.* */
+  --w-display:        900;
+  --w-headline:       900;
+  --w-title:          800;
+  --w-label-high:     700;
+  --w-body-high:      700;
+  --w-paragraph-high: 700;
+  --w-label-med:      500;
+  --w-body-med:       500;
+  --w-paragraph-med:  500;
+  --w-label-low:      400;
+  --w-body-low:       400;
+  --w-paragraph-low:  400;
+
+  /* Six-tier semantic type scale — values from JDS Typography.fig (S/360 viewport, base reference) */
+  --type-display-l-size: 40px;  --type-display-l-lh: 40px;
+  --type-display-m-size: 36px;  --type-display-m-lh: 36px;
+  --type-display-s-size: 32px;  --type-display-s-lh: 32px;
+  /* legacy aliases — Display defaults to L */
+  --type-display-size:   var(--type-display-l-size);
+  --type-display-lh:     1;
+  --type-display-tracking: -0.02em;
+
+  --type-headline-l-size: 28px;  --type-headline-l-lh: 28px;
+  --type-headline-m-size: 20px;  --type-headline-m-lh: 20px;
+  --type-headline-s-size: 16px;  --type-headline-s-lh: 16px;
+  /* legacy alias kept for backwards compat — maps XL → L's old size */
+  --type-headline-xl-size: 28px; --type-headline-xl-lh: 28px;
+
+  --type-title-l-size: 20px;  --type-title-l-lh: 22px;
+  --type-title-m-size: 16px;  --type-title-m-lh: 18px;
+  --type-title-s-size: 12px;  --type-title-s-lh: 14px;
+
+  --type-label-l-size: 18px;   --type-label-l-lh: 18px;
+  --type-label-m-size: 16px;   --type-label-m-lh: 16px;
+  --type-label-s-size: 14px;   --type-label-s-lh: 14px;
+  --type-label-xs-size: 12px;  --type-label-xs-lh: 12px;
+  --type-label-2xs-size: 10px; --type-label-2xs-lh: 10px;
+  --type-label-3xs-size: 8px;  --type-label-3xs-lh: 8px;
+
+  --type-body-l-size:  18px;  --type-body-l-lh:  24px;
+  --type-body-m-size:  16px;  --type-body-m-lh:  22px;
+  --type-body-s-size:  14px;  --type-body-s-lh:  20px;
+  --type-body-xs-size: 12px;  --type-body-xs-lh:  18px;
+
+  --type-paragraph-l-size: 18px; --type-paragraph-l-lh: 1.65;
+  --type-paragraph-m-size: 16px; --type-paragraph-m-lh: 1.65;
+  --type-paragraph-s-size: 14px; --type-paragraph-s-lh: 1.65;
+
+  --type-code-m-size:  16px;  --type-code-m-lh:  20px;
+  --type-code-s-size:  14px;  --type-code-s-lh:  18px;
+  --type-code-xs-size: 12px;  --type-code-xs-lh: 16px;
+  /* legacy aliases — Code defaults to S */
+  --type-code-size: var(--type-code-s-size);
+  --type-code-lh:   var(--type-code-s-lh);
+}
+
+/* ============================================================
+ * Dark mode (TokenProvider value={{mode:"dim"}})
+ * ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"], :root[data-theme="dim"] {
+    --surface-minimal:    oklch(15.93% 0.0065 270.98);
+    --surface-subtle:     oklch(20.00% 0.0065 270.98);
+    --surface-moderate:   oklch(24.00% 0.0065 270.98);
+    --surface-elevated-low:    oklch(20.00% 0.0065 270.98);
+    --surface-elevated-medium: oklch(24.00% 0.0065 270.98);
+    --surface-elevated-high:   oklch(28.00% 0.0065 270.98);
+    --surface-bold:       var(--reliance-midnight);
+
+    --content-heavy:      oklch(96.50% 0.0015 270.98);
+    --content-moderate:   oklch(82.00% 0.0035 270.98);
+    --content-minimal:    oklch(64.00% 0.0050 270.98);
+
+    --stroke-minimal:     oklch(28.00% 0.0065 270.98);
+    --stroke-moderate:    oklch(34.00% 0.0065 270.98);
+    --stroke-heavy:       oklch(45.00% 0.0065 270.98);
+  }
+}
+
+/* ============================================================
+ * Semantic typography helpers — analogues for h1/h2/p/code.
+ * Use these in plain HTML mockups; production uses <Text> instead.
+ * ============================================================ */
+
+html, body {
+  font-family: var(--font-sans);
+  color: var(--content-heavy);
+  background: var(--surface-minimal);
+  font-feature-settings: "ss01", "tnum"; /* tabular figures by default */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.jds-display {
+  font-family: var(--font-sans);
+  font-weight: var(--w-display);
+  font-size: var(--type-display-size);
+  line-height: var(--type-display-lh);
+  letter-spacing: var(--type-display-tracking);
+  color: var(--content-heavy);
+}
+
+.jds-headline,    h1.jds, .jds h1 {
+  font-family: var(--font-sans);
+  font-weight: var(--w-headline);
+  font-size: var(--type-headline-l-size);
+  line-height: var(--type-headline-l-lh);
+  letter-spacing: -0.01em;
+  color: var(--content-heavy);
+}
+.jds-headline-xl { font-size: var(--type-headline-xl-size); line-height: var(--type-headline-xl-lh); }
+.jds-headline-m  { font-size: var(--type-headline-m-size);  line-height: var(--type-headline-m-lh); }
+.jds-headline-s  { font-size: var(--type-headline-s-size);  line-height: var(--type-headline-s-lh); }
+
+.jds-title,       h2.jds, .jds h2 {
+  font-family: var(--font-sans);
+  font-weight: var(--w-title);
+  font-size: var(--type-title-l-size);
+  line-height: var(--type-title-l-lh);
+  color: var(--content-heavy);
+}
+.jds-title-m { font-size: var(--type-title-m-size); line-height: var(--type-title-m-lh); }
+.jds-title-s { font-size: var(--type-title-s-size); line-height: var(--type-title-s-lh); }
+
+.jds-label {
+  font-family: var(--font-sans);
+  font-weight: var(--w-label-med);
+  font-size: var(--type-label-m-size);
+  line-height: var(--type-label-m-lh);
+  color: var(--content-moderate);
+}
+.jds-label-l { font-size: var(--type-label-l-size); line-height: var(--type-label-l-lh); }
+.jds-label-s { font-size: var(--type-label-s-size); line-height: var(--type-label-s-lh); }
+.jds-label-xs{ font-size: var(--type-label-xs-size); line-height: var(--type-label-xs-lh); }
+
+.jds-body, p.jds, .jds p {
+  font-family: var(--font-sans);
+  font-weight: var(--w-body-med);
+  font-size: var(--type-body-m-size);
+  line-height: var(--type-body-m-lh);
+  color: var(--content-heavy);
+}
+.jds-body-l { font-size: var(--type-body-l-size); line-height: var(--type-body-l-lh); }
+.jds-body-s { font-size: var(--type-body-s-size); line-height: var(--type-body-s-lh); color: var(--content-moderate); }
+
+.jds-paragraph {
+  font-family: var(--font-sans);
+  font-weight: var(--w-paragraph-med);
+  font-size: var(--type-paragraph-m-size);
+  line-height: var(--type-paragraph-m-lh);
+  color: var(--content-heavy);
+  text-wrap: pretty;
+}
+
+.jds-code, code.jds, .jds code {
+  font-family: var(--font-mono);
+  font-size: var(--type-code-size);
+  line-height: var(--type-code-lh);
+  background: var(--surface-subtle);
+  padding: 1px 6px;
+  border-radius: var(--radius-component-s);
+  color: var(--content-heavy);
+}
+
+/* Weight overrides */
+.w-low    { font-weight: 400; }
+.w-medium { font-weight: 500; }
+.w-high   { font-weight: 700; }
+.w-title  { font-weight: 800; }
+.w-display{ font-weight: 900; }
+
+/* Appearance helpers (color only) */
+.fg-primary     { color: var(--reliance-base); }
+.fg-positive    { color: var(--positive); }
+.fg-negative    { color: var(--negative); }
+.fg-warning     { color: var(--warning); }
+.fg-informative { color: var(--informative); }
+.fg-sparkle     { color: var(--sparkle); }
+.fg-heavy       { color: var(--content-heavy); }
+.fg-moderate    { color: var(--content-moderate); }
+.fg-minimal     { color: var(--content-minimal); }

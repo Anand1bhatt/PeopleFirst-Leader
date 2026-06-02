@@ -1,0 +1,614 @@
+/* global React, Icon, ColorIcon, Button, Card, Signal, Dot, Widget, Stat, Trend */
+const { useState } = React;
+
+// ═══════════════════════════════════════════════════════════════
+// 1 · AI MORNING BRIEFING — the chief of staff
+// ═══════════════════════════════════════════════════════════════
+function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant }) {
+  const handled = [
+  { cat: "Approvals", n: 14, note: "auto-approved within policy" },
+  { cat: "Expenses", n: 9, note: "matched to receipts & cleared" },
+  { cat: "Calendar", n: 6, note: "conflicts resolved, 2 declined" }];
+
+  const handledTotal = handled.reduce((s, h) => s + h.n, 0);
+
+  return (
+    <div style={{
+      borderRadius: 20, overflow: "hidden",
+      border: "1px solid var(--sky-border)",
+      boxShadow: "0 1px 3px rgba(15,23,42,.05), 0 8px 24px -12px var(--sky-shadow)",
+      background: "var(--surface-minimal)"
+    }}>
+      {/* Sky header band */}
+      <div style={{ background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)", padding: "15px 16px 14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          <span style={{
+            width: 30, height: 30, borderRadius: 9, background: "var(--sky)", display: "flex",
+            alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px -1px var(--sky-shadow)"
+          }}>
+            <Icon name="ai_sparkle" size={19} color="#fff" />
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
+            <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
+          </div>
+        </div>
+        <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "var(--content-heavy)", letterSpacing: "-.01em", textWrap: "pretty" }}>
+          <span style={{ color: "var(--sky-ink)" }}>{decisions.length} critical {decisions.length === 1 ? "item" : "items"}</span> for today
+        </p>
+      </div>
+
+      {/* Decisions that need a human */}
+      <div style={{ padding: "6px 12px 12px" }}>
+        {decisions.map((d, i) =>
+        <div key={d.id} style={{
+          display: "flex", gap: 11, padding: "13px 6px 14px",
+          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
+        }}>
+            <span style={{ marginTop: 2, flexShrink: 0 }}><Dot tone={d.tone} size={9} /></span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.3, letterSpacing: "-.01em" }}>{d.title}</div>
+              <div style={{ fontSize: 13, color: "var(--content-moderate)", lineHeight: 1.42, marginTop: 3, textWrap: "pretty", whiteSpace: "pre-line" }}>{d.detail}</div>
+              <div style={{ display: "flex", gap: 8, marginTop: 11 }}>
+                <Button size="s" variant={d.cta.variant || "primary"} onClick={() => onResolve(d.id, "primary")}>{d.cta.label}</Button>
+                <Button size="s" variant="secondary" onClick={() => onResolve(d.id, "review")}>{d.secondary || "Review"}</Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {decisions.length === 0 &&
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 8px" }}>
+            <ColorIcon name="success_colored" size={26} />
+            <div>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)" }}>You're clear for the review.</div>
+              <div style={{ fontSize: 13, color: "var(--content-moderate)", marginTop: 1 }}>Nothing else needs you before 10am.</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      {/* Handled — expandable */}
+      <button onClick={onToggle} style={{
+        width: "100%", border: "none", borderTop: "1px solid var(--stroke-minimal)",
+        background: "var(--surface-subtle)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
+        display: "flex", alignItems: "center", gap: 8
+      }}>
+        <Icon name="check" size={16} color="var(--positive)" />
+        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, textAlign: "left" }}>Auto approved request · {handledTotal}
+
+        </span>
+        <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
+      </button>
+      {expanded &&
+      <div style={{ background: "var(--surface-subtle)", padding: "0 16px 14px" }}>
+          {handled.map((h) =>
+        <div key={h.cat} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--stroke-minimal)" }}>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", width: 78, flexShrink: 0 }}>{h.cat}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: "var(--sky-ink)", fontVariantNumeric: "tabular-nums" }}>{h.n}</span>
+              <span style={{ fontSize: 12.5, color: "var(--content-moderate)", flex: 1, textWrap: "pretty" }}>{h.note}</span>
+            </div>
+        )}
+        </div>
+      }
+    </div>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2 · PERFORMANCE — honest read of the month
+// ═══════════════════════════════════════════════════════════════
+function Performance({ onOpen }) {
+  const bars = [62, 70, 66, 74, 80, 86]; // last 6 weeks
+  // Priority first: off-track and at-risk lead; healthy drops to the bottom.
+  const subs = [
+  { label: "Team workload", value: "113%", tone: "off" },
+  { label: "Bugs found late", value: "14 this month", tone: "risk" },
+  { label: "Delivery speed", value: "92 pts", tone: "healthy" }];
+
+  const stripe = { off: "var(--negative)", risk: "var(--warning)", healthy: "transparent" };
+  return (
+    <Widget icon="analytics" title="Performance" action="Reports" onAction={onOpen} accent="var(--content-minimal)">
+      <Card surface="elev" pad={16}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Work finished on time · May</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginTop: 6 }}>
+              <span style={{ fontSize: 38, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>86%</span>
+              <Trend dir="up">+4 pts</Trend>
+            </div>
+          </div>
+          {/* trend chart — last 6 weeks */}
+          {(() => {
+            const w = 104, h = 46, pad = 5;
+            const lo = Math.min(...bars), hi = Math.max(...bars), span = hi - lo || 1;
+            const pts = bars.map((v, i) => [Math.round(i * (w / (bars.length - 1)) * 10) / 10, Math.round((h - pad - (v - lo) / span * (h - pad * 2)) * 10) / 10]);
+            const line = "M" + pts.map((p) => p.join(",")).join(" L ");
+            const area = line + ` L ${w},${h} L 0,${h} Z`;
+            const last = pts[pts.length - 1];
+            return (
+              <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ overflow: "visible" }}>
+                <defs>
+                  <linearGradient id="perfFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--reliance-base)" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="var(--reliance-base)" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d={area} fill="url(#perfFill)" />
+                <path d={line} fill="none" stroke="var(--reliance-base)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx={last[0]} cy={last[1]} r="3.5" fill="var(--reliance-base)" stroke="var(--surface-minimal)" strokeWidth="2" />
+              </svg>);
+
+          })()}
+        </div>
+        <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)", paddingTop: 6 }}>
+          {subs.map((s) => {
+            const isHealthy = s.tone === "healthy";
+            return (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0 9px 12px", position: "relative" }}>
+                <span style={{ position: "absolute", left: 0, top: 8, bottom: 8, width: 4, borderRadius: 999, background: stripe[s.tone] }} />
+                <span style={{ fontSize: 14, fontWeight: isHealthy ? 600 : 800, color: isHealthy ? "var(--content-moderate)" : "var(--content-heavy)", flex: 1 }}>{s.label}</span>
+                <span style={{ fontSize: 13.5, fontWeight: isHealthy ? 600 : 800, color: isHealthy ? "var(--content-minimal)" : "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>{s.value}</span>
+                <Signal tone={s.tone} />
+              </div>);
+
+          })}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3 · ACTION ITEMS — approvals, with AI bulk-approve
+// ═══════════════════════════════════════════════════════════════
+function ActionItems({ state, onBulkApprove, onOpen }) {
+  // state: { total, lowRisk, approved }
+  const types = [
+  { label: "Leave", n: 12, icon: "calendar", filter: "Leave", tint: "var(--sky)", tintBg: "var(--sky-light)" },
+  { label: "Travel", n: 6, icon: "location", crit: 1, filter: "Travel", tint: "var(--warning)", tintBg: "var(--warning-light)" },
+  { label: "Expense", n: 3, icon: "card", filter: "Expense", tint: "var(--reliance-base)", tintBg: "var(--reliance-50)" },
+  { label: "Sign-offs", n: 2, icon: "document", filter: "Sign-off", tint: "var(--positive)", tintBg: "var(--positive-light)" }];
+
+  const remaining = state.total - state.approved;
+  return (
+    <Widget icon="confirm" title="Approvals" action="See all" onAction={() => onOpen()}>
+      <Card surface="elev" pad={16}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{remaining}</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-moderate)" }}>waiting for you</span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 14 }}>
+          {types.map((t) =>
+          <button key={t.label} onClick={() => onOpen(t.filter)} style={{ position: "relative", background: "var(--surface-subtle)", borderRadius: 12, border: "none", padding: "12px 4px", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
+              {t.crit &&
+            <span style={{ position: "absolute", top: -4, right: 14, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid var(--surface-minimal)", fontVariantNumeric: "tabular-nums" }}>{t.crit}</span>
+            }
+              <Icon name={t.icon} size={22} color="var(--sky)" />
+              <div style={{ fontSize: 19, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{t.n}</div>
+              <div style={{ fontSize: 11.5, color: "var(--content-moderate)", fontWeight: 600 }}>{t.label}</div>
+            </button>
+          )}
+        </div>
+
+        {/* Critical item — highlighted as the primary action */}
+        <button onClick={() => onOpen("Travel")} style={{ width: "100%", textAlign: "left", marginTop: 14, padding: "13px 14px", borderRadius: 13, background: "var(--negative-light)", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#6a0202", lineHeight: 1.4, textWrap: "pretty" }}>Rohan Das is scheduled to travel to Bengaluru tomorrow. Please review and approve the ₹38,500 request.</div>
+          </div>
+        </button>
+
+        {/* Low-risk handled automatically — de-emphasised */}
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 11, padding: "0 2px" }}>
+          <Icon name="ai_sparkle" size={15} color="var(--sky)" style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600, lineHeight: 1.35 }}>{state.lowRisk} low-risk approvals handled automatically</span>
+        </div>
+
+        {remaining > 0 &&
+        <button onClick={() => onOpen()} style={{
+          width: "100%", marginTop: 12, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+          fontSize: 13.5, fontWeight: 700, color: "var(--reliance-base)"
+        }}>See all approvals</button>
+        }
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4 · TEAM SNAPSHOT — four numbers
+// ═══════════════════════════════════════════════════════════════
+function TeamSnapshot({ onOpen }) {
+  const total = 250,present = 204,leave = 20,notIn = 10,woph = 16; // sums to 250
+  const cells = [
+  { label: "Present", value: present, tone: "healthy" },
+  { label: "On leave", value: leave, tone: "info" },
+  { label: "Not in", value: notIn, tone: "risk" },
+  { label: "WO/PH", value: woph, tone: "off" }];
+
+  const toneColor = { healthy: "var(--positive)", info: "var(--sky)", risk: "var(--warning)", off: "var(--content-minimal)" };
+  return (
+    <Widget icon="group" title="Team summary" action="Team" onAction={onOpen}>
+      <Card surface="elev" pad={16}>
+        {/* total headcount */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Headcount</span>
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--positive)", fontVariantNumeric: "tabular-nums" }}>{Math.round(present / total * 100)}% present</span>
+        </div>
+        <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1, marginTop: 5 }}>{total}</div>
+        {/* presence bar */}
+        <div style={{ display: "flex", height: 8, borderRadius: 999, overflow: "hidden", gap: 2, margin: "12px 0 14px" }}>
+          <span style={{ flex: present, background: "var(--positive)" }} />
+          <span style={{ flex: leave, background: "var(--sky)" }} />
+          <span style={{ flex: notIn, background: "var(--warning)" }} />
+          <span style={{ flex: woph, background: "var(--content-minimal)" }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+          {cells.map((c, i) =>
+          <div key={c.label} style={{ textAlign: "center", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: toneColor[c.tone], fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{c.value}</div>
+              <div style={{ fontSize: 11.5, color: "var(--content-moderate)", fontWeight: 600, marginTop: 5 }}>{c.label}</div>
+            </div>
+          )}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 5 · RECRUITMENT — pipeline health
+// ═══════════════════════════════════════════════════════════════
+function Recruitment({ onOpen }) {
+  const roles = [
+  { title: "Product Designer", open: 2, apps: 0, tone: "off", ai: "AI: Try hiring remotely and increasing the salary range to attract more applicants." },
+  { title: "Engineering Manager, Platform", open: 1, apps: 18, tone: "risk" },
+  { title: "Sr. Backend Engineer", open: 3, apps: 142, tone: "healthy" }];
+
+  const cvs = 379,target = 400;
+  const cvPct = Math.round(cvs / target * 1000) / 10; // 94.8
+  return (
+    <Widget
+      icon="id" title="Recruitment" action="All 8 roles" onAction={onOpen}
+      right={<span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--negative)", display: "inline-flex", alignItems: "center", gap: 5, marginRight: 10 }}><Dot tone="off" size={7} />1 urgent</span>}>
+
+      <Card surface="elev" pad={16}>
+        {/* CVs received vs target */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Applications received</span>
+          <Trend dir="up">12%</Trend>
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 5 }}>
+          <span style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cvs}</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of {target}</span>
+        </div>
+        <div style={{ height: 6, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 11, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${cvPct}%`, borderRadius: 999, background: "var(--positive)" }} />
+        </div>
+
+        {/* roles */}
+        <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)" }}>
+          {roles.map((r, i) =>
+          <div key={r.title} style={{ padding: "12px 0", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
+                  <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{r.open} open · {r.apps} {r.apps === 1 ? "application" : "applications"}</div>
+                </div>
+                <Signal tone={r.tone} />
+              </div>
+              {r.ai &&
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 9, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
+                  <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ marginTop: 1 }} />
+                  <span style={{ fontSize: 12, color: "var(--sky-ink)", fontWeight: 600, lineHeight: 1.35 }}>{r.ai}</span>
+                </div>
+            }
+            </div>
+          )}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6 · UPCOMING BOOKINGS — next 2 weighty events
+// ═══════════════════════════════════════════════════════════════
+function Bookings({ onOpen }) {
+  const events = [
+  { time: "10:00", day: "Today", type: "Review", icon: "analytics", tone: "var(--reliance-base)", title: "Q2 Leadership Review", sub: "You present · 6 attendees", soon: "in 1h 8m" },
+  { time: "14:30", day: "Today", type: "Meeting", icon: "group", tone: "var(--content-moderate)", title: "1:1 with Karan Mehta", sub: "Platform team · 30 min", soon: null },
+  { time: "18:30", day: "Today", type: "Gym", icon: "time", tone: "var(--positive)", title: "Gym slot booked", sub: "Level 2 · 45 min", soon: null }];
+
+  return (
+    <Widget icon="calendar" title="Upcoming" action="Calendar" onAction={onOpen}>
+      <Card surface="elev" pad={4}>
+        {events.map((e, i) =>
+        <div key={e.title} style={{
+          display: "flex", alignItems: "center", gap: 13, padding: "13px 13px",
+          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
+        }}>
+            <div style={{
+            width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11,
+            background: i === 0 ? "var(--reliance-base)" : "var(--surface-subtle)",
+            color: i === 0 ? "#fff" : "var(--content-heavy)"
+          }}>
+              <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.day}</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: e.tone, textTransform: "uppercase", letterSpacing: ".03em" }}>
+                <Icon name={e.icon} size={13} color={e.tone} />{e.type}
+              </span>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 3 }}>{e.title}</div>
+              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+            </div>
+            {e.soon && <Signal tone="info" dot={false}>{e.soon}</Signal>}
+          </div>
+        )}
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 7 · NEWS & UPDATES — a trusted colleague's morning note
+// ═══════════════════════════════════════════════════════════════
+function News({ onOpen, onWish }) {
+  const [showCeleb, setShowCeleb] = useState(false);
+  const items = [
+  { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." },
+  { tag: "People", tone: "var(--sky)", title: "Sana is back from leave today", body: "She rejoins the Design team after 4 months." }];
+
+  const celebs = [
+  { name: "Karan Mehta", note: "Platform · Birthday", initials: "KM" },
+  { name: "Aanya Verma", note: "Design · 5 years at Reliance Jio", initials: "AV" },
+  { name: "Devansh Roy", note: "QA · Birthday", initials: "DR" },
+  { name: "Priya Nair", note: "Backend · 3 years at Reliance Jio", initials: "PN" },
+  { name: "Imran Khan", note: "Data · Birthday", initials: "IK" }];
+
+  const wish = (n) => onWish ? onWish(n) : null;
+  return (
+    <Widget icon="flag" title="News & updates" action="All updates" onAction={onOpen}>
+      <Card surface="elev" pad={4}>
+        {items.map((n, i) =>
+        <div key={n.title} style={{ display: "flex", gap: 11, padding: "13px 13px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+            <span style={{ width: 8, height: 8, borderRadius: 999, background: n.tone, flexShrink: 0, marginTop: 5 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: n.tone, textTransform: "uppercase", letterSpacing: ".04em" }}>{n.tag}</div>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>{n.title}</div>
+              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4, textWrap: "pretty" }}>{n.body}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Celebrations — styled like the other items, clickable to expand */}
+        <button onClick={() => setShowCeleb((v) => !v)} style={{ width: "100%", display: "flex", gap: 11, padding: "13px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "none", border: "none", borderTopWidth: 1, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
+          <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--sky)", flexShrink: 0, marginTop: 5 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--sky)", textTransform: "uppercase", letterSpacing: ".04em" }}>Celebrations</div>
+            <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>5 birthdays & anniversaries today</div>
+            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4 }}>Tap to see who and send a wish</div>
+          </div>
+          <Icon name={showCeleb ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" style={{ marginTop: 2 }} />
+        </button>
+        {showCeleb && celebs.map((b) =>
+        <div key={b.name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "var(--surface-subtle)" }}>
+            <span style={{ width: 36, height: 36, borderRadius: 999, background: "var(--sky-light)", color: "var(--sky-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{b.initials}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--content-heavy)" }}>{b.name}</div>
+              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 1 }}>{b.note}</div>
+            </div>
+            <Button size="s" variant="skyghost" icon="gift" onClick={() => wish(b.name)}>Wish</Button>
+          </div>
+        )}
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPENSE & BUDGET (leader only) — real-time spend vs plan
+// All figures reconcile: categories sum to total; travel split sums to travel.
+// ═══════════════════════════════════════════════════════════════
+function ExpenseBudget({ onOpen }) {
+  const pct = 83,pace = 79; // spent ₹86L of ₹104L plan; expected pace 79%
+  // Travel ₹35L → Domestic ₹17.1L (49%) + International ₹17.9L (51%) = ₹35.0L
+  const domPct = 49,intlPct = 51;
+  const cats = [
+  { label: "Team travel", value: "₹35L", tone: "risk", note: "+8% vs plan" },
+  { label: "Contractors", value: "₹24L", tone: "healthy", note: "Under plan" },
+  { label: "Tooling & SaaS", value: "₹17L", tone: "healthy", note: "On plan" },
+  { label: "Training & events", value: "₹10L", tone: "off", note: "+15% vs plan" }];
+
+  // Critical (off) first, then at-risk, then healthy
+  const toneRank = { off: 0, risk: 1, healthy: 2 };
+  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
+
+  const noteColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
+
+  return (
+    <Widget title="Expense & budget" action="Breakdown" onAction={onOpen}>
+      <Card surface="elev" pad={16}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Q2 spend vs plan</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
+              <span style={{ fontSize: 32, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>₹86L</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of ₹1.04 Cr</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ height: 8, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 13, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "var(--reliance-base)" }} />
+        </div>
+
+        {/* AI recommendation — light sky */}
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 12, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
+            {pct - pace}% over plan · <span style={{ color: "var(--sky-ink)" }}>team travel is the main driver</span>
+          </span>
+        </div>
+
+        <div style={{ marginTop: 4 }}>
+          {cats.map((c) =>
+          <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 0 0" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-heavy)", flex: 1 }}>{c.label}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-moderate)", fontVariantNumeric: "tabular-nums" }}>{c.value}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: noteColor(c.tone), width: 92, textAlign: "right" }}>{c.note}</span>
+            </div>
+          )}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+Object.assign(window, {
+  AIBriefing, Performance, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Recruitment, Bookings, News
+});
+
+// ═══════════════════════════════════════════════════════════════
+// EXPENSE & BUDGET (bar-graph variant) — same data, vertical bars
+// ═══════════════════════════════════════════════════════════════
+function ExpenseBudgetBars({ onOpen }) {
+  const pct = 83, pace = 79, spent = 86, plan = 104;
+  const cats = [
+  { label: "Travel", value: 35, display: "₹35L", tone: "risk", note: "+8%" },
+  { label: "Contractors", value: 24, display: "₹24L", tone: "healthy", note: "On track" },
+  { label: "Tooling", value: 17, display: "₹17L", tone: "healthy", note: "On track" },
+  { label: "Training", value: 10, display: "₹10L", tone: "off", note: "+15%" }];
+
+  const toneRank = { off: 0, risk: 1, healthy: 2 };
+  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
+  const barColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
+  const noteColor = (t) => t === "healthy" ? "var(--content-minimal)" : t === "risk" ? "var(--warning)" : "var(--negative)";
+  const max = Math.max(...cats.map((c) => c.value));
+  const total = cats.reduce((s, c) => s + c.value, 0);
+
+  return (
+    <Widget title="Expense by category" action="Breakdown" onAction={onOpen}>
+      <Card surface="elev" pad={18}>
+        {/* Header: spend vs plan with a small composition pie */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".03em" }}>Q2 spend</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 7 }}>
+              <span style={{ fontSize: 32, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>₹86L</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of ₹1.04 Cr</span>
+            </div>
+          </div>
+          {(() => {
+            const ps = 54, pr = ps / 2, c2 = 2 * Math.PI * pr / 2; // using full-disc pie
+            let acc = 0;
+            const slices = cats.map((c) => { const frac = c.value / total; const s = { c, frac, start: acc }; acc += frac; return s; });
+            // build conic-gradient stops
+            const stops = slices.map((s) => `${barColor(s.c.tone)} ${(s.start * 100).toFixed(1)}% ${((s.start + s.frac) * 100).toFixed(1)}%`).join(", ");
+            return <span style={{ width: ps, height: ps, borderRadius: "50%", flexShrink: 0, background: `conic-gradient(${stops})`, WebkitMaskImage: "radial-gradient(circle, transparent 40%, #000 41%)", maskImage: "radial-gradient(circle, transparent 40%, #000 41%)" }} />;
+          })()}
+        </div>
+
+        {/* AI recommendation — light sky */}
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 14, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
+            {pct - pace}% over plan · <span style={{ color: "var(--sky-ink)" }}>team travel is the main driver</span>
+          </span>
+        </div>
+
+        {/* Horizontal bar list — label, proportional fill, amount + share */}
+        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
+          {cats.map((c) =>
+          <div key={c.label}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: barColor(c.tone), flexShrink: 0 }} />
+                <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, letterSpacing: "-.01em" }}>{c.label}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: noteColor(c.tone), whiteSpace: "nowrap" }}>{c.note}</span>
+                <span style={{ fontSize: 13.5, fontWeight: 800, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", minWidth: 42, textAlign: "right" }}>{c.display}</span>
+              </div>
+              <div style={{ height: 8, borderRadius: 999, background: "var(--surface-subtle)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${c.value / max * 100}%`, minWidth: 8, borderRadius: 999, background: barColor(c.tone) }} />
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+Object.assign(window, { ExpenseBudgetBars });
+
+// ═══════════════════════════════════════════════════════════════
+// EXPENSE & BUDGET (donut variant) — composition of spend
+// ═══════════════════════════════════════════════════════════════
+function ExpenseBudgetDonut({ onOpen }) {
+  const pct = 83, pace = 79;
+  const cats = [
+  { label: "Travel", value: 35, display: "₹35L", tone: "risk", note: "+8%" },
+  { label: "Contractors", value: 24, display: "₹24L", tone: "healthy", note: "On track" },
+  { label: "Tooling", value: 17, display: "₹17L", tone: "healthy", note: "On track" },
+  { label: "Training", value: 10, display: "₹10L", tone: "off", note: "+15%" }];
+
+  const toneRank = { off: 0, risk: 1, healthy: 2 };
+  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
+  const color = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
+  const noteColor = (t) => t === "healthy" ? "var(--content-minimal)" : t === "risk" ? "var(--warning)" : "var(--negative)";
+  const total = cats.reduce((s, c) => s + c.value, 0);
+
+  // donut geometry
+  const size = 108, stroke = 16, r = (size - stroke) / 2, circ = 2 * Math.PI * r;
+  let offset = 0;
+  const segs = cats.map((c) => {
+    const len = c.value / total * circ;
+    const seg = { c, len, dashoffset: -offset };
+    offset += len;
+    return seg;
+  });
+
+  return (
+    <Widget title="Expense by category" action="Breakdown" onAction={onOpen}>
+      <Card surface="elev" pad={18}>
+        {/* AI recommendation — light sky */}
+        <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
+            {pct - pace}% over plan · <span style={{ color: "var(--sky-ink)" }}>team travel is the main driver</span>
+          </span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 16 }}>
+          {/* donut */}
+          <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)" }}>
+              {segs.map((s, i) =>
+              <circle key={i} cx={size / 2} cy={size / 2} r={r} fill="none"
+                stroke={color(s.c.tone)} strokeWidth={stroke}
+                strokeDasharray={`${Math.max(0, s.len - 2)} ${circ - Math.max(0, s.len - 2)}`}
+                strokeDashoffset={s.dashoffset} />
+              )}
+            </svg>
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>₹86L</span>
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 2 }}>of ₹1.04 Cr</span>
+            </div>
+          </div>
+          {/* legend */}
+          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            {cats.map((c) =>
+            <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 9, height: 9, borderRadius: 3, background: color(c.tone), flexShrink: 0 }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", flex: 1, letterSpacing: "-.01em" }}>{c.label}</span>
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: noteColor(c.tone), whiteSpace: "nowrap" }}>{c.note}</span>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", minWidth: 40, textAlign: "right" }}>{c.display}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+Object.assign(window, { ExpenseBudgetDonut });
