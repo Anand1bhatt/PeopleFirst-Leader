@@ -1,6 +1,38 @@
 /* global React, Icon, ColorIcon, Button, Card, Signal, Dot, Widget, Stat, Trend */
 const { useState } = React;
 
+// ── Shared hook: expand when fully visible, collapse when nearly gone ──
+function useStackReveal() {
+  const [expanded, setExpanded] = React.useState(false);
+  const ref = React.useRef(null);
+  const timer = React.useRef(null);
+  const expandedRef = React.useRef(false); // ref mirror so closure stays accurate
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      clearTimeout(timer.current);
+      const ratio = e.intersectionRatio;
+      if (ratio >= 0.88 && !expandedRef.current) {
+        // 100% in frame (collapsed card is small, 88% ≈ fully visible) → expand
+        timer.current = setTimeout(() => {
+          setExpanded(true);
+          expandedRef.current = true;
+        }, 220);
+      } else if (ratio < 0.15 && expandedRef.current) {
+        // Almost out of frame and was expanded → collapse
+        setExpanded(false);
+        expandedRef.current = false;
+      }
+    }, { threshold: [0, 0.15, 0.5, 0.88, 1.0] });
+    obs.observe(el);
+    return () => { obs.disconnect(); clearTimeout(timer.current); };
+  }, []);
+
+  return { expanded, ref };
+}
+
 function useCountUp(target, { suffix = '', prefix = '', decimals = 0, duration = 1000, delay = 0 } = {}) {
   const [val, setVal] = React.useState(0);
   const ref = React.useRef(null);
@@ -342,24 +374,7 @@ function Recruitment({ onOpen }) {
   const cuCvs = useCountUp(379, { duration: 1000 });
 
   // ── Bidirectional scroll animation ──
-  const [expanded, setExpanded] = React.useState(false);
-  const sectionRef = React.useRef(null);
-  const expandTimer = React.useRef(null);
-
-  React.useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      clearTimeout(expandTimer.current);
-      if (e.isIntersecting) {
-        expandTimer.current = setTimeout(() => setExpanded(true), 220);
-      } else {
-        setExpanded(false);
-      }
-    }, { threshold: [0.15, 0.4], rootMargin: "0px 0px -60px 0px" });
-    obs.observe(el);
-    return () => { obs.disconnect(); clearTimeout(expandTimer.current); };
-  }, []);
+  const { expanded, ref: sectionRef } = useStackReveal();
 
   const RoleRow = ({ r, divider }) => (
     <div style={{ padding: "12px 0", borderTop: divider ? "1px solid var(--stroke-minimal)" : "none" }}>
@@ -437,24 +452,7 @@ function Bookings({ onOpen }) {
   { time: "18:30", day: "Today", type: "Gym", icon: "time", tone: "var(--positive)", title: "Gym slot booked", sub: "Level 2 · 45 min", soon: null }];
 
   // ── Bidirectional scroll animation ──
-  const [expanded, setExpanded] = React.useState(false);
-  const sectionRef = React.useRef(null);
-  const expandTimer = React.useRef(null);
-
-  React.useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      clearTimeout(expandTimer.current);
-      if (e.isIntersecting) {
-        expandTimer.current = setTimeout(() => setExpanded(true), 220);
-      } else {
-        setExpanded(false);
-      }
-    }, { threshold: [0.15, 0.4], rootMargin: "0px 0px -60px 0px" });
-    obs.observe(el);
-    return () => { obs.disconnect(); clearTimeout(expandTimer.current); };
-  }, []);
+  const { expanded, ref: sectionRef } = useStackReveal();
 
   const EventRow = ({ e, i }) => (
     <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none", background: "var(--surface-minimal)" }}>
@@ -508,32 +506,9 @@ function Bookings({ onOpen }) {
 // 7 · NEWS & UPDATES — a trusted colleague's morning note
 // ═══════════════════════════════════════════════════════════════
 function News({ onOpen, onWish }) {
-  // Auto-expands when scrolled into view — no button needed
-  const [expanded, setExpanded] = React.useState(false);
+  // ── Bidirectional scroll animation ──
+  const { expanded, ref: sectionRef } = useStackReveal();
   const [showCeleb, setShowCeleb] = React.useState(false);
-  const sectionRef = React.useRef(null);
-
-  const expandTimer = React.useRef(null);
-
-  React.useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      clearTimeout(expandTimer.current);
-      if (e.isIntersecting) {
-        // Entering viewport — delay slightly so user sees the stacked state first
-        expandTimer.current = setTimeout(() => setExpanded(true), 220);
-      } else {
-        // Leaving viewport — collapse immediately so animation is visible on scroll back
-        setExpanded(false);
-      }
-    }, {
-      threshold: [0.15, 0.4],   // fire at 15% (collapse trigger) and 40% (expand trigger)
-      rootMargin: "0px 0px -60px 0px"  // trigger a little before the bottom edge
-    });
-    obs.observe(el);
-    return () => { obs.disconnect(); clearTimeout(expandTimer.current); };
-  }, []);
 
   const items = [
   { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." },
