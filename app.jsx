@@ -161,7 +161,7 @@ const EMP_TASKS = [
 
 
 function App() {
-  __wIdx = 0;
+  window.__wIdx = 0;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const persona = t.persona || "leader";
   const [screen, setScreen] = useState("home");

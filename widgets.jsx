@@ -27,7 +27,7 @@ function useCountUp(target, { suffix = '', prefix = '', decimals = 0, duration =
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 1 · AI MORNING BRIEFING — the chief of staff
+// 1 · AI MORNING BRIEFING — cinematic reveal on landing
 // ═══════════════════════════════════════════════════════════════
 function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant }) {
   const handled = [
@@ -37,87 +37,126 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
 
   const handledTotal = handled.reduce((s, h) => s + h.n, 0);
 
+  // ── Reveal state machine ──────────────────────────────────────
+  // phase 0: card slides in, only header visible (content collapsed)
+  // phase 1: content expands (decisions + auto-approve row)
+  // phase 2: each decision fades in staggered
+  const [phase, setPhase] = React.useState(0);
+
+  React.useEffect(() => {
+    // Step 1: card entrance → 600ms → expand body
+    const t1 = setTimeout(() => setPhase(1), 600);
+    // Step 2: body open → 200ms → stagger decisions in
+    const t2 = setTimeout(() => setPhase(2), 820);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  const bodyOpen = phase >= 1;
+  const decisionsIn = phase >= 2;
+
   return (
     <div style={{
       borderRadius: 20, overflow: "hidden",
       border: "1px solid var(--sky-border)",
       boxShadow: "0 1px 3px rgba(15,23,42,.05), 0 8px 24px -12px var(--sky-shadow)",
       background: "var(--surface-minimal)",
-      animation: "fadeInScale .5s cubic-bezier(.2,0,0,1) .05s both"
+      animation: "fadeInScale .5s cubic-bezier(.2,0,0,1) .1s both"
     }}>
-      {/* Sky header band */}
-      <div style={{ background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)", padding: "15px 16px 14px" }}>
+
+      {/* ── Sky header band — always visible ── */}
+      <div style={{
+        background: "linear-gradient(135deg, var(--sky) 0%, color-mix(in oklch, var(--sky) 70%, #5bc8f5) 100%)",
+        padding: "15px 16px 14px"
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <span className="ai-sparkle" style={{
-            width: 30, height: 30, borderRadius: 9, background: "var(--sky)", display: "flex",
-            alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px -1px var(--sky-shadow)"
+            width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,.22)", display: "flex",
+            alignItems: "center", justifyContent: "center",
+            boxShadow: "0 2px 8px -1px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35)"
           }}>
             <Icon name="ai_sparkle" size={19} color="#fff" />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
-            <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
+            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.75)", fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
           </div>
         </div>
-        <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "var(--content-heavy)", letterSpacing: "-.01em", textWrap: "pretty" }}>
-          <span style={{ color: "var(--sky-ink)" }}>{decisions.length} critical {decisions.length === 1 ? "item" : "items"}</span> for today
+        <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "#fff", letterSpacing: "-.01em", textWrap: "pretty" }}>
+          <span style={{ color: "rgba(255,255,255,.9)", fontWeight: 900 }}>{decisions.length} critical {decisions.length === 1 ? "item" : "items"}</span> for today
         </p>
       </div>
 
-      {/* Decisions that need a human */}
-      <div style={{ padding: "6px 12px 12px" }}>
-        {decisions.map((d, i) =>
-        <div key={d.id} style={{
-          display: "flex", gap: 11, padding: "13px 6px 14px",
-          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
-        }}>
-            <span style={{ marginTop: 2, flexShrink: 0 }}><Dot tone={d.tone} size={9} /></span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.3, letterSpacing: "-.01em" }}>{d.title}</div>
-              <div style={{ fontSize: 13, color: "var(--content-moderate)", lineHeight: 1.42, marginTop: 3, textWrap: "pretty", whiteSpace: "pre-line" }}>{d.detail}</div>
-              <div style={{ display: "flex", gap: 8, marginTop: 11 }}>
-                <Button size="s" variant={d.cta.variant || "primary"} onClick={() => onResolve(d.id, "primary")}>{d.cta.label}</Button>
-                <Button size="s" variant="secondary" onClick={() => onResolve(d.id, "review")}>{d.secondary || "Review"}</Button>
+      {/* ── Expanding body — animates from maxHeight 0 → full ── */}
+      <div style={{
+        maxHeight: bodyOpen ? "900px" : "0px",
+        overflow: "hidden",
+        transition: bodyOpen
+          ? "max-height .65s cubic-bezier(.2,0,0,1)"
+          : "max-height .3s cubic-bezier(.4,0,1,1)",
+      }}>
+
+        {/* Decisions */}
+        <div style={{ padding: "6px 12px 12px", background: "var(--surface-minimal)" }}>
+          {decisions.map((d, i) =>
+          <div key={d.id} style={{
+            display: "flex", gap: 11, padding: "13px 6px 14px",
+            borderTop: i ? "1px solid var(--stroke-minimal)" : "none",
+            opacity: decisionsIn ? 1 : 0,
+            transform: decisionsIn ? "translateY(0)" : "translateY(12px)",
+            transition: `opacity .4s ease ${i * 120}ms, transform .4s cubic-bezier(.2,0,0,1) ${i * 120}ms`
+          }}>
+              <span style={{ marginTop: 2, flexShrink: 0 }}><Dot tone={d.tone} size={9} /></span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.3, letterSpacing: "-.01em" }}>{d.title}</div>
+                <div style={{ fontSize: 13, color: "var(--content-moderate)", lineHeight: 1.42, marginTop: 3, textWrap: "pretty", whiteSpace: "pre-line" }}>{d.detail}</div>
+                <div style={{ display: "flex", gap: 8, marginTop: 11 }}>
+                  <Button size="s" variant={d.cta.variant || "primary"} onClick={() => onResolve(d.id, "primary")}>{d.cta.label}</Button>
+                  <Button size="s" variant="secondary" onClick={() => onResolve(d.id, "review")}>{d.secondary || "Review"}</Button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {decisions.length === 0 &&
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 8px" }}>
-            <ColorIcon name="success_colored" size={26} />
-            <div>
-              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)" }}>You're clear for the review.</div>
-              <div style={{ fontSize: 13, color: "var(--content-moderate)", marginTop: 1 }}>Nothing else needs you before 10am.</div>
+          )}
+          {decisions.length === 0 &&
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 8px", opacity: decisionsIn ? 1 : 0, transition: "opacity .4s ease" }}>
+              <ColorIcon name="success_colored" size={26} />
+              <div>
+                <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)" }}>You're clear for the review.</div>
+                <div style={{ fontSize: 13, color: "var(--content-moderate)", marginTop: 1 }}>Nothing else needs you before 10am.</div>
+              </div>
             </div>
-          </div>
-        }
-      </div>
-
-      {/* Handled — expandable */}
-      <button onClick={onToggle} style={{
-        width: "100%", border: "none", borderTop: "1px solid var(--stroke-minimal)",
-        background: "var(--surface-subtle)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
-        display: "flex", alignItems: "center", gap: 8
-      }}>
-        <Icon name="check" size={16} color="var(--positive)" />
-        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, textAlign: "left" }}>Auto approved request · {handledTotal}
-
-        </span>
-        <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
-      </button>
-      {expanded &&
-      <div style={{ background: "var(--surface-subtle)", padding: "0 16px 14px" }}>
-          {handled.map((h) =>
-        <div key={h.cat} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--stroke-minimal)" }}>
-              <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", width: 78, flexShrink: 0 }}>{h.cat}</span>
-              <span style={{ fontSize: 13.5, fontWeight: 800, color: "var(--sky-ink)", fontVariantNumeric: "tabular-nums" }}>{h.n}</span>
-              <span style={{ fontSize: 12.5, color: "var(--content-moderate)", flex: 1, textWrap: "pretty" }}>{h.note}</span>
-            </div>
-        )}
+          }
         </div>
-      }
-    </div>);
 
+        {/* Auto-approve row — slides in last */}
+        <div style={{
+          opacity: decisionsIn ? 1 : 0,
+          transform: decisionsIn ? "translateY(0)" : "translateY(8px)",
+          transition: `opacity .4s ease ${decisions.length * 120 + 80}ms, transform .4s cubic-bezier(.2,0,0,1) ${decisions.length * 120 + 80}ms`
+        }}>
+          <button onClick={onToggle} style={{
+            width: "100%", border: "none", borderTop: "1px solid var(--stroke-minimal)",
+            background: "var(--surface-subtle)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
+            display: "flex", alignItems: "center", gap: 8
+          }}>
+            <Icon name="check" size={16} color="var(--positive)" />
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, textAlign: "left" }}>Auto approved request · {handledTotal}</span>
+            <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
+          </button>
+          {expanded &&
+          <div style={{ background: "var(--surface-subtle)", padding: "0 16px 14px" }}>
+              {handled.map((h) =>
+            <div key={h.cat} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--stroke-minimal)" }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", width: 78, flexShrink: 0 }}>{h.cat}</span>
+                  <span style={{ fontSize: 13.5, fontWeight: 800, color: "var(--sky-ink)", fontVariantNumeric: "tabular-nums" }}>{h.n}</span>
+                  <span style={{ fontSize: 12.5, color: "var(--content-moderate)", flex: 1, textWrap: "pretty" }}>{h.note}</span>
+                </div>
+              )}
+            </div>
+          }
+        </div>
+
+      </div>{/* end expanding body */}
+    </div>);
 }
 
 // ═══════════════════════════════════════════════════════════════
