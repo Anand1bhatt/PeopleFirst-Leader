@@ -428,32 +428,12 @@ function Bookings({ onOpen }) {
 // 7 · NEWS & UPDATES — a trusted colleague's morning note
 // ═══════════════════════════════════════════════════════════════
 function News({ onOpen, onWish }) {
-  const [showCeleb, setShowCeleb] = useState(false);
-
-  // Stack-reveal animation: items start layered on top of each other, deal out on scroll-in
-  const [dealt, setDealt] = React.useState(false);
-  const stackRef = React.useRef(null);
-  React.useEffect(() => {
-    const el = stackRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setTimeout(() => setDealt(true), 80); obs.disconnect(); }
-    }, { threshold: 0.2 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+  const [expanded, setExpanded] = React.useState(false);
+  const [showCeleb, setShowCeleb] = React.useState(false);
 
   const items = [
   { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." },
   { tag: "People", tone: "var(--sky)", title: "Sana is back from leave today", body: "She rejoins the Design team after 4 months." }];
-
-  // 3 stack rows: 2 news items + celebrations button
-  const celebRow = {
-    tag: "Celebrations", tone: "var(--sky)",
-    title: "5 birthdays & anniversaries today",
-    body: "Tap to see who and send a wish", isCeleb: true
-  };
-  const allRows = [...items, celebRow];
 
   const celebs = [
   { name: "Karan Mehta", note: "Platform · Birthday", initials: "KM" },
@@ -464,69 +444,123 @@ function News({ onOpen, onWish }) {
 
   const wish = (n) => onWish ? onWish(n) : null;
 
+  // Shared item row renderer
+  const NewsRow = ({ n, i, divider }) => (
+    <div style={{ display: "flex", gap: 11, padding: "14px 14px", borderTop: divider ? "1px solid var(--stroke-minimal)" : "none" }}>
+      <span style={{ width: 8, height: 8, borderRadius: 999, background: n.tone, flexShrink: 0, marginTop: 5 }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 11, fontWeight: 800, color: n.tone, textTransform: "uppercase", letterSpacing: ".04em" }}>{n.tag}</div>
+        <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>{n.title}</div>
+        <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4, textWrap: "pretty" }}>{n.body}</div>
+      </div>
+    </div>
+  );
+
   return (
     <Widget icon="flag" title="News & updates" action="All updates" onAction={onOpen}>
-      {/* Stack container — items layer on top of each other then deal out */}
-      <div ref={stackRef} style={{ borderRadius: 16, background: "var(--surface-minimal)", boxShadow: "var(--shadow-elevated-low)", border: "1px solid var(--stroke-minimal)", overflow: "hidden" }}>
-        {allRows.map((n, i) => {
-          // Stacked: each card sits at offset from top (hidden behind card above)
-          // Dealt: each card in natural position
-          const stackOffset = dealt ? 0 : -(i * 52);
-          const stackScale = dealt ? 1 : 1 - i * 0.025;
-          const stackOpacity = dealt ? 1 : (i === 0 ? 1 : i === 1 ? 0.55 : 0.25);
-          const delay = `${i * 100}ms`;
 
-          if (n.isCeleb) return (
-            <div key="celeb" style={{
-              transformOrigin: "top center",
-              transform: `translateY(${stackOffset}px) scale(${stackScale})`,
-              opacity: stackOpacity,
-              transition: `transform .55s cubic-bezier(.4,0,.2,1) ${delay}, opacity .4s ease ${delay}`,
-              zIndex: 3 - i,
-            }}>
-              <button onClick={() => setShowCeleb((v) => !v)} style={{ width: "100%", display: "flex", gap: 11, padding: "13px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "none", border: "none", borderTopWidth: 1, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
-                <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--sky)", flexShrink: 0, marginTop: 5 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: "var(--sky)", textTransform: "uppercase", letterSpacing: ".04em" }}>Celebrations</div>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>5 birthdays & anniversaries today</div>
-                  <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4 }}>Tap to see who and send a wish</div>
-                </div>
-                <Icon name={showCeleb ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" style={{ marginTop: 2 }} />
-              </button>
-              {showCeleb && celebs.map((b) =>
-              <div key={b.name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "var(--surface-subtle)" }}>
-                  <span style={{ width: 36, height: 36, borderRadius: 999, background: "var(--sky-light)", color: "var(--sky-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{b.initials}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--content-heavy)" }}>{b.name}</div>
-                    <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 1 }}>{b.note}</div>
-                  </div>
-                  <Button size="s" variant="skyghost" icon="gift" onClick={() => wish(b.name)}>Wish</Button>
-                </div>
-              )}
-            </div>
-          );
+      {/* ── iOS Calendar-style stacked card ── */}
+      <div style={{ position: "relative", paddingBottom: expanded ? 0 : 16, transition: "padding-bottom .4s cubic-bezier(.4,0,.2,1)" }}>
 
-          return (
-            <div key={n.title} style={{
-              transformOrigin: "top center",
-              transform: `translateY(${stackOffset}px) scale(${stackScale})`,
-              opacity: stackOpacity,
-              transition: `transform .55s cubic-bezier(.4,0,.2,1) ${delay}, opacity .4s ease ${delay}`,
-              zIndex: 3 - i,
-              display: "flex", gap: 11, padding: "13px 13px",
-              borderTop: i ? "1px solid var(--stroke-minimal)" : "none",
-              background: "var(--surface-minimal)",
+        {/* Peek card — furthest back */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 10, right: 10, height: 20,
+          background: "var(--surface-subtle)", borderRadius: 16,
+          border: "1px solid var(--stroke-minimal)",
+          opacity: expanded ? 0 : 1,
+          transform: expanded ? "scaleX(0.92)" : "scaleX(1)",
+          transition: "opacity .25s ease, transform .35s ease",
+          pointerEvents: "none", zIndex: 1
+        }} />
+
+        {/* Peek card — middle */}
+        <div style={{
+          position: "absolute", bottom: 8, left: 5, right: 5, height: 20,
+          background: "var(--surface-minimal)", borderRadius: 16,
+          border: "1px solid var(--stroke-minimal)",
+          boxShadow: "0 1px 4px rgba(15,23,42,.06)",
+          opacity: expanded ? 0 : 1,
+          transform: expanded ? "scaleX(0.96)" : "scaleX(1)",
+          transition: "opacity .25s ease, transform .35s ease",
+          pointerEvents: "none", zIndex: 2
+        }} />
+
+        {/* Foreground card */}
+        <div style={{
+          position: "relative", zIndex: 3,
+          background: "var(--surface-minimal)",
+          borderRadius: 16,
+          border: "1px solid var(--stroke-minimal)",
+          boxShadow: "0 2px 8px rgba(15,23,42,.07)",
+          overflow: "hidden",
+        }}>
+
+          {/* Item 1 — always visible */}
+          <NewsRow n={items[0]} i={0} divider={false} />
+
+          {/* Items 2+ — grid expand on "Show all" */}
+          {[items[1], { isCeleb: true }].map((n, i) => (
+            <div key={i} style={{
+              display: "grid",
+              gridTemplateRows: expanded ? "1fr" : "0fr",
+              transition: `grid-template-rows .45s cubic-bezier(.4,0,.2,1) ${i * 70}ms`,
             }}>
-              <span style={{ width: 8, height: 8, borderRadius: 999, background: n.tone, flexShrink: 0, marginTop: 5 }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: n.tone, textTransform: "uppercase", letterSpacing: ".04em" }}>{n.tag}</div>
-                <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>{n.title}</div>
-                <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4, textWrap: "pretty" }}>{n.body}</div>
+              <div style={{ minHeight: 0, overflow: "hidden" }}>
+                <div style={{
+                  opacity: expanded ? 1 : 0,
+                  transform: expanded ? "translateY(0)" : "translateY(-8px)",
+                  transition: `opacity .35s ease ${expanded ? i * 70 + 120 : 0}ms, transform .4s cubic-bezier(.4,0,.2,1) ${expanded ? i * 70 + 80 : 0}ms`,
+                }}>
+                  {n.isCeleb ? (
+                    <div>
+                      <button onClick={() => setShowCeleb((v) => !v)} style={{ width: "100%", display: "flex", gap: 11, padding: "14px 14px", borderTop: "1px solid var(--stroke-minimal)", background: "none", border: "none", borderTopWidth: 1, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--sky)", flexShrink: 0, marginTop: 5 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--sky)", textTransform: "uppercase", letterSpacing: ".04em" }}>Celebrations</div>
+                          <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>5 birthdays & anniversaries today</div>
+                          <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4 }}>Tap to see who and send a wish</div>
+                        </div>
+                        <Icon name={showCeleb ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" style={{ marginTop: 2 }} />
+                      </button>
+                      {showCeleb && celebs.map((b) =>
+                      <div key={b.name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "var(--surface-subtle)" }}>
+                          <span style={{ width: 36, height: 36, borderRadius: 999, background: "var(--sky-light)", color: "var(--sky-ink)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{b.initials}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--content-heavy)" }}>{b.name}</div>
+                            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 1 }}>{b.note}</div>
+                          </div>
+                          <Button size="s" variant="skyghost" icon="gift" onClick={() => wish(b.name)}>Wish</Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <NewsRow n={n} i={i + 1} divider={true} />
+                  )}
+                </div>
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
+
+      {/* Show all / Show less pill button */}
+      <button
+        onClick={() => setExpanded(v => !v)}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          width: "100%", marginTop: 10,
+          height: 40, borderRadius: 999,
+          border: "1px solid var(--stroke-minimal)",
+          background: "var(--surface-minimal)",
+          boxShadow: "0 1px 3px rgba(15,23,42,.06)",
+          cursor: "pointer", fontFamily: "inherit",
+          fontSize: 13.5, fontWeight: 700, color: "var(--content-moderate)",
+          transition: "background .15s ease",
+        }}>
+        {expanded ? "Show less" : "Show all"}
+        <Icon name={expanded ? "chevron_up" : "chevron_down"} size={16} color="var(--content-moderate)" />
+      </button>
+
     </Widget>);
 }
 

@@ -22,7 +22,7 @@ function SplashScreen() {
   return (
     <div style={{
       position: "absolute", inset: 0, overflow: "hidden",
-      background: "#0f2980",
+      background: "#2F8FD4",
       display: "flex", alignItems: "center", justifyContent: "center",
       animation: "fadeIn .2s ease"
     }}>
