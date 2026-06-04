@@ -194,30 +194,31 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
 // 2 · CRITICAL PROJECTS — horizontal scroll cards with sparkline + AI read
 // ═══════════════════════════════════════════════════════════════
 function Performance({ onOpen }) {
+  // Critical (delayed) first, then on-track
   const PROJECTS = [
+    {
+      name: "MyJio App", status: "delayed", statusLabel: "Delayed",
+      metric: "Sprint velocity", period: "last quarter",
+      pct: 74, trend: -12, target: 95,
+      bars: [95, 90, 88, 84, 79, 74],
+      months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
+      ai: ["3 sprints behind on payments rewrite. Moving engineer from Growth recovers the date."]
+    },
     {
       name: "MyJio 3.1 revamp", status: "on_track", statusLabel: "On track",
       metric: "On-time delivery", period: "last 6 months",
       pct: 86, trend: +4, target: 90,
       bars: [62, 70, 66, 74, 80, 86],
       months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
-      ai: ["Delivery speed up 8% this quarter.", "Team workload running high at 113%."]
-    },
-    {
-      name: "MyJio App", status: "delayed", statusLabel: "Delayed",
-      metric: "Sprint velocity", period: "last quarter",
-      pct: 86, trend: -12, target: 95,
-      bars: [95, 90, 88, 84, 80, 86],
-      months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
-      ai: ["3 sprints behind on payments rewrite.", "Moving engineer from Growth recovers date."]
+      ai: ["Delivery speed up 8% this quarter. Team workload running high at 113%."]
     },
     {
       name: "Jio Translate", status: "on_track", statusLabel: "On track",
       metric: "Feature completion", period: "Q2 2026",
-      pct: 72, trend: 0, target: 85,
+      pct: 72, trend: +3, target: 85,
       bars: [60, 65, 68, 70, 71, 72],
       months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
-      ai: ["On track for Q2 delivery.", "2 features ahead of schedule."]
+      ai: ["On track for Q2 delivery. 2 features are ahead of schedule."]
     }
   ];
 
@@ -284,92 +285,87 @@ function Performance({ onOpen }) {
   return (
     <Widget icon="analytics" title="Critical projects" action="See all" onAction={onOpen}>
 
-      {/* Summary tile + project cards horizontal scroll */}
-      <div style={{ display: "flex", gap: 10, overflowX: "auto", padding: "2px 0 6px", scrollSnapType: "x mandatory" }}
-           onScroll={(e) => {
-             const i = Math.round(e.target.scrollLeft / (e.target.children[0]?.offsetWidth + 10));
-             setActive(i);
-           }}>
+      {/* ── Unified container — same bg wraps summary + project cards ── */}
+      <div style={{ background: "#EEF2FF", borderRadius: 18, padding: "14px 14px 14px", overflow: "hidden" }}>
+        <div style={{ display: "flex", gap: 10, overflowX: "auto", scrollSnapType: "x mandatory", padding: "0 0 2px" }}
+             onScroll={(e) => {
+               const i = Math.round(e.target.scrollLeft / (e.target.children[0]?.offsetWidth + 10));
+               setActive(i);
+             }}>
 
-        {/* ── Summary card — reference design ── */}
-        <div ref={sumRef} style={{
-          flex: "0 0 160px", scrollSnapAlign: "start",
-          background: "#EEF2FF",
-          borderRadius: 16,
-          border: "none",
-          boxShadow: "none",
-          padding: "16px 14px 16px",
-        }}>
-          {/* Label */}
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--content-moderate)" }}>Projects</div>
-
-          {/* Big number */}
-          <div ref={cuTotal.ref} style={{ fontSize: 64, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.05em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .5s cubic-bezier(.2,0,0,1) .1s both" }}>
-            {cuTotal.display}
-          </div>
-
-          {/* Segmented bar — grows in from left */}
-          <div style={{ height: 10, borderRadius: 999, overflow: "hidden", background: "rgba(0,0,0,.06)", margin: "14px 0 14px" }}>
-            <div style={{ display: "flex", height: "100%", width: sumBarsIn ? "100%" : "0%", transition: "width .9s cubic-bezier(.4,0,.2,1) .3s", overflow: "hidden", borderRadius: 999 }}>
-              <div style={{ flex: summary.onTime, background: "var(--positive)" }} />
-              <div style={{ flex: summary.delayed, background: "var(--negative)", marginLeft: 2 }} />
-              <div style={{ flex: summary.onHold, background: "#B0B8C4", marginLeft: 2 }} />
-            </div>
-          </div>
-
-          {/* Stat rows — left vertical bar + label + bold number */}
-          {[
-            { label: "On time", cu: cuOnTime, color: "var(--positive)" },
-            { label: "Delayed", cu: cuDelayed, color: "var(--negative)" },
-            { label: "On Hold", cu: cuOnHold, color: "#B0B8C4" }
-          ].map((s, i) => (
-            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: 10, position: "relative", marginBottom: i < 2 ? 10 : 0, animation: `fadeIn .4s ease ${.3 + i * .1}s both` }}>
-              <span style={{ position: "absolute", left: 0, top: 1, bottom: 1, width: 3, borderRadius: 999, background: s.color }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--content-moderate)", flex: 1 }}>{s.label}</span>
-              <span ref={s.cu.ref} style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{s.cu.display}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* ── Project detail cards — compact, no AI READ label ── */}
-        {PROJECTS.map((p, idx) => (
-          <div key={p.name} style={{ flex: "0 0 248px", scrollSnapAlign: "start", background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 8px rgba(15,23,42,.07)", padding: "14px 14px 12px" }}>
-            {/* Header */}
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1 }}>{p.name}</div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap", flexShrink: 0 }}>{p.statusLabel}</span>
-            </div>
-            <div style={{ fontSize: 11.5, color: "var(--content-minimal)", fontWeight: 500, marginTop: 3 }}>{p.metric} · {p.period}</div>
-
-            {/* Metric */}
-            <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 8 }}>
-              <span style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-.03em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
-              <Trend dir={p.trend >= 0 ? "up" : "down"} good={p.trend >= 0}>{p.trend >= 0 ? "+" : ""}{p.trend} pts</Trend>
-              <span style={{ fontSize: 11.5, color: "var(--content-minimal)", fontWeight: 500 }}>vs {p.target}%</span>
+          {/* ── Summary card ── */}
+          <div ref={sumRef} style={{ flex: "0 0 148px", scrollSnapAlign: "start", flexShrink: 0 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--content-moderate)" }}>Projects</div>
+            <div ref={cuTotal.ref} style={{ fontSize: 60, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.05em", lineHeight: 1, marginTop: 2, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .5s cubic-bezier(.2,0,0,1) .1s both" }}>
+              {cuTotal.display}
             </div>
 
-            {/* Sparkline */}
-            <Sparkline bars={p.bars} target={p.target} months={p.months} />
-
-            {/* AI insights — icon only, no label, 2 lines */}
-            <div style={{ marginTop: 10, padding: "9px 11px", borderRadius: 11, background: "var(--sky-light)", display: "flex", gap: 8, alignItems: "flex-start" }}>
-              <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {p.ai.map((a, i) => (
-                  <span key={i} style={{ fontSize: 12, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35 }}>{a}</span>
-                ))}
+            {/* Segmented bar */}
+            <div style={{ height: 8, borderRadius: 999, overflow: "hidden", background: "rgba(0,0,0,.08)", margin: "12px 0 12px" }}>
+              <div style={{ display: "flex", height: "100%", width: sumBarsIn ? "100%" : "0%", transition: "width .9s cubic-bezier(.4,0,.2,1) .3s", overflow: "hidden", borderRadius: 999 }}>
+                <div style={{ flex: summary.onTime, background: "var(--positive)" }} />
+                <div style={{ flex: summary.delayed, background: "var(--negative)", marginLeft: 2 }} />
+                <div style={{ flex: summary.onHold, background: "#B0B8C4", marginLeft: 2 }} />
               </div>
             </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Pagination dots */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 10 }}>
-        {[0, 1, 2, 3].map(i => (
-          <span key={i} style={{ width: i === active ? 20 : 7, height: 7, borderRadius: 999, background: i === active ? "var(--reliance-base)" : "var(--stroke-heavy)", transition: "width .3s ease, background .3s ease" }} />
-        ))}
-      </div>
+            {/* Stat rows */}
+            {[
+              { label: "On time", cu: cuOnTime, color: "var(--positive)" },
+              { label: "Delayed", cu: cuDelayed, color: "var(--negative)" },
+              { label: "On Hold", cu: cuOnHold, color: "#B0B8C4" }
+            ].map((s, i) => (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 10, position: "relative", marginBottom: i < 2 ? 9 : 0, animation: `fadeIn .4s ease ${.3 + i * .1}s both` }}>
+                <span style={{ position: "absolute", left: 0, top: 2, bottom: 2, width: 3, borderRadius: 999, background: s.color }} />
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--content-moderate)", flex: 1 }}>{s.label}</span>
+                <span ref={s.cu.ref} style={{ fontSize: 18, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{s.cu.display}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Project cards — white cards inside the blue container ── */}
+          {PROJECTS.map((p, idx) => (
+            <div key={p.name} style={{
+              flex: "0 0 224px", scrollSnapAlign: "start", flexShrink: 0,
+              background: "var(--surface-minimal)",
+              borderRadius: 14,
+              border: p.status === "delayed" ? "1.5px solid rgba(220,38,38,.2)" : "1px solid var(--stroke-minimal)",
+              boxShadow: p.status === "delayed" ? "0 2px 12px rgba(220,38,38,.08)" : "0 1px 4px rgba(15,23,42,.05)",
+              padding: "13px 13px 11px"
+            }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 6 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1 }}>{p.name}</div>
+                <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{p.statusLabel}</span>
+              </div>
+              <div style={{ fontSize: 11, color: "var(--content-minimal)", fontWeight: 500, marginTop: 2 }}>{p.metric} · {p.period}</div>
+
+              {/* Big number */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 8 }}>
+                <span style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-.03em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
+                <Trend dir={p.trend >= 0 ? "up" : "down"} good={p.trend >= 0}>{p.trend >= 0 ? "+" : ""}{p.trend} pts</Trend>
+                <span style={{ fontSize: 11, color: "var(--content-minimal)", fontWeight: 500 }}>vs {p.target}%</span>
+              </div>
+
+              {/* Sparkline */}
+              <Sparkline bars={p.bars} target={p.target} months={p.months} />
+
+              {/* AI — icon + 2 lines combined, no label */}
+              <div style={{ marginTop: 9, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)", display: "flex", gap: 7, alignItems: "flex-start" }}>
+                <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.ai[0]}</span>
+              </div>
+            </div>
+          ))}
+        </div>{/* end scroll row */}
+
+        {/* Pagination dots — inside the container */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 10 }}>
+          {[0, 1, 2].map(i => (
+            <span key={i} style={{ width: i === active ? 20 : 7, height: 6, borderRadius: 999, background: i === active ? "var(--reliance-base)" : "rgba(0,0,0,.15)", transition: "width .3s ease, background .3s ease" }} />
+          ))}
+        </div>
+      </div>{/* end unified container */}
     </Widget>);
 }
 
