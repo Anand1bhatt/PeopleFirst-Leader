@@ -259,7 +259,7 @@ function App() {
           <Performance onOpen={() => go("reports")} />
           <ExpenseBudgetBars onOpen={() => go("reports")} />
           <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />
-          <TeamSnapshot onOpen={() => go("team")} />
+          <TeamSnapshot onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />
           <Recruitment onOpen={() => go("more")} />
           <Bookings onOpen={() => flash("Opening calendar")} />
           <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />

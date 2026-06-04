@@ -199,8 +199,8 @@ function Performance({ onOpen }) {
     {
       name: "MyJio App", statusLabel: "Delayed",
       metric: "Sprint velocity", period: "last quarter",
-      pct: 74, trend: -12,
-      bars: [95, 90, 88, 84, 79, 74],
+      pct: 56, trend: -12,
+      bars: [95, 88, 80, 72, 64, 56],
       months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
       ai: "3 sprints behind on payments rewrite. Moving one engineer from Growth recovers the delivery date."
     },
@@ -246,18 +246,19 @@ function Performance({ onOpen }) {
 
   // Layout constants
   const SUMMARY_W = 144;
-  const GAP       = 18;   // breathing room between summary and cards (instruction 1)
-  const PAD       = 14;
-  const CARD_W    = 210;  // narrower — peeks next card (instruction 4)
-  const scrollPadLeft = PAD + SUMMARY_W + GAP;
+  const GAP       = 8;    // gap between cards only
+  const PAD       = 20;
+  const CARD_W    = 210;
+  const FIRST_CARD_ML = 16; // extra space between summary and first card only
 
-  // Scroll handler — fade summary as cards slide over (instruction 7)
+  const scrollRef = React.useRef(null);
+
+  // Scroll handler — cards slide OVER summary → fade summary beneath them
   const handleScroll = (e) => {
     const sl = e.target.scrollLeft;
-    const fadeEnd = SUMMARY_W * 0.85;
-    const opacity = Math.max(0.18, 1 - Math.max(0, sl - 10) / fadeEnd);
+    const fadeEnd = SUMMARY_W;
+    const opacity = Math.max(0, 1 - Math.max(0, sl) / fadeEnd);
     setSummaryOpacity(opacity);
-    setActive(Math.round(sl / (CARD_W + GAP)));
   };
 
   const Sparkline = ({ bars, months }) => {
@@ -292,95 +293,101 @@ function Performance({ onOpen }) {
   return (
     <Widget icon="analytics" title="Critical projects" action="See all" onAction={onOpen}>
 
-      {/* ── Outer container — clips scroll, holds absolute summary ── */}
-      <div ref={outerRef} style={{ position: "relative", background: "#EEF2FF", borderRadius: 18, overflow: "hidden" }}>
-
-        {/* ── Summary — absolutely fixed, fades as cards scroll over (instructions 2, 3, 7) ── */}
-        <div style={{
-          position: "absolute", left: PAD, top: PAD, bottom: PAD + 28, // 28 = dots height
-          width: SUMMARY_W, zIndex: 2,
-          opacity: summaryOpacity,
-          transition: "opacity .12s linear",
-          pointerEvents: summaryOpacity < 0.35 ? "none" : "auto",
-          display: "flex", flexDirection: "column", justifyContent: "center" // vertically centered (instruction 2)
-        }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>Projects</div>
-
-          {/* "74" — reduced to match card's 74% scale (instruction 3) */}
-          <div ref={cuTotal.ref} style={{ fontSize: 38, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .5s cubic-bezier(.2,0,0,1) .1s both" }}>
-            {cuTotal.display}
-          </div>
-
-          {/* Segmented bar */}
-          <div style={{ height: 7, borderRadius: 999, overflow: "hidden", background: "rgba(0,0,0,.08)", margin: "11px 0 11px" }}>
-            <div style={{ display: "flex", height: "100%", width: sumBarsIn ? "100%" : "0%", transition: "width .9s cubic-bezier(.4,0,.2,1) .3s", overflow: "hidden", borderRadius: 999 }}>
-              <div style={{ flex: summary.onTime, background: "var(--positive)" }} />
-              <div style={{ flex: summary.delayed, background: "var(--negative)", marginLeft: 2 }} />
-              <div style={{ flex: summary.onHold, background: "#B0B8C4", marginLeft: 2 }} />
-            </div>
-          </div>
-
-          {/* Stat rows */}
-          {[
-            { label: "On time", cu: cuOnTime, color: "var(--positive)" },
-            { label: "Delayed", cu: cuDelayed, color: "var(--negative)" },
-            { label: "On Hold", cu: cuOnHold, color: "#B0B8C4" }
-          ].map((s, i) => (
-            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 9, position: "relative", marginBottom: i < 2 ? 8 : 0, animation: `fadeIn .4s ease ${.3 + i * .1}s both` }}>
-              <span style={{ position: "absolute", left: 0, top: 2, bottom: 2, width: 3, borderRadius: 999, background: s.color }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)", flex: 1 }}>{s.label}</span>
-              <span ref={s.cu.ref} style={{ fontSize: 17, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{s.cu.display}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* ── Scroll area — paddingLeft reserves space for sticky summary (instruction 7) ── */}
+      {/*
+        ── KEY TECHNIQUE ──
+        Summary is a sticky flex child (position: sticky; left: 0).
+        At scrollLeft=0 it sits at the left — ALWAYS VISIBLE on load.
+        Cards are normal flex children to its right.
+        As user scrolls: cards slide LEFT, physically overlaying the summary.
+        Cards have z-index:2, summary z-index:1 → cards paint on top.
+        summaryOpacity fades from 1→0 as scrollLeft increases.
+        Outer has NO overflow:hidden (that breaks sticky) — clipPath handles rounding.
+      */}
+      {/* No overflow:hidden on outer — that breaks position:sticky. Border-radius handles visual rounding. */}
+      <div ref={outerRef} style={{ background: "#EEF2FF", borderRadius: 18 }}>
         <div
           style={{
-            overflowX: "auto", display: "flex", gap: GAP,
-            paddingLeft: scrollPadLeft, paddingTop: PAD, paddingBottom: PAD, paddingRight: PAD,
-            scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch",
+            display: "flex", gap: GAP,
+            overflowX: "auto", overflowY: "hidden",
+            WebkitOverflowScrolling: "touch",
+            padding: PAD,
+            // No scroll snap — it forces scrollLeft on mount and hides the sticky summary
           }}
+          ref={scrollRef}
           onScroll={handleScroll}>
 
+          {/* ── Summary — sticky to left, fades as cards scroll over it ── */}
+          <div style={{
+            position: "sticky", left: 0,     // stays at left edge while cards scroll
+            flexShrink: 0, width: SUMMARY_W,
+            zIndex: 1,                        // behind cards
+            opacity: summaryOpacity,
+            transition: "opacity .1s linear",
+            pointerEvents: summaryOpacity < 0.3 ? "none" : "auto",
+            display: "flex", flexDirection: "column", justifyContent: "center",
+            background: "#EEF2FF",           // solid bg so cards slide over cleanly
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>Projects</div>
+            <div ref={cuTotal.ref} style={{ fontSize: 38, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .5s cubic-bezier(.2,0,0,1) .1s both" }}>
+              {cuTotal.display}
+            </div>
+
+            {/* Segmented bar */}
+            <div style={{ height: 7, borderRadius: 999, overflow: "hidden", background: "rgba(0,0,0,.08)", margin: "11px 0 11px" }}>
+              <div style={{ display: "flex", height: "100%", width: sumBarsIn ? "100%" : "0%", transition: "width .9s cubic-bezier(.4,0,.2,1) .3s", overflow: "hidden", borderRadius: 999 }}>
+                <div style={{ flex: summary.onTime, background: "var(--positive)" }} />
+                <div style={{ flex: summary.delayed, background: "var(--negative)", marginLeft: 2 }} />
+                <div style={{ flex: summary.onHold, background: "#B0B8C4", marginLeft: 2 }} />
+              </div>
+            </div>
+
+            {/* Stat rows with left coloured bar */}
+            {[
+              { label: "On time", cu: cuOnTime, color: "var(--positive)" },
+              { label: "Delayed", cu: cuDelayed, color: "var(--negative)" },
+              { label: "On Hold", cu: cuOnHold, color: "#B0B8C4" }
+            ].map((s, i) => (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 9, position: "relative", marginBottom: i < 2 ? 8 : 0, animation: `fadeIn .4s ease ${.3 + i * .1}s both` }}>
+                <span style={{ position: "absolute", left: 0, top: 2, bottom: 2, width: 3, borderRadius: 999, background: s.color }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)", flex: 1 }}>{s.label}</span>
+                <span ref={s.cu.ref} style={{ fontSize: 17, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{s.cu.display}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Project cards — z-index:2 so they paint above the sticky summary ── */}
           {PROJECTS.map((p, idx) => (
             <div key={p.name} style={{
-              flex: `0 0 ${CARD_W}px`, flexShrink: 0, scrollSnapAlign: "start",
+              flex: `0 0 ${CARD_W}px`, flexShrink: 0,
+              marginLeft: idx === 0 ? FIRST_CARD_ML : 0,
+              position: "relative", zIndex: 2,
               background: "#fff",
               borderRadius: 14,
-              // No coloured border — elevation via shadow only (instruction 5)
               boxShadow: "0 2px 14px rgba(15,23,42,.10)",
-              padding: "13px 13px 11px"
+              padding: "13px 13px 11px",
+              display: "flex", flexDirection: "column"  // column so bottom section can be pushed down
             }}>
-              {/* Header */}
+              {/* Top content */}
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 6 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1 }}>{p.name}</div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "var(--negative)", background: "var(--negative-light)", borderRadius: 999, padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{p.statusLabel}</span>
               </div>
               <div style={{ fontSize: 11, color: "var(--content-minimal)", fontWeight: 500, marginTop: 2 }}>{p.metric} · {p.period}</div>
-
-              {/* Big number — no "vs X%" (instruction 4) */}
               <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 8 }}>
                 <span style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-.03em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
                 <Trend dir="down" good={false}>{p.trend} pts</Trend>
               </div>
 
-              {/* Sparkline */}
-              <Sparkline bars={p.bars} months={p.months} />
+              {/* Spacer — pushes sparkline + AI to the bottom */}
+              <div style={{ flex: 1 }} />
 
-              {/* AI — icon + max 2 lines */}
+              {/* Bottom-aligned: sparkline + AI comment */}
+              <Sparkline bars={p.bars} months={p.months} />
               <div style={{ marginTop: 9, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)", display: "flex", gap: 7, alignItems: "flex-start" }}>
                 <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
                 <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.ai}</span>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Pagination dots */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 6, paddingBottom: 12 }}>
-          {PROJECTS.map((_, i) => (
-            <span key={i} style={{ width: i === active ? 20 : 7, height: 6, borderRadius: 999, background: i === active ? "var(--reliance-base)" : "rgba(0,0,0,.15)", transition: "width .3s ease, background .3s ease" }} />
           ))}
         </div>
       </div>
@@ -417,9 +424,9 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 14 }}>
           {types.map((t) =>
           <button key={t.label} onClick={() => onOpen(t.filter)} style={{ position: "relative", background: "var(--surface-subtle)", borderRadius: 12, border: "none", padding: "12px 4px", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
-              {/* Red dot indicator — no number */}
+              {/* Red dot — inside the tile, top-right corner */}
               {t.crit &&
-            <span style={{ position: "absolute", top: -4, right: -4, width: 10, height: 10, borderRadius: 999, background: "var(--negative)", border: "2px solid var(--surface-minimal)" }} />
+            <span style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: 999, background: "var(--negative)" }} />
             }
               <Icon name={t.icon} size={22} color="var(--sky)" />
               <div style={{ fontSize: 19, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{t.n}</div>
@@ -428,25 +435,17 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
           )}
         </div>
 
-        {/* Critical item — highlighted as the primary action */}
-        <button onClick={() => onOpen("Travel")} style={{ width: "100%", textAlign: "left", marginTop: 14, padding: "13px 14px", borderRadius: 13, background: "var(--negative-light)", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#6a0202", lineHeight: 1.4, textWrap: "pretty" }}>Rohan Das is scheduled to travel to Bengaluru tomorrow. Please review and approve the ₹38,500 request.</div>
-          </div>
+        {/* Critical item — AI comment style matching other widgets */}
+        <button onClick={() => onOpen("Travel")} style={{ width: "100%", textAlign: "left", marginTop: 14, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "flex-start", gap: 7 }}>
+          <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>Rohan Das travels to Bengaluru tomorrow. Review and approve ₹38,500.</span>
         </button>
 
-        {/* Low-risk handled automatically — de-emphasised */}
+        {/* Low-risk handled automatically */}
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 11, padding: "0 2px" }}>
           <Icon name="ai_sparkle" size={15} color="var(--sky)" style={{ flexShrink: 0 }} />
           <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600, lineHeight: 1.35 }}>{state.lowRisk} low-risk approvals handled automatically</span>
         </div>
-
-        {remaining > 0 &&
-        <button onClick={() => onOpen()} style={{
-          width: "100%", marginTop: 12, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-          fontSize: 13.5, fontWeight: 700, color: "var(--reliance-base)"
-        }}>See all approvals</button>
-        }
       </Card>
     </Widget>);
 
@@ -456,65 +455,85 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
 // 4 · TEAM SNAPSHOT — four numbers
 // ═══════════════════════════════════════════════════════════════
 function TeamSnapshot({ onOpen }) {
-  const total = 250,present = 204,leave = 20,notIn = 10,woph = 16; // sums to 250
-  const cuTotal = useCountUp(250, { duration: 900 });
+  const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
+  const cuTotal   = useCountUp(250, { duration: 900 });
   const cuPresent = useCountUp(204, { duration: 900, delay: 100 });
-  const cuLeave = useCountUp(20, { duration: 900, delay: 150 });
-  const cuNotIn = useCountUp(10, { duration: 900, delay: 200 });
-  const cuWoph = useCountUp(16, { duration: 900, delay: 250 });
+  const cuLeave   = useCountUp(20,  { duration: 900, delay: 150 });
+  const cuNotIn   = useCountUp(10,  { duration: 900, delay: 200 });
+  const cuWoph    = useCountUp(16,  { duration: 900, delay: 250 });
   const cellCountUps = [cuPresent, cuLeave, cuNotIn, cuWoph];
+
+  // Each cell routes to team page with a filter
   const cells = [
-  { label: "Present", value: present, tone: "healthy" },
-  { label: "On leave", value: leave, tone: "info" },
-  { label: "Not in", value: notIn, tone: "risk" },
-  { label: "WO/PH", value: woph, tone: "off" }];
+    { label: "Present",  value: present, tone: "healthy", filter: "present" },
+    { label: "On leave", value: leave,   tone: "info",    filter: "on_leave" },
+    { label: "Not in",   value: notIn,   tone: "risk",    filter: "not_in" },
+    { label: "WO/PH",   value: woph,    tone: "off",     filter: "woph" }
+  ];
 
   const toneColor = { healthy: "var(--positive)", info: "var(--sky)", risk: "var(--warning)", off: "var(--content-minimal)" };
+
+  // Shared clickable style
+  const clickStyle = { cursor: "pointer", WebkitTapHighlightColor: "transparent" };
+
   return (
     <Widget icon="group" title="Team summary" action="Team" onAction={onOpen}>
       <Card surface="elev" pad={16}>
-        {/* total headcount */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Headcount</span>
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--positive)", fontVariantNumeric: "tabular-nums" }}>{Math.round(present / total * 100)}% present</span>
+
+        {/* Headcount row — clickable, goes to full team view */}
+        <button onClick={onOpen} style={{ width: "100%", background: "none", border: "none", padding: 0, fontFamily: "inherit", textAlign: "left", ...clickStyle }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Headcount</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--positive)", fontVariantNumeric: "tabular-nums" }}>{Math.round(present / total * 100)}% present</span>
+          </div>
+          <div ref={cuTotal.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1, marginTop: 5 }}>{cuTotal.display}</div>
+        </button>
+
+        {/* Presence bar — each segment clickable to its filter */}
+        <div style={{ display: "flex", height: 8, borderRadius: 999, overflow: "hidden", gap: 2, margin: "12px 0 14px", cursor: "pointer" }}>
+          <span className="presence-seg" onClick={() => onOpen("present")}  style={{ flex: present, background: "var(--positive)", cursor: "pointer" }} />
+          <span className="presence-seg" onClick={() => onOpen("on_leave")} style={{ flex: leave,   background: "var(--sky)",      cursor: "pointer" }} />
+          <span className="presence-seg" onClick={() => onOpen("not_in")}   style={{ flex: notIn,   background: "var(--warning)",  cursor: "pointer" }} />
+          <span className="presence-seg" onClick={() => onOpen("woph")}     style={{ flex: woph,    background: "var(--content-minimal)", cursor: "pointer" }} />
         </div>
-        <div ref={cuTotal.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1, marginTop: 5 }}>{cuTotal.display}</div>
-        {/* presence bar */}
-        <div style={{ display: "flex", height: 8, borderRadius: 999, overflow: "hidden", gap: 2, margin: "12px 0 14px" }}>
-          <span className="presence-seg" style={{ flex: present, background: "var(--positive)" }} />
-          <span className="presence-seg" style={{ flex: leave, background: "var(--sky)" }} />
-          <span className="presence-seg" style={{ flex: notIn, background: "var(--warning)" }} />
-          <span className="presence-seg" style={{ flex: woph, background: "var(--content-minimal)" }} />
-        </div>
+
+        {/* Stat cells — each clickable with filter */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
           {cells.map((c, i) =>
-          <div key={c.label} style={{ textAlign: "center", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none" }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: toneColor[c.tone], fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}><span ref={cellCountUps[i].ref}>{cellCountUps[i].display}</span></div>
+          <button key={c.label} onClick={() => onOpen(c.filter)} style={{
+            textAlign: "center", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none",
+            background: "none", border: "none", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none",
+            padding: "4px 0", fontFamily: "inherit", ...clickStyle
+          }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: toneColor[c.tone], fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>
+                <span ref={cellCountUps[i].ref}>{cellCountUps[i].display}</span>
+              </div>
               <div style={{ fontSize: 11.5, color: "var(--content-moderate)", fontWeight: 600, marginTop: 5 }}>{c.label}</div>
-            </div>
+            </button>
           )}
         </div>
       </Card>
     </Widget>);
-
 }
 
 // ═══════════════════════════════════════════════════════════════
 // 5 · RECRUITMENT — pipeline health
 // ═══════════════════════════════════════════════════════════════
 function Recruitment({ onOpen }) {
+  // Change 4: Sr. Backend Engineer → At risk, 8 open, 92 applications
   const roles = [
-  { title: "Product Designer", open: 2, apps: 0, tone: "off", ai: "AI: Try hiring remotely and increasing the salary range to attract more applicants." },
-  { title: "Engineering Manager, Platform", open: 1, apps: 18, tone: "risk" },
-  { title: "Sr. Backend Engineer", open: 3, apps: 142, tone: "healthy" }];
+  { title: "Product Designer",           open: 2, apps: 0,   tone: "off",  ai: "Try hiring remotely and increasing the salary range to attract more applicants." },
+  { title: "Engineering Manager, Platform", open: 1, apps: 18,  tone: "risk" },
+  { title: "Sr. Backend Engineer",        open: 8, apps: 92,  tone: "risk" }];  // Change 4
 
-  const cvs = 379, target = 400;
-  const cvPct = Math.round(cvs / target * 1000) / 10;
+  // Change 5: show 379 with "20 Openings" — no "of 400"
+  const cvs = 379, openings = 20;
+  const cvPct = Math.round(cvs / (cvs + 21) * 100); // proportional bar
   const cuCvs = useCountUp(379, { duration: 1000 });
 
-  // ── Bidirectional scroll animation ──
   const { expanded, ref: sectionRef } = useStackReveal();
 
+  // Change 3: Remove "AI:" prefix — just show the comment text
   const RoleRow = ({ r, divider }) => (
     <div style={{ padding: "12px 0", borderTop: divider ? "1px solid var(--stroke-minimal)" : "none" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
@@ -526,8 +545,8 @@ function Recruitment({ onOpen }) {
       </div>
       {r.ai &&
       <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 9, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
-          <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ marginTop: 1 }} />
-          <span style={{ fontSize: 12, color: "var(--sky-ink)", fontWeight: 600, lineHeight: 1.35 }}>{r.ai}</span>
+          <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ marginTop: 1, flexShrink: 0 }} />
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{r.ai}</span>
         </div>
       }
     </div>
@@ -535,8 +554,7 @@ function Recruitment({ onOpen }) {
 
   return (
     <Widget
-      icon="id" title="Recruitment" action="All 8 roles" onAction={onOpen}
-      right={<span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--negative)", display: "inline-flex", alignItems: "center", gap: 5, marginRight: 10 }}><Dot tone="off" size={7} />1 urgent</span>}>
+      icon="id" title="Recruitment" action="View all" onAction={onOpen}>{/* Change 1: removed "1 urgent"; Change 6: "View all" */}
 
       <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
 
@@ -548,30 +566,26 @@ function Recruitment({ onOpen }) {
         {/* Foreground card */}
         <div style={{ position: "relative", zIndex: 3, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)", overflow: "hidden", padding: 16 }}>
 
-          {/* CVs header — always visible */}
+          {/* CVs header — 379 applications · 20 Openings chip */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Applications received</span>
             <Trend dir="up">12%</Trend>
           </div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 5 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 5 }}>
             <span ref={cuCvs.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cuCvs.display}</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of {target}</span>
+            {/* Change 5: "20 Openings" badge instead of "of 400" */}
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)", background: "var(--surface-subtle)", borderRadius: 999, padding: "2px 9px", letterSpacing: "-.01em" }}>{openings} openings</span>
           </div>
           <div style={{ height: 6, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 11, overflow: "hidden" }}>
             <div className="anim-bar" style={{ height: "100%", width: `${cvPct}%`, borderRadius: 999, background: "var(--positive)" }} />
           </div>
 
-          {/* Role 1 — always visible */}
-          <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)" }}>
-            <RoleRow r={roles[0]} divider={false} />
-          </div>
-
-          {/* Roles 2+3 — expand on scroll */}
-          {roles.slice(1).map((r, i) => (
-            <div key={r.title} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(1 - i) * 50}ms` }}>
+          {/* All 3 roles — expand on scroll (Change 2: Product Designer also animates) */}
+          {roles.map((r, i) => (
+            <div key={r.title} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(2 - i) * 50}ms` }}>
               <div style={{ minHeight: 0 }}>
-                <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-8px)", transition: expanded ? `opacity .38s ease ${i * 70 + 160}ms, transform .42s cubic-bezier(.4,0,.2,1) ${i * 70 + 110}ms` : "opacity .22s ease 0ms, transform .28s ease 0ms" }}>
-                  <RoleRow r={r} divider={true} />
+                <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-8px)", transition: expanded ? `opacity .38s ease ${i * 70 + 120}ms, transform .42s cubic-bezier(.4,0,.2,1) ${i * 70 + 80}ms` : "opacity .22s ease 0ms, transform .28s ease 0ms" }}>
+                  <RoleRow r={r} divider={i > 0} />
                 </div>
               </div>
             </div>
@@ -586,9 +600,9 @@ function Recruitment({ onOpen }) {
 // ═══════════════════════════════════════════════════════════════
 function Bookings({ onOpen }) {
   const events = [
-  { time: "10:00", day: "Today", type: "Review", icon: "analytics", tone: "var(--reliance-base)", title: "Q2 Leadership Review", sub: "You present · 6 attendees", soon: "in 1h 8m" },
-  { time: "14:30", day: "Today", type: "Meeting", icon: "group", tone: "var(--content-moderate)", title: "1:1 with Karan Mehta", sub: "Platform team · 30 min", soon: null },
-  { time: "18:30", day: "Today", type: "Gym", icon: "time", tone: "var(--positive)", title: "Gym slot booked", sub: "Level 2 · 45 min", soon: null }];
+  { time: "10:00", ampm: "AM", type: "Meeting", icon: "analytics", tone: "var(--reliance-base)", title: "Q2 Leadership Review", sub: "You present · 6 attendees", soon: "in 1h 8m" },
+  { time: "2:30",  ampm: "PM", type: "Meeting", icon: "group", tone: "var(--content-moderate)", title: "1:1 with Karan Mehta", sub: "Platform team · 30 min", soon: null },
+  { time: "6:30",  ampm: "PM", type: "Gym",     icon: "time",      tone: "var(--positive)", title: "Gym slot booked", sub: "Level 2 · 45 min", soon: null }];
 
   // ── Bidirectional scroll animation ──
   const { expanded, ref: sectionRef } = useStackReveal();
@@ -597,7 +611,7 @@ function Bookings({ onOpen }) {
     <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none", background: "var(--surface-minimal)" }}>
       <div style={{ width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11, background: i === 0 ? "var(--reliance-base)" : "var(--surface-subtle)", color: i === 0 ? "#fff" : "var(--content-heavy)" }}>
         <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
-        <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.day}</div>
+        <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.ampm}</div>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: e.tone, textTransform: "uppercase", letterSpacing: ".03em" }}>
@@ -893,21 +907,23 @@ function ExpenseBudgetBars({ onOpen }) {
               <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of ₹1.04 Cr</span>
             </div>
           </div>
+          {/* Pie: 2 colours — Blue (₹86L spent) + Grey (₹18L remaining) */}
           {(() => {
-            const ps = 54, pr = ps / 2, c2 = 2 * Math.PI * pr / 2; // using full-disc pie
-            let acc = 0;
-            const slices = cats.map((c) => { const frac = c.value / total; const s = { c, frac, start: acc }; acc += frac; return s; });
-            // build conic-gradient stops
-            const stops = slices.map((s) => `${barColor(s.c.tone)} ${(s.start * 100).toFixed(1)}% ${((s.start + s.frac) * 100).toFixed(1)}%`).join(", ");
-            return <span style={{ width: ps, height: ps, borderRadius: "50%", flexShrink: 0, background: `conic-gradient(${stops})`, WebkitMaskImage: "radial-gradient(circle, transparent 40%, #000 41%)", maskImage: "radial-gradient(circle, transparent 40%, #000 41%)" }} />;
+            const spentPct = (86 / 104 * 100).toFixed(1);
+            return <span style={{
+              width: 54, height: 54, borderRadius: "50%", flexShrink: 0,
+              background: `conic-gradient(var(--reliance-base) 0% ${spentPct}%, #D1D5DB ${spentPct}% 100%)`,
+              WebkitMaskImage: "radial-gradient(circle, transparent 40%, #000 41%)",
+              maskImage: "radial-gradient(circle, transparent 40%, #000 41%)"
+            }} />;
           })()}
         </div>
 
-        {/* AI recommendation — specific to most critical (Travel) */}
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginTop: 14, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
-          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.45 }}>
-            <span style={{ color: "var(--negative)" }}>Travel ₹35L is 11% over budget</span> — largest overspend this quarter. Consider capping domestic travel approvals until Q3.
+        {/* AI recommendation — matches other widget AI comment style */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 14, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ flexShrink: 0, marginTop: 2 }} />
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            International travel driving 51% of overspend. Cap cross-border approvals in Q3.
           </span>
         </div>
 
