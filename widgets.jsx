@@ -291,125 +291,74 @@ function Performance({ onOpen }) {
              setActive(i);
            }}>
 
-        {/* Summary card — enhanced */}
+        {/* ── Summary card — reference design ── */}
         <div ref={sumRef} style={{
-          flex: "0 0 172px", scrollSnapAlign: "start",
-          background: "linear-gradient(145deg, #e8f3ff 0%, #f7faff 45%, #fff 100%)",
+          flex: "0 0 160px", scrollSnapAlign: "start",
+          background: "#EEF2FF",
           borderRadius: 16,
-          border: "1px solid rgba(30,100,200,.12)",
-          boxShadow: "0 2px 16px rgba(26,58,168,.08)",
-          padding: "16px 14px 18px",
-          position: "relative", overflow: "hidden"
+          border: "none",
+          boxShadow: "none",
+          padding: "16px 14px 16px",
         }}>
-
-          {/* Decorative blur circle top-right */}
-          <div style={{ position: "absolute", top: -18, right: -18, width: 70, height: 70, borderRadius: "50%", background: "var(--reliance-base)", opacity: .07, pointerEvents: "none" }} />
-
           {/* Label */}
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".07em" }}>Total projects</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--content-moderate)" }}>Projects</div>
 
-          {/* Big number + donut */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
-            <span ref={cuTotal.ref} style={{ fontSize: 44, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .55s cubic-bezier(.2,0,0,1) .15s both" }}>
-              {cuTotal.display}
-            </span>
-
-            {/* Animated conic donut */}
-            {(() => {
-              const circ = 2 * Math.PI * 16; // r=16
-              const onTimePct = summary.onTime / summary.total;
-              const delayedPct = summary.delayed / summary.total;
-              const onHoldPct = summary.onHold / summary.total;
-              const seg1 = onTimePct * circ;
-              const seg2 = delayedPct * circ;
-              const seg3 = onHoldPct * circ;
-              return (
-                <svg width="44" height="44" viewBox="0 0 44 44" style={{ flexShrink: 0, animation: "donutSpin .7s cubic-bezier(.2,0,0,1) .2s both" }}>
-                  {/* BG ring */}
-                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--stroke-minimal)" strokeWidth="5.5" />
-                  {/* On time - green */}
-                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--positive)" strokeWidth="5.5"
-                    strokeDasharray={`${seg1 - .5} ${circ}`}
-                    strokeDashoffset={circ * .25}
-                    style={{ transition: "stroke-dasharray .9s cubic-bezier(.4,0,.2,1) .4s" }}
-                  />
-                  {/* Delayed - red */}
-                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--negative)" strokeWidth="5.5"
-                    strokeDasharray={`${seg2 - .5} ${circ}`}
-                    strokeDashoffset={circ * .25 - seg1}
-                    style={{ transition: "stroke-dasharray .8s cubic-bezier(.4,0,.2,1) .6s" }}
-                  />
-                  {/* On hold - gray */}
-                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--content-minimal)" strokeWidth="5.5"
-                    strokeDasharray={`${seg3 - .5} ${circ}`}
-                    strokeDashoffset={circ * .25 - seg1 - seg2}
-                  />
-                </svg>
-              );
-            })()}
+          {/* Big number */}
+          <div ref={cuTotal.ref} style={{ fontSize: 64, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.05em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .5s cubic-bezier(.2,0,0,1) .1s both" }}>
+            {cuTotal.display}
           </div>
 
-          {/* Divider */}
-          <div style={{ height: 1, background: "rgba(30,100,200,.1)", margin: "13px 0 11px" }} />
+          {/* Segmented bar — grows in from left */}
+          <div style={{ height: 10, borderRadius: 999, overflow: "hidden", background: "rgba(0,0,0,.06)", margin: "14px 0 14px" }}>
+            <div style={{ display: "flex", height: "100%", width: sumBarsIn ? "100%" : "0%", transition: "width .9s cubic-bezier(.4,0,.2,1) .3s", overflow: "hidden", borderRadius: 999 }}>
+              <div style={{ flex: summary.onTime, background: "var(--positive)" }} />
+              <div style={{ flex: summary.delayed, background: "var(--negative)", marginLeft: 2 }} />
+              <div style={{ flex: summary.onHold, background: "#B0B8C4", marginLeft: 2 }} />
+            </div>
+          </div>
 
-          {/* Stats with animated bars */}
+          {/* Stat rows — left vertical bar + label + bold number */}
           {[
-            { label: "On time", cu: cuOnTime, color: "var(--positive)", frac: summary.onTime / summary.total, delay: 0 },
-            { label: "Delayed", cu: cuDelayed, color: "var(--negative)", frac: summary.delayed / summary.total, delay: 110 },
-            { label: "On hold", cu: cuOnHold, color: "var(--content-minimal)", frac: summary.onHold / summary.total, delay: 220 }
+            { label: "On time", cu: cuOnTime, color: "var(--positive)" },
+            { label: "Delayed", cu: cuDelayed, color: "var(--negative)" },
+            { label: "On Hold", cu: cuOnHold, color: "#B0B8C4" }
           ].map((s, i) => (
-            <div key={s.label} style={{ marginBottom: i < 2 ? 11 : 0, animation: `fadeIn .4s ease ${.35 + i * .1}s both` }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: 999, background: s.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>{s.label}</span>
-                </div>
-                <span ref={s.cu.ref} style={{ fontSize: 15, fontWeight: 800, color: s.color, fontVariantNumeric: "tabular-nums" }}>{s.cu.display}</span>
-              </div>
-              {/* Mini progress bar */}
-              <div style={{ height: 4, borderRadius: 999, background: "rgba(30,100,200,.08)", overflow: "hidden" }}>
-                <div style={{
-                  height: "100%", borderRadius: 999, background: s.color,
-                  width: sumBarsIn ? `${s.frac * 100}%` : "0%",
-                  transition: `width .8s cubic-bezier(.4,0,.2,1) ${s.delay}ms`
-                }} />
-              </div>
+            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, paddingLeft: 10, position: "relative", marginBottom: i < 2 ? 10 : 0, animation: `fadeIn .4s ease ${.3 + i * .1}s both` }}>
+              <span style={{ position: "absolute", left: 0, top: 1, bottom: 1, width: 3, borderRadius: 999, background: s.color }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--content-moderate)", flex: 1 }}>{s.label}</span>
+              <span ref={s.cu.ref} style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{s.cu.display}</span>
             </div>
           ))}
         </div>
 
-        {/* Project detail cards */}
+        {/* ── Project detail cards — compact, no AI READ label ── */}
         {PROJECTS.map((p, idx) => (
-          <div key={p.name} style={{ flex: "0 0 260px", scrollSnapAlign: "start", background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 8px rgba(15,23,42,.07)", padding: "16px 14px 14px" }}>
+          <div key={p.name} style={{ flex: "0 0 248px", scrollSnapAlign: "start", background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 8px rgba(15,23,42,.07)", padding: "14px 14px 12px" }}>
             {/* Header */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1 }}>{p.name}</div>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "3px 10px", whiteSpace: "nowrap", flexShrink: 0 }}>{p.statusLabel}</span>
+              <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1 }}>{p.name}</div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap", flexShrink: 0 }}>{p.statusLabel}</span>
             </div>
-            <div style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 500, marginTop: 4 }}>{p.metric} · {p.period}</div>
+            <div style={{ fontSize: 11.5, color: "var(--content-minimal)", fontWeight: 500, marginTop: 3 }}>{p.metric} · {p.period}</div>
 
             {/* Metric */}
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 10 }}>
-              <span style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-.03em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 8 }}>
+              <span style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-.03em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
               <Trend dir={p.trend >= 0 ? "up" : "down"} good={p.trend >= 0}>{p.trend >= 0 ? "+" : ""}{p.trend} pts</Trend>
-              <span style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 500 }}>vs {p.target}% target</span>
+              <span style={{ fontSize: 11.5, color: "var(--content-minimal)", fontWeight: 500 }}>vs {p.target}%</span>
             </div>
 
-            {/* Sparkline with months + target */}
+            {/* Sparkline */}
             <Sparkline bars={p.bars} target={p.target} months={p.months} />
 
-            {/* AI READ */}
-            <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 7 }}>
-                <Icon name="ai_sparkle" size={14} color="var(--sky)" />
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: ".03em", textTransform: "uppercase" }}>AI Read</span>
+            {/* AI insights — icon only, no label, 2 lines */}
+            <div style={{ marginTop: 10, padding: "9px 11px", borderRadius: 11, background: "var(--sky-light)", display: "flex", gap: 8, alignItems: "flex-start" }}>
+              <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                {p.ai.map((a, i) => (
+                  <span key={i} style={{ fontSize: 12, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35 }}>{a}</span>
+                ))}
               </div>
-              {p.ai.map((a, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: i ? 5 : 0 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: 999, background: i === 0 ? "var(--positive)" : "var(--reliance-base)", marginTop: 4, flexShrink: 0 }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35 }}>{a}</span>
-                </div>
-              ))}
             </div>
           </div>
         ))}
