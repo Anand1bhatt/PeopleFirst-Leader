@@ -375,12 +375,35 @@ function App() {
       {phase === "skeleton" && <HomeSkeleton persona={persona} />}
       {phase === "ready" &&
       <React.Fragment>
-        <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>{body}</div>
+        <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>
+          {body}
+          {/* Floating nav — absolutely positioned so content scrolls behind it */}
+          {wOn("floating_footer", true) &&
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 30, pointerEvents: "none" }}>
+              <div style={{ height: 60, background: "linear-gradient(to bottom, rgba(232,235,242,0), rgba(232,235,242,0.96))" }} />
+              <div style={{ padding: "0 14px 22px", pointerEvents: "all" }}>
+                <div style={{ background: "#fff", borderRadius: 28, border: "1px solid rgba(0,0,0,0.07)", boxShadow: "0 8px 28px rgba(15,23,42,.15), 0 2px 6px rgba(15,23,42,.08)", display: "flex", padding: "6px 4px" }}>
+                  {navItems.map((it) => {
+                    const on = screen === it.id;
+                    return (
+                      <button key={it.id} onClick={() => go(it.id)} style={{ flex: 1, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "4px 0", color: on ? "var(--reliance-base)" : "var(--content-minimal)" }}>
+                        <span style={{ position: "relative" }}>
+                          <Icon name={it.icon} size={23} color={on ? "var(--reliance-base)" : "var(--content-minimal)"} />
+                          {it.badge > 0 && <span className="nav-badge" style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #fff", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>}
+                        </span>
+                        <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 600 }}>{it.label}</span>
+                      </button>);
+                  })}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
         <Toast toast={toast} />
         {assistant && <AssistantSheet onClose={() => setAssistant(false)} onPick={openChat} prompts={prompts} sub={assistantSub} />}
         {chat && <ChatScreen persona={persona} seed={chatSeed} onClose={() => setChat(false)} />}
         {search && <SearchSheet onClose={() => setSearch(false)} suggestions={searchSuggestions} onPick={(s) => { setSearch(false); go(s.to); }} />}
-        <BottomNav items={navItems} active={screen} onChange={go} floating={wOn("floating_footer", true)} />
+        {!wOn("floating_footer", true) && <BottomNav items={navItems} active={screen} onChange={go} />}
       </React.Fragment>
       }
     </div>);

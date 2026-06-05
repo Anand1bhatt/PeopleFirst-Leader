@@ -761,8 +761,8 @@ function TeamsHeadcount({ onOpen }) {
           <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 14px" }} />
 
           <div style={{ flex: 1 }}>
-            <span ref={cuPresent.ref} style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, fontVariantNumeric: "tabular-nums", display: "block" }}>{cuPresent.display}</span>
-            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>{presencePct}% rate</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
+            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>Presence rate</div>
           </div>
 
           <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 14px" }} />
