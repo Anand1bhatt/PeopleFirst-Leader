@@ -400,58 +400,16 @@ function Performance({ onOpen }) {
 function CriticalProjectsCards({ onOpen }) {
   const summary = { total: 74, onTime: 47, delayed: 19, onHold: 8 };
 
-  // Enriched project data — what a leader actually needs
   const PROJECTS = [
-    {
-      name: "MyJio App",
-      status: "critical",   // critical / delayed / at_risk
-      owner: "Platform · Karan Mehta",
-      progress: 56, target: 95,
-      trend: -12,
-      dueIn: "Due Jul 15",
-      urgency: "high",
-      blocker: "3 sprints behind on payments rewrite",
-      action: "Move 1 engineer from Growth — recovers date"
-    },
-    {
-      name: "MyJio 3.1 revamp",
-      status: "delayed",
-      owner: "Design · Priya Sharma",
-      progress: 76, target: 90,
-      trend: -8,
-      dueIn: "Due Aug 1",
-      urgency: "medium",
-      blocker: "On-time delivery slipped 10pts since Feb",
-      action: "Reduce team workload — currently at 113%"
-    },
-    {
-      name: "Jio Translate",
-      status: "delayed",
-      owner: "ML · Arjun Nair",
-      progress: 58, target: 85,
-      trend: -5,
-      dueIn: "Due Jun 30",
-      urgency: "high",
-      blocker: "Scope creep in ML pipeline module",
-      action: "Freeze new feature requests until Q3"
-    },
-    {
-      name: "JioFiber B2B",
-      status: "at_risk",
-      owner: "Sales · Meena Joshi",
-      progress: 82, target: 90,
-      trend: -3,
-      dueIn: "Due Jul 20",
-      urgency: "low",
-      blocker: "Legal sign-off pending for enterprise contracts",
-      action: "Escalate to legal — 3 deals blocked"
-    }
+    { name: "MyJio App",        status: "critical", pct: 74, trend: -12, dueIn: "Due in 18 days", blocker: "3 sprints behind on payments rewrite" },
+    { name: "MyJio 3.1 revamp", status: "delayed",  pct: 76, trend: -8,  dueIn: "Due in 32 days", blocker: "On-time delivery slipped 10pts since Feb" },
+    { name: "Jio Translate",    status: "delayed",  pct: 58, trend: -5,  dueIn: "Due in 6 days",  blocker: "Scope creep in ML pipeline module" },
+    { name: "JioFiber B2B",     status: "at_risk",  pct: 82, trend: -3,  dueIn: "Due in 25 days", blocker: "Legal sign-off pending for enterprise contracts" }
   ];
 
   const statusColor = (s) => s === "critical" ? "var(--negative)" : s === "delayed" ? "#FB923C" : "var(--warning)";
   const statusBg   = (s) => s === "critical" ? "var(--negative-light)" : s === "delayed" ? "#FFF0E5" : "var(--warning-light)";
   const statusLabel = (s) => s === "critical" ? "Critical" : s === "delayed" ? "Delayed" : "At risk";
-  const urgencyColor = { high: "var(--negative)", medium: "#FB923C", low: "var(--warning)" };
 
   const scrollRef = React.useRef(null);
 
@@ -503,56 +461,30 @@ function CriticalProjectsCards({ onOpen }) {
             background: "var(--surface-minimal)",
             borderRadius: 14,
             border: "1px solid var(--stroke-minimal)",
-            boxShadow: "0 2px 10px rgba(15,23,42,.07)",
-            padding: "14px",
-            display: "flex", flexDirection: "column", gap: 10
+            boxShadow: "0 2px 8px rgba(15,23,42,.07)",
+            padding: "12px 13px",
+            display: "flex", flexDirection: "column", gap: 8
           }}>
 
-            {/* Row 1: name + status */}
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2 }}>{p.name}</div>
-                <div style={{ fontSize: 11, color: "var(--content-minimal)", fontWeight: 500, marginTop: 2 }}>{p.owner}</div>
-              </div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "3px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{statusLabel(p.status)}</span>
+            {/* Row 1: name + status badge */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{statusLabel(p.status)}</span>
             </div>
 
-            {/* Row 2: Big % + trend + due date */}
-            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                <span style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-.04em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.progress}%</span>
-                <Trend dir="down" good={false}>{p.trend} pts</Trend>
-              </div>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: urgencyColor[p.urgency], display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ width: 6, height: 6, borderRadius: 999, background: urgencyColor[p.urgency], flexShrink: 0 }} />
-                {p.dueIn}
-              </span>
+            {/* Row 2: Big % + trend */}
+            <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
+              <span style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-.04em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
+              <Trend dir="down" good={false}>{p.trend} pts</Trend>
             </div>
 
-            {/* Row 3: Progress bar vs target */}
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)" }}>Progress</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--content-moderate)" }}>Target {p.target}%</span>
-              </div>
-              <div style={{ height: 7, borderRadius: 999, background: "var(--surface-subtle)", overflow: "hidden", position: "relative" }}>
-                {/* Target marker */}
-                <div style={{ position: "absolute", left: `${p.target}%`, top: 0, bottom: 0, width: 2, background: "var(--stroke-heavy)", zIndex: 1 }} />
-                {/* Progress fill */}
-                <div style={{ height: "100%", width: `${p.progress}%`, borderRadius: 999, background: statusColor(p.status) }} />
-              </div>
-            </div>
+            {/* Row 3: Due date */}
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>{p.dueIn}</div>
 
-            {/* Row 4: Blocker + Action — what leader needs */}
-            <div style={{ background: "var(--sky-light)", borderRadius: 10, padding: "9px 10px" }}>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 5 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: "var(--negative)", textTransform: "uppercase", letterSpacing: ".03em", flexShrink: 0 }}>⚑</span>
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-heavy)", lineHeight: 1.35 }}>{p.blocker}</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
-                <Icon name="ai_sparkle" size={12} color="var(--sky)" style={{ marginTop: 1, flexShrink: 0 }} />
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35 }}>{p.action}</span>
-              </div>
+            {/* Row 4: Warning blocker — single line */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 6, padding: "7px 9px", borderRadius: 9, background: "var(--negative-light)" }}>
+              <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}>⚠</span>
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: "#7a1515", lineHeight: 1.4 }}>{p.blocker}</span>
             </div>
           </div>
         ))}
@@ -1184,7 +1116,7 @@ function ExpenseBudget({ onOpen }) {
 }
 
 Object.assign(window, {
-  AIBriefing, Performance, CriticalProjectsCards, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Teams, TeamsGauge, TeamsHeadcount, Recruitment, Bookings, News
+  AIBriefing, Performance, CriticalProjectsCards, ExpenseBudget, ExpenseBudgetBars, ExpenseBudgetV2, ActionItems, TeamSnapshot, Teams, TeamsGauge, TeamsHeadcount, Recruitment, Bookings, News
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1276,6 +1208,88 @@ function ExpenseBudgetBars({ onOpen }) {
 }
 
 Object.assign(window, { ExpenseBudgetBars });
+
+// ═══════════════════════════════════════════════════════════════
+// EXPENSE & BUDGET V2 — chips/badges + cleaner layout + consistent AI
+// ═══════════════════════════════════════════════════════════════
+function ExpenseBudgetV2({ onOpen }) {
+  const cuSpent = useCountUp(86, { prefix: '₹', suffix: 'L', duration: 1000 });
+  const pct = 83;
+
+  // No dots, spent/budget format, variance as badge
+  const cats = [
+    { label: "Training & events", spent: 10, budget: 8,  tone: "off",     badge: "₹2L over",  badgeType: "over" },
+    { label: "Team travel",        spent: 35, budget: 32, tone: "risk",    badge: "₹3L over",  badgeType: "over" },
+    { label: "Contractors",        spent: 24, budget: 30, tone: "healthy", badge: "₹6L left",  badgeType: "left" },
+    { label: "Tooling & SaaS",     spent: 17, budget: 18, tone: "ok",      badge: "₹1L left",  badgeType: "left" },
+  ];
+
+  const dotColor  = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : t === "ok" ? "#94A3B8" : "var(--negative)";
+  const spentColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : t === "ok" ? "var(--warning)" : "var(--negative)";
+
+  // Badge chip styles
+  const badgeStyle = (type) => ({
+    display: "inline-flex", alignItems: "center",
+    fontSize: 11.5, fontWeight: 700,
+    padding: "2px 8px", borderRadius: 999,
+    whiteSpace: "nowrap",
+    color:       type === "over" ? "var(--negative)" : "var(--positive)",
+    background:  type === "over" ? "var(--negative-light)" : "var(--positive-light)",
+  });
+
+  return (
+    <Widget title="Expense & Budget" action="Breakdown" onAction={onOpen}>
+      <Card surface="elev" pad={18}>
+
+        {/* Header row — spend + pct */}
+        <div>
+          <div style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".03em" }}>Q2 spend vs plan</div>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginTop: 6 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
+              <span ref={cuSpent.ref} style={{ fontSize: 32, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>{cuSpent.display}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--content-minimal)" }}>of ₹1.04 Cr</span>
+            </div>
+            <span style={{ fontSize: 16, fontWeight: 800, color: "var(--warning)", fontVariantNumeric: "tabular-nums" }}>{pct}%</span>
+          </div>
+        </div>
+
+        {/* Single progress bar */}
+        <div style={{ height: 8, borderRadius: 999, background: "var(--surface-subtle)", overflow: "hidden", marginTop: 12, marginBottom: 18 }}>
+          <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "var(--reliance-base)", transition: "width .8s cubic-bezier(.4,0,.2,1) .2s" }} />
+        </div>
+
+        {/* Category rows — no dots, spent/budget, variance badge */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {cats.map((c, i) => (
+            <div key={c.label} style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "13px 0",
+              borderTop: i > 0 ? "1px solid var(--stroke-minimal)" : "none",
+            }}>
+              {/* Label */}
+              <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{c.label}</span>
+              {/* Spent / Budget */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 1, flexShrink: 0 }}>
+                <span style={{ fontSize: 18, fontWeight: 900, color: spentColor(c.tone), fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>₹{c.spent}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--content-minimal)", fontVariantNumeric: "tabular-nums" }}>/{c.budget}L</span>
+              </div>
+              {/* Variance badge / chip */}
+              <span style={badgeStyle(c.badgeType)}>{c.badge}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* AI comment — consistent with other widgets */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 4, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ flexShrink: 0, marginTop: 2 }} />
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            International travel driving 51% of overspend. Cap cross-border approvals in Q3.
+          </span>
+        </div>
+
+      </Card>
+    </Widget>);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // EXPENSE & BUDGET (donut variant) — composition of spend

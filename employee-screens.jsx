@@ -321,7 +321,13 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
         { key: "projects_cards",    label: "Summary + Cards",     desc: "Stats strip + business-focused cards", def: false },
       ]
     },
-    { key: "expense",     icon: "card",      label: "Expense & Budget",   desc: "Category bars + pie chart" },
+    {
+      key: "expense_group", icon: "card", label: "Expense & Budget", desc: "Q2 spend vs plan",
+      children: [
+        { key: "expense_bars", label: "Bars view",   desc: "Horizontal bars + donut chart", def: true },
+        { key: "expense_v2",   label: "Badges view", desc: "Spent/budget rows with variance chips", def: false },
+      ]
+    },
     { key: "approvals",   icon: "confirm",   label: "Approvals",          desc: "Pending approval queue" },
     {
       key: "teams_group", icon: "group", label: "Teams", desc: "Attendance breakdown",

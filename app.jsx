@@ -272,7 +272,8 @@ function App() {
           <AIBriefing expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />
           {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
           {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
-          {wOn("expense") && <ExpenseBudgetBars onOpen={() => go("reports")} />}
+          {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
+          {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
           {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
           {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
           {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
