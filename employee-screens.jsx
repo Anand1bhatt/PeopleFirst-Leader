@@ -346,6 +346,7 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
     { key: "recruitment", icon: "id",        label: "Recruitment",        desc: "Pipeline health by role" },
     { key: "upcoming",    icon: "calendar",  label: "Upcoming",           desc: "Next meetings & events" },
     { key: "news",        icon: "flag",      label: "News & Updates",     desc: "Policy, people, celebrations" },
+    { key: "floating_footer", icon: "more_horizontal", label: "Floating Footer", desc: "Glass pill navigation bar" },
   ];
 
   const p = PROFILES[persona];

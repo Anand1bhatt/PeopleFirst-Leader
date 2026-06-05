@@ -17,10 +17,18 @@ const ACCENTS = {
 // ─────────────────────────────────────────────────────────────
 // Header — greeting + date + avatar (shared)
 // ─────────────────────────────────────────────────────────────
-function Header({ name, initials, onBell, onSearch, onProfile, badge }) {
+function Header({ name, initials, onBell, onSearch, onProfile, badge, scrolled }) {
   const ghostBtn = { width: 40, height: 40, borderRadius: 999, border: "none", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
   return (
-    <div style={{ padding: "10px 12px 14px 16px", background: "var(--surface-minimal)" }}>
+    <div style={{
+      padding: "10px 12px 14px 16px",
+      background: scrolled ? "rgba(255,255,255,0.82)" : "var(--surface-minimal)",
+      backdropFilter: scrolled ? "blur(18px)" : "none",
+      WebkitBackdropFilter: scrolled ? "blur(18px)" : "none",
+      borderBottom: scrolled ? "1px solid rgba(255,255,255,0.4)" : "1px solid transparent",
+      transition: "background .25s ease, backdrop-filter .25s ease, border-color .25s ease",
+      flexShrink: 0,
+    }}>
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, letterSpacing: "-.025em", color: "var(--content-heavy)", lineHeight: 1.1 }}>Good morning</h1>
@@ -42,27 +50,42 @@ function Header({ name, initials, onBell, onSearch, onProfile, badge }) {
 // ─────────────────────────────────────────────────────────────
 // Bottom navigation (shared, items per persona)
 // ─────────────────────────────────────────────────────────────
-function BottomNav({ items, active, onChange }) {
+function BottomNav({ items, active, onChange, floating }) {
+  const NavItem = ({ it }) => {
+    const on = active === it.id;
+    return (
+      <button key={it.id} onClick={() => onChange(it.id)} style={{
+        flex: 1, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "4px 0",
+        color: on ? "var(--reliance-base)" : "var(--content-minimal)"
+      }}>
+        <span style={{ position: "relative" }}>
+          <Icon name={it.icon} size={23} color={on ? "var(--reliance-base)" : "var(--content-minimal)"} />
+          {it.badge > 0 &&
+          <span className="nav-badge" style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--surface-minimal)", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>
+          }
+        </span>
+        <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 600 }}>{it.label}</span>
+      </button>);
+  };
+
+  if (floating) return (
+    <div style={{ padding: "6px 16px 28px", background: "transparent", flexShrink: 0 }}>
+      <div style={{
+        backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+        background: "rgba(255,255,255,0.78)",
+        borderRadius: 32,
+        border: "1px solid rgba(255,255,255,0.6)",
+        boxShadow: "0 4px 32px rgba(15,23,42,.14), 0 1px 6px rgba(15,23,42,.06)",
+        display: "flex", padding: "6px 4px"
+      }}>
+        {items.map((it) => <NavItem key={it.id} it={it} />)}
+      </div>
+    </div>);
+
   return (
     <div style={{ background: "var(--surface-minimal)", borderTop: "1px solid var(--stroke-minimal)", display: "flex", padding: "8px 4px 26px", flexShrink: 0 }}>
-      {items.map((it) => {
-        const on = active === it.id;
-        return (
-          <button key={it.id} onClick={() => onChange(it.id)} style={{
-            flex: 1, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "4px 0",
-            color: on ? "var(--reliance-base)" : "var(--content-minimal)"
-          }}>
-            <span style={{ position: "relative" }}>
-              <Icon name={it.icon} size={23} color={on ? "var(--reliance-base)" : "var(--content-minimal)"} />
-              {it.badge > 0 &&
-              <span className="nav-badge" style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--surface-minimal)", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>
-              }
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 600 }}>{it.label}</span>
-          </button>);
-
-      })}
+      {items.map((it) => <NavItem key={it.id} it={it} />)}
     </div>);
 
 }
@@ -184,6 +207,8 @@ function App() {
   };
   const wOn = (key, def = true) => wCfg[key] === undefined ? def : wCfg[key];
   const wVariant = (key, def) => wCfg[key] || def;
+  const [scrolled, setScrolled] = useState(false);
+  const onScroll = (e) => setScrolled(e.target.scrollTop > 6);
   // Boot sequence: splash → award → skeleton → ready
   const [phase, setPhase] = useState("splash");
   useEffect(() => {
@@ -265,21 +290,23 @@ function App() {
   let body;
   if (persona === "leader") {
     if (screen === "home") body =
-    <div style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
-        <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
-        <div style={{ padding: "20px 16px 28px", display: "flex", flexDirection: "column", gap }}>
-          {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-          {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-          {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
-          {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
-          {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
-          {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
-          {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
-          {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-          {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-          {wOn("recruitment") && <Recruitment onOpen={() => go("more")} />}
-          {wOn("upcoming") && <Bookings onOpen={() => flash("Opening calendar")} />}
-          {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+        <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} scrolled={scrolled} />
+        <div onScroll={onScroll} style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
+          <div style={{ padding: "20px 16px 110px", display: "flex", flexDirection: "column", gap }}>
+            {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
+            {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
+            {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
+            {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
+            {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
+            {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
+            {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
+            {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+            {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+            {wOn("recruitment") && <Recruitment onOpen={() => go("more")} />}
+            {wOn("upcoming") && <Bookings onOpen={() => flash("Opening calendar")} />}
+            {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
+          </div>
         </div>
       </div>;else
 
@@ -289,9 +316,10 @@ function App() {
     if (screen === "more") body = <MoreScreen onBack={() => go("home")} persona={persona} onSwitch={(p) => setTweak("persona", p)} wCfg={wCfg} updateWCfg={updateWCfg} wOn={wOn} />;
   } else {
     if (screen === "home") body =
-    <div style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
-        <Header name="Priya" initials="PS" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
-        <div style={{ padding: "20px 16px 28px", display: "flex", flexDirection: "column", gap, textAlign: "left" }}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+        <Header name="Priya" initials="PS" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} scrolled={scrolled} />
+        <div onScroll={onScroll} style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
+        <div style={{ padding: "20px 16px 110px", display: "flex", flexDirection: "column", gap, textAlign: "left" }}>
           <EmpBrief items={empItems} onItem={(it) => go(it.target)} onOpenAssistant={() => setAssistant(true)} />
           <Attendance att={att} onMark={markAtt} onOpen={() => go("attendance")} />
           <QuickLinks onGo={quickGo} />
@@ -299,6 +327,7 @@ function App() {
           <BookingsEmp onViewAll={() => flash("All bookings")} />
           <EmpNews onOpen={() => flash("Opening all updates")} />
           <RefersCard onCall={() => flash("Calling REFERS · 1800 8899 009")} />
+        </div>
         </div>
       </div>;else
 
@@ -346,7 +375,7 @@ function App() {
         {assistant && <AssistantSheet onClose={() => setAssistant(false)} onPick={openChat} prompts={prompts} sub={assistantSub} />}
         {chat && <ChatScreen persona={persona} seed={chatSeed} onClose={() => setChat(false)} />}
         {search && <SearchSheet onClose={() => setSearch(false)} suggestions={searchSuggestions} onPick={(s) => { setSearch(false); go(s.to); }} />}
-        <BottomNav items={navItems} active={screen} onChange={go} />
+        <BottomNav items={navItems} active={screen} onChange={go} floating={wOn("floating_footer", true)} />
       </React.Fragment>
       }
     </div>);
