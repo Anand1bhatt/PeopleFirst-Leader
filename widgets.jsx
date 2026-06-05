@@ -735,25 +735,38 @@ function TeamsGauge({ onOpen }) {
 
 // ── View B: Headcount + avatars + stat row ──
 function TeamsHeadcount({ onOpen }) {
-  const { total, present, vTotal, stats, avatars } = useTeamsData(onOpen);
+  const { total, present, vTotal, stats } = useTeamsData(onOpen);
+  const presencePct = Math.round(present / total * 100);
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={onOpen}>
       <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
         <div style={{ padding: "18px 16px 14px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-            <div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 0, justifyContent: "flex-start" }}>
+
+            {/* Headcount */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
-              <div style={{ fontSize: 44, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.05em", lineHeight: 1, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
             </div>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#22C55E", marginBottom: 8 }}>{Math.round(present / total * 100)}% present</div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {avatars.map((src, i) => (
-                  <img key={i} src={src} alt="" style={{ width: 34, height: 34, borderRadius: 999, objectFit: "cover", border: "2px solid white", marginLeft: i === 0 ? 0 : -10, display: "block", flexShrink: 0, position: "relative", zIndex: avatars.length - i }} />
-                ))}
-                <div style={{ height: 34, minWidth: 34, borderRadius: 999, padding: "0 7px", background: "var(--surface-subtle)", border: "2px solid white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--content-moderate)", marginLeft: -10, flexShrink: 0, position: "relative", zIndex: 0, whiteSpace: "nowrap" }}>+245</div>
-              </div>
+
+            {/* Divider */}
+            <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 16px" }} />
+
+            {/* Presence Rate */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Presence Rate</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
             </div>
+
+            {/* Divider */}
+            <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 16px" }} />
+
+            {/* vs yesterday */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>vs yesterday</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
+            </div>
+
           </div>
         </div>
         <div style={{ display: "flex", borderTop: "1px solid var(--stroke-minimal)" }}>
