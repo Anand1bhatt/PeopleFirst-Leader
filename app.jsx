@@ -69,13 +69,13 @@ function BottomNav({ items, active, onChange, floating }) {
   };
 
   if (floating) return (
-    <div style={{ flexShrink: 0, padding: "0 16px 28px" }}>
+    <div style={{ flexShrink: 0, background: "linear-gradient(to bottom, transparent 0%, oklch(93% .012 264) 38%)", padding: "28px 14px 22px" }}>
       <div style={{
-        backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
-        background: "rgba(255,255,255,0.78)",
-        borderRadius: 32,
-        border: "1px solid rgba(255,255,255,0.6)",
-        boxShadow: "0 4px 32px rgba(15,23,42,.14), 0 1px 6px rgba(15,23,42,.06)",
+        backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)",
+        background: "rgba(255,255,255,0.9)",
+        borderRadius: 30,
+        border: "1px solid rgba(255,255,255,0.75)",
+        boxShadow: "0 2px 20px rgba(15,23,42,.12), 0 1px 4px rgba(15,23,42,.07)",
         display: "flex", padding: "6px 4px"
       }}>
         {items.map((it) => <NavItem key={it.id} it={it} />)}
@@ -380,7 +380,6 @@ function App() {
         {assistant && <AssistantSheet onClose={() => setAssistant(false)} onPick={openChat} prompts={prompts} sub={assistantSub} />}
         {chat && <ChatScreen persona={persona} seed={chatSeed} onClose={() => setChat(false)} />}
         {search && <SearchSheet onClose={() => setSearch(false)} suggestions={searchSuggestions} onPick={(s) => { setSearch(false); go(s.to); }} />}
-        {wOn("floating_footer", true) && <div style={{ height: 56, marginBottom: -56, background: "linear-gradient(to bottom, transparent, oklch(93% .012 264))", pointerEvents: "none", position: "relative", zIndex: 20 }} />}
         <BottomNav items={navItems} active={screen} onChange={go} floating={wOn("floating_footer", true)} />
       </React.Fragment>
       }
