@@ -69,13 +69,13 @@ function BottomNav({ items, active, onChange, floating }) {
   };
 
   if (floating) return (
-    <div style={{ flexShrink: 0, background: "linear-gradient(to bottom, transparent 0%, oklch(93% .012 264) 38%)", padding: "28px 14px 22px" }}>
+    <div style={{ flexShrink: 0, padding: "0 14px 24px" }}>
+      <div style={{ height: 40, background: "linear-gradient(to bottom, rgba(232,235,242,0) 0%, rgba(232,235,242,1) 100%)", marginBottom: 0 }} />
       <div style={{
-        backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)",
-        background: "rgba(255,255,255,0.9)",
-        borderRadius: 30,
-        border: "1px solid rgba(255,255,255,0.75)",
-        boxShadow: "0 2px 20px rgba(15,23,42,.12), 0 1px 4px rgba(15,23,42,.07)",
+        background: "#ffffff",
+        borderRadius: 28,
+        border: "1px solid rgba(0,0,0,0.06)",
+        boxShadow: "0 6px 24px rgba(15,23,42,.13), 0 1px 4px rgba(15,23,42,.07)",
         display: "flex", padding: "6px 4px"
       }}>
         {items.map((it) => <NavItem key={it.id} it={it} />)}
