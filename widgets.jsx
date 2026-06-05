@@ -1018,7 +1018,7 @@ function News({ onOpen, onWish }) {
                   ? "opacity .38s ease 160ms, transform .42s cubic-bezier(.4,0,.2,1) 110ms"
                   : "opacity .25s ease 0ms, transform .3s ease 0ms",
               }}>
-                <NewsRow n={items[1]} divider={true} />
+                {items[1] && <NewsRow n={items[1]} divider={true} />}
               </div>
             </div>
           </div>
