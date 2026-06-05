@@ -22,11 +22,10 @@ function Header({ name, initials, onBell, onSearch, onProfile, badge, scrolled }
   return (
     <div style={{
       padding: "10px 12px 14px 16px",
-      background: scrolled ? "rgba(255,255,255,0.82)" : "var(--surface-minimal)",
-      backdropFilter: scrolled ? "blur(18px)" : "none",
-      WebkitBackdropFilter: scrolled ? "blur(18px)" : "none",
-      borderBottom: scrolled ? "1px solid rgba(255,255,255,0.4)" : "1px solid transparent",
-      transition: "background .25s ease, backdrop-filter .25s ease, border-color .25s ease",
+      background: "rgba(248,249,252,0.78)",
+      backdropFilter: "blur(20px)",
+      WebkitBackdropFilter: "blur(20px)",
+      borderBottom: "1px solid rgba(255,255,255,0.35)",
       flexShrink: 0,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -70,16 +69,20 @@ function BottomNav({ items, active, onChange, floating }) {
   };
 
   if (floating) return (
-    <div style={{ padding: "6px 16px 28px", background: "transparent", flexShrink: 0 }}>
-      <div style={{
-        backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
-        background: "rgba(255,255,255,0.78)",
-        borderRadius: 32,
-        border: "1px solid rgba(255,255,255,0.6)",
-        boxShadow: "0 4px 32px rgba(15,23,42,.14), 0 1px 6px rgba(15,23,42,.06)",
-        display: "flex", padding: "6px 4px"
-      }}>
-        {items.map((it) => <NavItem key={it.id} it={it} />)}
+    <div style={{ flexShrink: 0, position: "relative" }}>
+      {/* gradient fade — content bleeds through, no hard edge */}
+      <div style={{ position: "absolute", top: -48, left: 0, right: 0, height: 48, background: "linear-gradient(to bottom, transparent, oklch(93% .012 264))", pointerEvents: "none" }} />
+      <div style={{ padding: "0 16px 28px" }}>
+        <div style={{
+          backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+          background: "rgba(255,255,255,0.78)",
+          borderRadius: 32,
+          border: "1px solid rgba(255,255,255,0.6)",
+          boxShadow: "0 4px 32px rgba(15,23,42,.14), 0 1px 6px rgba(15,23,42,.06)",
+          display: "flex", padding: "6px 4px"
+        }}>
+          {items.map((it) => <NavItem key={it.id} it={it} />)}
+        </div>
       </div>
     </div>);
 
