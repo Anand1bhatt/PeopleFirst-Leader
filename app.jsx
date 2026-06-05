@@ -60,9 +60,12 @@ function FloatingNav({ items, active, onChange }) {
       {/* Pill */}
       <div style={{ background: "rgba(232,235,242,1)", padding: "0 14px 24px", pointerEvents: "all" }}>
         <div style={{
-          background: "#ffffff",
-          borderRadius: 26,
-          boxShadow: "0 2px 16px rgba(15,23,42,.12), 0 0 0 1px rgba(15,23,42,.06)",
+          background: "rgba(255,255,255,0.72)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          borderRadius: 999,
+          border: "1px solid rgba(255,255,255,0.6)",
+          boxShadow: "0 4px 24px rgba(15,23,42,.13), 0 1px 4px rgba(15,23,42,.07)",
           display: "flex",
           padding: "6px 4px",
         }}>
