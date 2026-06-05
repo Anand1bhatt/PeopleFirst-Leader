@@ -385,6 +385,7 @@ class AppErrorBoundary extends React.Component {
         <div style={{ position: "fixed", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--surface-subtle, #F1F5F9)", gap: 12 }}>
           <div style={{ fontSize: 40 }}>🔄</div>
           <div style={{ fontSize: 14, fontWeight: 600, color: "#475569" }}>Refreshing…</div>
+          <div style={{ fontSize: 11, color: "#94a3b8", maxWidth: 300, textAlign: "center", padding: "0 16px" }}>{this.state.error}</div>
         </div>
       );
     }
