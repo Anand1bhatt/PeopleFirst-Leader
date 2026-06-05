@@ -538,55 +538,40 @@ function useMountCount(target, delay = 0) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 4b · TEAMS — 2 switchable views (Frame 3 gauge | Frame 2 headcount)
+// 4b · TEAMS — shared data + 2 independent widgets
+// TeamsGauge = semicircle gauge + 2x2 grid
+// TeamsHeadcount = large number + avatars + stat row
 // ═══════════════════════════════════════════════════════════════
-function Teams({ onOpen }) {
-  const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
-  const [view, setView] = React.useState(0);
 
-  // Mount-based count — no ref conflicts
+// Shared Teams data hook
+function useTeamsData(onOpen) {
+  const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
   const vTotal   = useMountCount(total,   200);
   const vPresent = useMountCount(present, 300);
   const vLeave   = useMountCount(leave,   400);
   const vNotIn   = useMountCount(notIn,   500);
   const vWoph    = useMountCount(woph,    600);
-
   const stats = [
     { label: "Present",  val: vPresent, color: "#22C55E", filter: "present" },
     { label: "On leave", val: vLeave,   color: "#38BDF8", filter: "on_leave" },
     { label: "Not in",   val: vNotIn,   color: "#FB923C", filter: "not_in" },
     { label: "WO/PH",   val: vWoph,    color: "#94A3B8", filter: "woph" }
   ];
-
-  // Semicircle gauge data
   const cx = 100, cy = 110, r = 86;
-  const fullCirc = 2 * Math.PI * r;
-  const halfCirc = fullCirc / 2;
-  const GAP = 4;
+  const fullCirc = 2 * Math.PI * r, halfCirc = fullCirc / 2, GAP = 4;
   const segs = [
-    { value: present, color: "#22C55E" },
-    { value: leave,   color: "#38BDF8" },
-    { value: notIn,   color: "#FB923C" },
-    { value: woph,    color: "#CBD5E1" }
+    { value: present, color: "#22C55E" }, { value: leave, color: "#38BDF8" },
+    { value: notIn, color: "#FB923C" }, { value: woph, color: "#CBD5E1" }
   ];
   let acc = 0;
-  const arcs = segs.map(s => {
-    const len = (s.value / total) * halfCirc;
-    const a = { ...s, len: Math.max(len - GAP, 4), offset: acc };
-    acc += len;
-    return a;
-  });
+  const arcs = segs.map(s => { const len=(s.value/total)*halfCirc; const a={...s,len:Math.max(len-GAP,4),offset:acc}; acc+=len; return a; });
+  const avatars = ["https://i.pravatar.cc/40?img=11","https://i.pravatar.cc/40?img=25","https://i.pravatar.cc/40?img=32","https://i.pravatar.cc/40?img=47","https://i.pravatar.cc/40?img=53"];
+  return { total, present, leave, notIn, woph, vTotal, stats, arcs, fullCirc, halfCirc, cx, cy, avatars };
+}
 
-  // Real person photos via pravatar CDN
-  const avatars = [
-    "https://i.pravatar.cc/40?img=11",
-    "https://i.pravatar.cc/40?img=25",
-    "https://i.pravatar.cc/40?img=32",
-    "https://i.pravatar.cc/40?img=47",
-    "https://i.pravatar.cc/40?img=53"
-  ];
-
-  // ── Shared stat row (used by both views) ──
+// ── View A: Gauge + 2×2 grid ──
+function TeamsGauge({ onOpen }) {
+  const { total, present, vTotal, stats, arcs, fullCirc, halfCirc, cx, cy } = useTeamsData(onOpen);
   const StatRow = () => (
     <div style={{ display: "flex", borderTop: "1px solid var(--stroke-minimal)" }}>
       {stats.map((s, i) => (
@@ -605,118 +590,89 @@ function Teams({ onOpen }) {
     </div>
   );
 
+  // ── Gauge + 2×2 grid (no header toggle)
   return (
-    <Widget icon="group" title="Teams" action="Team" onAction={onOpen}
-      right={
-        /* Toggle pills */
-        <div style={{ display: "flex", gap: 4, marginRight: 8, background: "var(--surface-subtle)", borderRadius: 999, padding: "3px" }}>
-          {["⊙", "☰"].map((icon, i) => (
-            <button key={i} onClick={() => setView(i)} style={{
-              width: 28, height: 22, borderRadius: 999, border: "none", cursor: "pointer",
-              fontFamily: "inherit", fontSize: 13,
-              background: view === i ? "var(--surface-minimal)" : "transparent",
-              color: view === i ? "var(--reliance-base)" : "var(--content-minimal)",
-              boxShadow: view === i ? "0 1px 3px rgba(0,0,0,.1)" : "none",
-              transition: "all .2s ease"
-            }}>{icon}</button>
-          ))}
-        </div>
-      }>
-
+    <Widget icon="group" title="Teams" action="Team" onAction={onOpen}>
       <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
-
-        {/* ── VIEW 0: Gauge (Frame 3) ── */}
-        {view === 0 && (
-          <div style={{ position: "relative" }}>
-            <div style={{ display: "flex", alignItems: "center", padding: "16px 16px 0" }}>
-              {/* Gauge left */}
-              <div style={{ flex: "0 0 48%", position: "relative" }}>
-                <svg viewBox="0 0 200 118" style={{ width: "100%", display: "block" }}>
-                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F1F5F9" strokeWidth={20}
-                    strokeDasharray={`${halfCirc} ${fullCirc}`} strokeDashoffset={0}
-                    transform={`rotate(180 ${cx} ${cy})`} strokeLinecap="round" />
-                  {arcs.map((arc, i) => (
-                    <circle key={i} cx={cx} cy={cy} r={r} fill="none"
-                      stroke={arc.color} strokeWidth={20}
-                      strokeDasharray={`${arc.len} ${fullCirc - arc.len}`}
-                      strokeDashoffset={-arc.offset}
-                      transform={`rotate(180 ${cx} ${cy})`}
-                      strokeLinecap={i === 0 || i === arcs.length - 1 ? "round" : "butt"}
-                      style={{ transition: `stroke-dasharray .8s cubic-bezier(.4,0,.2,1) ${i * 80}ms` }}
-                    />
-                  ))}
-                </svg>
-                <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, textAlign: "center", pointerEvents: "none" }}>
-                  <div style={{ fontSize: 30, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
-                  <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>Headcount</div>
-                </div>
-              </div>
-
-              {/* 2×2 grid right */}
-              <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, paddingLeft: 12 }}>
-                {stats.map(s => (
-                  <button key={s.label} onClick={() => onOpen(s.filter)} style={{
-                    background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-                    textAlign: "left", padding: 0, display: "flex", flexDirection: "column", gap: 2
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: 999, background: s.color, flexShrink: 0 }} />
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>{s.label}</span>
-                    </div>
-                    <span style={{ fontSize: 24, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1.1 }}>{s.val}</span>
-                  </button>
+        <div style={{ position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", padding: "16px 16px 0" }}>
+            <div style={{ flex: "0 0 48%", position: "relative" }}>
+              <svg viewBox="0 0 200 118" style={{ width: "100%", display: "block" }}>
+                <circle cx={cx} cy={cy} r={r} fill="none" stroke="#F1F5F9" strokeWidth={20}
+                  strokeDasharray={`${halfCirc} ${fullCirc}`} strokeDashoffset={0}
+                  transform={`rotate(180 ${cx} ${cy})`} strokeLinecap="round" />
+                {arcs.map((arc, i) => (
+                  <circle key={i} cx={cx} cy={cy} r={r} fill="none"
+                    stroke={arc.color} strokeWidth={20}
+                    strokeDasharray={`${arc.len} ${fullCirc - arc.len}`}
+                    strokeDashoffset={-arc.offset}
+                    transform={`rotate(180 ${cx} ${cy})`}
+                    strokeLinecap={i === 0 || i === arcs.length - 1 ? "round" : "butt"}
+                    style={{ transition: `stroke-dasharray .8s cubic-bezier(.4,0,.2,1) ${i * 80}ms` }}
+                  />
                 ))}
+              </svg>
+              <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, textAlign: "center", pointerEvents: "none" }}>
+                <div style={{ fontSize: 30, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
+                <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>Headcount</div>
               </div>
             </div>
-            <div style={{ height: 16 }} />
-          </div>
-        )}
-
-        {/* ── VIEW 1: Headcount + Avatars (Frame 2) ── */}
-        {view === 1 && (
-          <div style={{ padding: "18px 16px 14px" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
-                <div style={{ fontSize: 44, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.05em", lineHeight: 1, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#22C55E", marginBottom: 8 }}>{Math.round(present / total * 100)}% present</div>
-                {/* Overlapping avatars — left to right, +245 at end */}
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  {avatars.map((src, i) => (
-                    <img key={i} src={src} alt=""
-                      style={{
-                        width: 34, height: 34, borderRadius: 999,
-                        objectFit: "cover",
-                        border: "2px solid white",
-                        marginLeft: i === 0 ? 0 : -10,
-                        display: "block", flexShrink: 0,
-                        position: "relative", zIndex: avatars.length - i
-                      }}
-                    />
-                  ))}
-                  {/* +245 at the end */}
-                  <div style={{
-                    height: 34, minWidth: 34, borderRadius: 999, padding: "0 7px",
-                    background: "var(--surface-subtle)",
-                    border: "2px solid white",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 11, fontWeight: 700, color: "var(--content-moderate)",
-                    marginLeft: -10, flexShrink: 0, position: "relative", zIndex: 0,
-                    whiteSpace: "nowrap"
-                  }}>+245</div>
-                </div>
-              </div>
+            <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, paddingLeft: 12 }}>
+              {stats.map(s => (
+                <button key={s.label} onClick={() => onOpen(s.filter)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textAlign: "left", padding: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: 999, background: s.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>{s.label}</span>
+                  </div>
+                  <span style={{ fontSize: 24, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1.1 }}>{s.val}</span>
+                </button>
+              ))}
             </div>
           </div>
-        )}
-
-        {/* ── Stat row — Frame 2 only (Frame 3 already has 2×2 grid) ── */}
-        {view === 1 && <StatRow />}
+          <div style={{ height: 16 }} />
+        </div>
       </Card>
     </Widget>);
 }
+
+// ── View B: Headcount + avatars + stat row ──
+function TeamsHeadcount({ onOpen }) {
+  const { total, present, vTotal, stats, avatars } = useTeamsData(onOpen);
+  return (
+    <Widget icon="group" title="Teams" action="Team" onAction={onOpen}>
+      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
+        <div style={{ padding: "18px 16px 14px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
+              <div style={{ fontSize: 44, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.05em", lineHeight: 1, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#22C55E", marginBottom: 8 }}>{Math.round(present / total * 100)}% present</div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {avatars.map((src, i) => (
+                  <img key={i} src={src} alt="" style={{ width: 34, height: 34, borderRadius: 999, objectFit: "cover", border: "2px solid white", marginLeft: i === 0 ? 0 : -10, display: "block", flexShrink: 0, position: "relative", zIndex: avatars.length - i }} />
+                ))}
+                <div style={{ height: 34, minWidth: 34, borderRadius: 999, padding: "0 7px", background: "var(--surface-subtle)", border: "2px solid white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--content-moderate)", marginLeft: -10, flexShrink: 0, position: "relative", zIndex: 0, whiteSpace: "nowrap" }}>+245</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", borderTop: "1px solid var(--stroke-minimal)" }}>
+          {stats.map((s, i) => (
+            <button key={s.label} onClick={() => onOpen(s.filter)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "14px 4px", background: "none", border: "none", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none", cursor: "pointer", fontFamily: "inherit" }}>
+              <span style={{ fontSize: 22, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{s.val}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--content-moderate)", whiteSpace: "nowrap" }}>{s.label}</span>
+              <span style={{ width: 20, height: 3, borderRadius: 999, background: s.color, marginTop: 1 }} />
+            </button>
+          ))}
+        </div>
+      </Card>
+    </Widget>);
+}
+
+// Keep Teams as alias for TeamsGauge (backward compat)
+const Teams = TeamsGauge;
 
 // ═══════════════════════════════════════════════════════════════
 // 5 · RECRUITMENT — pipeline health
@@ -1061,7 +1017,7 @@ function ExpenseBudget({ onOpen }) {
 }
 
 Object.assign(window, {
-  AIBriefing, Performance, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Teams, Recruitment, Bookings, News
+  AIBriefing, Performance, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Teams, TeamsGauge, TeamsHeadcount, Recruitment, Bookings, News
 });
 
 // ═══════════════════════════════════════════════════════════════

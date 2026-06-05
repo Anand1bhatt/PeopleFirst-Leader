@@ -232,6 +232,61 @@ function PersonaSwitcher({ persona, onSwitch }) {
   );
 }
 
+// ── Widgets section with expandable rows ──
+function WidgetsSection({ leaderWidgets, isOn, toggle, Icon, Card, Toggle }) {
+  const [expanded, setExpanded] = React.useState({});
+  const toggleExpand = (key) => setExpanded(p => ({ ...p, [key]: !p[key] }));
+
+  return (
+    <div style={{ marginTop: 22 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".02em", color: "var(--content-moderate)", padding: "0 2px 10px" }}>Dashboard widgets</div>
+      <Card surface="elev" pad={4}>
+        {leaderWidgets.map((w, i) => (
+          <div key={w.key}>
+            {/* Main row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+              <span style={{
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: w.children ? "var(--reliance-50)" : (isOn(w.key) ? "var(--reliance-50)" : "var(--surface-subtle)"),
+                display: "flex", alignItems: "center", justifyContent: "center", transition: "background .2s ease"
+              }}>
+                <Icon name={w.icon} size={18} color={w.children ? "var(--reliance-base)" : (isOn(w.key) ? "var(--reliance-base)" : "var(--content-minimal)")} />
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{w.label}</div>
+                <div style={{ fontSize: 12, color: "var(--content-minimal)", marginTop: 1 }}>{w.desc}</div>
+              </div>
+              {w.children ? (
+                /* Expandable — show chevron */
+                <button onClick={() => toggleExpand(w.key)} style={{ width: 32, height: 32, borderRadius: 999, border: "none", background: "var(--surface-subtle)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Icon name={expanded[w.key] ? "chevron_up" : "chevron_down"} size={16} color="var(--content-moderate)" />
+                </button>
+              ) : (
+                <Toggle on={isOn(w.key)} onToggle={() => toggle(w.key)} />
+              )}
+            </div>
+
+            {/* Sub-options (expanded) */}
+            {w.children && expanded[w.key] && (
+              <div style={{ background: "var(--surface-subtle)", borderTop: "1px solid var(--stroke-minimal)" }}>
+                {w.children.map((child, ci) => (
+                  <div key={child.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px 11px 62px", borderTop: ci ? "1px solid var(--stroke-minimal)" : "none" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: isOn(child.key, child.def) ? "var(--content-heavy)" : "var(--content-moderate)", letterSpacing: "-.01em" }}>{child.label}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--content-minimal)", marginTop: 1 }}>{child.desc}</div>
+                    </div>
+                    <Toggle on={isOn(child.key, child.def)} onToggle={() => toggle(child.key)} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
 function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, wOn }) {
   const isOn = (key, def = true) => wOn ? wOn(key, def) : (wCfg[key] === undefined ? def : wCfg[key]);
   const toggle = (key) => updateWCfg && updateWCfg(key, !isOn(key));
@@ -257,12 +312,18 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
     }))
   );
 
-  // Leader widgets list
+  // Leader widgets list — items with `children` are expandable
   const leaderWidgets = [
     { key: "projects",    icon: "analytics", label: "Critical Projects",  desc: "Carousel with AI insights" },
     { key: "expense",     icon: "card",      label: "Expense & Budget",   desc: "Category bars + pie chart" },
     { key: "approvals",   icon: "confirm",   label: "Approvals",          desc: "Pending approval queue" },
-    { key: "teams",       icon: "group",     label: "Teams",              desc: "Gauge + headcount view" },
+    {
+      key: "teams_group", icon: "group", label: "Teams", desc: "Attendance breakdown",
+      children: [
+        { key: "teams_gauge",     label: "Gauge view",     desc: "Semicircle + 2×2 grid", def: true },
+        { key: "teams_headcount", label: "Headcount view", desc: "Large number + avatars", def: false },
+      ]
+    },
     { key: "recruitment", icon: "id",        label: "Recruitment",        desc: "Pipeline health by role" },
     { key: "upcoming",    icon: "calendar",  label: "Upcoming",           desc: "Next meetings & events" },
     { key: "news",        icon: "flag",      label: "News & Updates",     desc: "Policy, people, celebrations" },
@@ -302,30 +363,8 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
         </div>
 
         {/* ── WIDGETS section (Leader only) ── */}
-        {persona === "leader" && (
-          <div style={{ marginTop: 22 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".02em", color: "var(--content-moderate)", padding: "0 2px 10px" }}>Dashboard widgets</div>
-            <Card surface="elev" pad={4}>
-              {leaderWidgets.map((w, i) => (
-                <div key={w.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
-                  <span style={{
-                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: isOn(w.key) ? "var(--reliance-50)" : "var(--surface-subtle)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    transition: "background .2s ease"
-                  }}>
-                    <Icon name={w.icon} size={18} color={isOn(w.key) ? "var(--reliance-base)" : "var(--content-minimal)"} />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: isOn(w.key) ? "var(--content-heavy)" : "var(--content-minimal)", letterSpacing: "-.01em" }}>{w.label}</div>
-                    <div style={{ fontSize: 12, color: "var(--content-minimal)", marginTop: 1 }}>{w.desc}</div>
-                  </div>
-                  <Toggle on={isOn(w.key)} onToggle={() => toggle(w.key)} />
-                </div>
-              ))}
-            </Card>
-          </div>
-        )}
+        {persona === "leader" && React.createElement(WidgetsSection, { leaderWidgets, isOn, toggle, Icon, Card, Toggle })}
+
 
         {/* Other sections */}
         {sections.map((s) => (

@@ -273,7 +273,8 @@ function App() {
           {wOn("projects") && <Performance onOpen={() => go("reports")} />}
           {wOn("expense") && <ExpenseBudgetBars onOpen={() => go("reports")} />}
           {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
-          {wOn("teams") && <Teams onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+          {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+          {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
           {wOn("recruitment") && <Recruitment onOpen={() => go("more")} />}
           {wOn("upcoming") && <Bookings onOpen={() => flash("Opening calendar")} />}
           {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
