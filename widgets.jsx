@@ -96,7 +96,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
 
       {/* ── Sky header band — always visible ── */}
       <div style={{
-        background: "color-mix(in oklch, var(--sky) 18%, white)",
+        background: "var(--sky-border)",
         padding: "15px 16px 14px"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
@@ -164,7 +164,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
         }}>
           <button onClick={onToggle} style={{
             width: "100%", border: "none", borderTop: "1px solid var(--sky-border)",
-            background: "color-mix(in oklch, var(--sky) 10%, white)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
+            background: "var(--sky-light)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
             display: "flex", alignItems: "center", gap: 8
           }}>
             <Icon name="check" size={16} color="var(--positive)" />
@@ -172,7 +172,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
             <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
           </button>
           {expanded &&
-          <div style={{ background: "color-mix(in oklch, var(--sky) 10%, white)", padding: "0 16px 14px" }}>
+          <div style={{ background: "var(--sky-light)", padding: "0 16px 14px" }}>
               {handled.map((h) =>
             <div key={h.cat} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--stroke-minimal)" }}>
                   <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", width: 78, flexShrink: 0 }}>{h.cat}</span>
