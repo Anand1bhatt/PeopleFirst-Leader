@@ -943,7 +943,7 @@ function News({ onOpen, onWish }) {
   const [showCeleb, setShowCeleb] = React.useState(false);
 
   const items = [
-  { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." }];
+  { tag: "Policy", icon: "document", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." }];
 
   const celebs = [
   { name: "Karan Mehta", note: "Platform · Birthday", initials: "KM" },
@@ -956,7 +956,7 @@ function News({ onOpen, onWish }) {
 
   const NewsRow = ({ n, divider }) => (
     <div style={{ display: "flex", gap: 11, padding: "14px 14px", borderTop: divider ? "1px solid var(--stroke-minimal)" : "none", background: "var(--surface-minimal)" }}>
-      <span style={{ width: 8, height: 8, borderRadius: 999, background: n.tone, flexShrink: 0, marginTop: 5 }} />
+      <span style={{ flexShrink: 0, marginTop: 1 }}><Icon name={n.icon} size={16} color={n.tone} /></span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 11, fontWeight: 800, color: n.tone, textTransform: "uppercase", letterSpacing: ".04em" }}>{n.tag}</div>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>{n.title}</div>
@@ -1053,7 +1053,7 @@ function News({ onOpen, onWish }) {
                   : "opacity .22s ease 0ms, transform .28s ease 0ms",
               }}>
                 <button onClick={() => setShowCeleb((v) => !v)} style={{ width: "100%", display: "flex", gap: 11, padding: "14px 14px", borderTop: "1px solid var(--stroke-minimal)", background: "none", border: "none", borderTopWidth: 1, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
-                  <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--sky)", flexShrink: 0, marginTop: 5 }} />
+                  <span style={{ flexShrink: 0, marginTop: 1 }}><Icon name="gift" size={16} color="var(--sky)" /></span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 11, fontWeight: 800, color: "var(--sky)", textTransform: "uppercase", letterSpacing: ".04em" }}>Celebrations</div>
                     <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>5 birthdays & anniversaries today</div>
