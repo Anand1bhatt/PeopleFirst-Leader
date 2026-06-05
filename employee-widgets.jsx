@@ -17,7 +17,7 @@ function EmpBrief({ items, onItem, onOpenAssistant }) {
       borderRadius: 20, overflow: "hidden", border: "1px solid var(--sky-border)",
       boxShadow: "0 1px 3px rgba(15,23,42,.05), 0 8px 24px -12px var(--sky-shadow)", background: "var(--surface-minimal)"
     }}>
-      <div style={{ background: "var(--sky-light)", padding: "15px 16px 14px" }}>
+      <div style={{ background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)", padding: "15px 16px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <span style={{ width: 30, height: 30, borderRadius: 9, background: "var(--sky)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px -1px var(--sky-shadow)" }}>
             <Icon name="ai_sparkle" size={19} color="#fff" />

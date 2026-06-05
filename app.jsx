@@ -268,7 +268,7 @@ function App() {
     <div style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
         <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
         <div style={{ padding: "20px 16px 28px", display: "flex", flexDirection: "column", gap }}>
-          {wOn("ai_briefing_v1", true) && <AIBriefing expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
+          <AIBriefing expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />
           {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
           {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
           {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
