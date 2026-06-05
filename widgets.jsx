@@ -538,7 +538,7 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
         {/* Critical item — AI comment style matching other widgets */}
         <button onClick={() => onOpen("Travel")} style={{ width: "100%", textAlign: "left", marginTop: 14, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "flex-start", gap: 7 }}>
           <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
-          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>2 travel requests scheduled for tomorrow are awaiting your approval. Review and approve ₹38,500.</span>
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>2 trips scheduled for tomorrow is awaiting your approval. Approve ₹38,500.</span>
         </button>
 
         {/* Low-risk handled automatically */}
@@ -1211,7 +1211,7 @@ function ExpenseBudgetBars({ onOpen }) {
         <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 16, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
           <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ flexShrink: 0, marginTop: 2 }} />
           <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            International travel driving 51% of overspend. Cap cross-border approvals in Q3.
+            International travel drives 51% of overspend. Limit cross-border approvals.
           </span>
         </div>
       </Card>
@@ -1295,7 +1295,7 @@ function ExpenseBudgetV2({ onOpen }) {
         <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 4, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
           <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ flexShrink: 0, marginTop: 2 }} />
           <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            International travel driving 51% of overspend. Cap cross-border approvals in Q3.
+            International travel drives 51% of overspend. Limit cross-border approvals.
           </span>
         </div>
 
