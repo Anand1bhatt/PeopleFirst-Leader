@@ -69,20 +69,16 @@ function BottomNav({ items, active, onChange, floating }) {
   };
 
   if (floating) return (
-    <div style={{ flexShrink: 0, position: "relative" }}>
-      {/* gradient fade — content bleeds through, no hard edge */}
-      <div style={{ position: "absolute", top: -48, left: 0, right: 0, height: 48, background: "linear-gradient(to bottom, transparent, oklch(93% .012 264))", pointerEvents: "none" }} />
-      <div style={{ padding: "0 16px 28px" }}>
-        <div style={{
-          backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
-          background: "rgba(255,255,255,0.78)",
-          borderRadius: 32,
-          border: "1px solid rgba(255,255,255,0.6)",
-          boxShadow: "0 4px 32px rgba(15,23,42,.14), 0 1px 6px rgba(15,23,42,.06)",
-          display: "flex", padding: "6px 4px"
-        }}>
-          {items.map((it) => <NavItem key={it.id} it={it} />)}
-        </div>
+    <div style={{ flexShrink: 0, padding: "0 16px 28px" }}>
+      <div style={{
+        backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+        background: "rgba(255,255,255,0.78)",
+        borderRadius: 32,
+        border: "1px solid rgba(255,255,255,0.6)",
+        boxShadow: "0 4px 32px rgba(15,23,42,.14), 0 1px 6px rgba(15,23,42,.06)",
+        display: "flex", padding: "6px 4px"
+      }}>
+        {items.map((it) => <NavItem key={it.id} it={it} />)}
       </div>
     </div>);
 
@@ -293,10 +289,10 @@ function App() {
   let body;
   if (persona === "leader") {
     if (screen === "home") body =
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
-        <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} scrolled={scrolled} />
-        <div onScroll={onScroll} style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
-          <div style={{ padding: "20px 16px 110px", display: "flex", flexDirection: "column", gap }}>
+    <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
+        {/* Scroll fills full height — content starts at top, padded to clear glass header */}
+        <div onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
+          <div style={{ padding: "76px 16px 20px", display: "flex", flexDirection: "column", gap }}>
             {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
             {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
             {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
@@ -311,6 +307,10 @@ function App() {
             {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
           </div>
         </div>
+        {/* Glass header floats on top of the scroll area */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 }}>
+          <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
+        </div>
       </div>;else
 
     if (screen === "approvals") body = <ApprovalsScreen onBack={() => go("home")} initialFilter={apprFilter} bulkApproved={approve.approved > 0} onBulkApprove={() => setApprove((s) => ({ ...s, approved: s.lowRisk }))} />;else
@@ -319,10 +319,9 @@ function App() {
     if (screen === "more") body = <MoreScreen onBack={() => go("home")} persona={persona} onSwitch={(p) => setTweak("persona", p)} wCfg={wCfg} updateWCfg={updateWCfg} wOn={wOn} />;
   } else {
     if (screen === "home") body =
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
-        <Header name="Priya" initials="PS" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} scrolled={scrolled} />
-        <div onScroll={onScroll} style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
-        <div style={{ padding: "20px 16px 110px", display: "flex", flexDirection: "column", gap, textAlign: "left" }}>
+    <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
+        <div onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
+        <div style={{ padding: "76px 16px 20px", display: "flex", flexDirection: "column", gap, textAlign: "left" }}>
           <EmpBrief items={empItems} onItem={(it) => go(it.target)} onOpenAssistant={() => setAssistant(true)} />
           <Attendance att={att} onMark={markAtt} onOpen={() => go("attendance")} />
           <QuickLinks onGo={quickGo} />
@@ -331,6 +330,9 @@ function App() {
           <EmpNews onOpen={() => flash("Opening all updates")} />
           <RefersCard onCall={() => flash("Calling REFERS · 1800 8899 009")} />
         </div>
+        </div>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 }}>
+          <Header name="Priya" initials="PS" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
         </div>
       </div>;else
 
@@ -378,6 +380,7 @@ function App() {
         {assistant && <AssistantSheet onClose={() => setAssistant(false)} onPick={openChat} prompts={prompts} sub={assistantSub} />}
         {chat && <ChatScreen persona={persona} seed={chatSeed} onClose={() => setChat(false)} />}
         {search && <SearchSheet onClose={() => setSearch(false)} suggestions={searchSuggestions} onPick={(s) => { setSearch(false); go(s.to); }} />}
+        {wOn("floating_footer", true) && <div style={{ height: 56, marginBottom: -56, background: "linear-gradient(to bottom, transparent, oklch(93% .012 264))", pointerEvents: "none", position: "relative", zIndex: 20 }} />}
         <BottomNav items={navItems} active={screen} onChange={go} floating={wOn("floating_footer", true)} />
       </React.Fragment>
       }
