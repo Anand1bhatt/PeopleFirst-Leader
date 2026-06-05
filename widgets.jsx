@@ -881,8 +881,8 @@ function Bookings({ onOpen }) {
         <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.ampm}</div>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: e.tone, textTransform: "uppercase", letterSpacing: ".03em" }}>
-          <Icon name={e.icon} size={13} color={e.tone} />{e.type}
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".03em" }}>
+          <Icon name={e.icon} size={13} color="var(--content-minimal)" />{e.type}
         </span>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 3 }}>{e.title}</div>
         <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
@@ -931,8 +931,7 @@ function News({ onOpen, onWish }) {
   const [showCeleb, setShowCeleb] = React.useState(false);
 
   const items = [
-  { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." },
-  { tag: "People", tone: "var(--sky)", title: "Sana is back from leave today", body: "She rejoins the Design team after 4 months." }];
+  { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy starts Monday", body: "2 of your remote teams need a desk plan." }];
 
   const celebs = [
   { name: "Karan Mehta", note: "Platform · Birthday", initials: "KM" },
@@ -1048,7 +1047,6 @@ function News({ onOpen, onWish }) {
                     <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>5 birthdays & anniversaries today</div>
                     <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4 }}>Tap to see who and send a wish</div>
                   </div>
-                  <Icon name={showCeleb ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" style={{ marginTop: 2 }} />
                 </button>
                 {showCeleb && celebs.map((b) =>
                 <div key={b.name} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "var(--surface-subtle)" }}>

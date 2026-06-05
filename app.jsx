@@ -249,10 +249,9 @@ function App() {
   // ── nav items ──
   const navItems = persona === "leader" ? [
   { id: "home", icon: "home", label: "Home" },
-  { id: "team", icon: "group", label: "Team" },
-  { id: "approvals", icon: "confirm", label: "Approvals", badge: leaderBadge },
-  { id: "reports", icon: "analytics", label: "Reports" },
-  { id: "more", icon: "more_horizontal", label: "More" }] :
+  { id: "reports", icon: "analytics", label: "Analytics" },
+  { id: "approvals", icon: "ai_sparkle", label: "HR Buddy", badge: leaderBadge },
+  { id: "more", icon: "more_horizontal", label: "Menu" }] :
   [
   { id: "home", icon: "home", label: "Home" },
   { id: "tasks", icon: "list", label: "Tasks", badge: empBadge },
