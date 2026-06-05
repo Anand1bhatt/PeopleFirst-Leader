@@ -322,17 +322,17 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
       ]
     },
     {
-      key: "projects_group", icon: "analytics", label: "Critical Projects", desc: "Project pipeline overview",
-      children: [
-        { key: "projects_carousel", label: "Carousel view",       desc: "Sticky summary + swipeable cards", def: true },
-        { key: "projects_cards",    label: "Summary + Cards",     desc: "Stats strip + business-focused cards", def: false },
-      ]
-    },
-    {
       key: "expense_group", icon: "card", label: "Expense & Budget", desc: "Q2 spend vs plan",
       children: [
         { key: "expense_bars", label: "Bars view",   desc: "Horizontal bars + donut chart", def: true },
         { key: "expense_v2",   label: "Badges view", desc: "Spent/budget rows with variance chips", def: false },
+      ]
+    },
+    {
+      key: "projects_group", icon: "analytics", label: "Projects", desc: "Project pipeline overview",
+      children: [
+        { key: "projects_carousel", label: "Carousel view",       desc: "Sticky summary + swipeable cards", def: true },
+        { key: "projects_cards",    label: "Summary + Cards",     desc: "Stats strip + business-focused cards", def: false },
       ]
     },
     { key: "approvals",   icon: "confirm",   label: "Approvals",          desc: "Pending approval queue" },

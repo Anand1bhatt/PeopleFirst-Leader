@@ -298,7 +298,7 @@ function Performance({ onOpen }) {
   };
 
   return (
-    <Widget icon="analytics" title="Critical projects" action="See all" onAction={onOpen}>
+    <Widget icon="analytics" title="Projects" action="See all" onAction={onOpen}>
 
       {/*
         ── KEY TECHNIQUE ──
@@ -422,7 +422,7 @@ function CriticalProjectsCards({ onOpen }) {
   const scrollRef = React.useRef(null);
 
   return (
-    <Widget icon="analytics" title="Critical projects" action="See all" onAction={onOpen}>
+    <Widget icon="analytics" title="Projects" action="See all" onAction={onOpen}>
 
       {/* ── Top: Compact summary strip ── */}
       <div style={{
@@ -489,10 +489,10 @@ function CriticalProjectsCards({ onOpen }) {
             {/* Row 3: Due date */}
             <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>{p.dueIn}</div>
 
-            {/* Row 4: Warning blocker — single line */}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 6, padding: "7px 9px", borderRadius: 9, background: "var(--negative-light)" }}>
-              <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}>⚠</span>
-              <span style={{ fontSize: 11.5, fontWeight: 600, color: "#7a1515", lineHeight: 1.4 }}>{p.blocker}</span>
+            {/* Row 4: AI comment */}
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 6, padding: "7px 9px", borderRadius: 9, background: "var(--sky-light)" }}>
+              <Icon name="ai_sparkle" size={12} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
+              <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4 }}>{p.blocker}</span>
             </div>
           </div>
         ))}
@@ -741,49 +741,40 @@ function TeamsGauge({ onOpen }) {
     </Widget>);
 }
 
-// ── View B: Headcount + avatars + stat row ──
+// ── View B: Headcount + 4-box grid + progress bar ──
 function TeamsHeadcount({ onOpen }) {
   const { total, present, vTotal, stats } = useTeamsData(onOpen);
   const presencePct = Math.round(present / total * 100);
+  const cuTotal = useCountUp(total, { duration: 900 });
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={onOpen}>
-      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
-        <div style={{ padding: "18px 16px 14px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 0, justifyContent: "flex-start" }}>
-
-            {/* Headcount */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
-              <div style={{ fontSize: 32, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{vTotal}</div>
-            </div>
-
-            {/* Divider */}
-            <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 16px" }} />
-
-            {/* Presence Rate */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Presence Rate</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
-            </div>
-
-            {/* Divider */}
-            <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 16px" }} />
-
-            {/* vs yesterday */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>vs yesterday</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
-            </div>
-
+      <Card surface="elev" pad={16}>
+        {/* Top: headcount + presence rate */}
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
+            <span ref={cuTotal.ref} style={{ fontSize: 36, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums", display: "block" }}>{cuTotal.display}</span>
+          </div>
+          <div style={{ flex: 1 }} />
+          <div style={{ textAlign: "right", paddingBottom: 3 }}>
+            <div style={{ fontSize: 20, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)", marginTop: 2 }}>Present today</div>
           </div>
         </div>
-        <div style={{ display: "flex", background: "var(--surface-subtle)", borderTop: "1px solid var(--stroke-minimal)" }}>
-          {stats.map((s, i) => (
-            <button key={s.label} onClick={() => onOpen(s.filter)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "14px 4px", background: "none", border: "none", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none", cursor: "pointer", fontFamily: "inherit" }}>
-              <span style={{ fontSize: 22, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{s.val}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--content-moderate)", whiteSpace: "nowrap" }}>{s.label}</span>
+
+        {/* Progress bar */}
+        <div style={{ height: 7, borderRadius: 999, overflow: "hidden", background: "var(--stroke-minimal)", marginBottom: 14 }}>
+          <div className="anim-bar" style={{ height: "100%", width: `${presencePct}%`, background: "var(--positive)", borderRadius: 999 }} />
+        </div>
+
+        {/* 4-box grid — same style as Approvals */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+          {stats.map((s) =>
+            <button key={s.label} onClick={() => onOpen(s.filter)} style={{ background: "var(--surface-subtle)", borderRadius: 12, border: "none", padding: "12px 4px", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <div style={{ fontSize: 19, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontSize: 11, color: "var(--content-moderate)", fontWeight: 600, whiteSpace: "nowrap" }}>{s.label}</div>
             </button>
-          ))}
+          )}
         </div>
       </Card>
     </Widget>);

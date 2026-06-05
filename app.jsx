@@ -250,7 +250,7 @@ function App() {
   const navItems = persona === "leader" ? [
   { id: "home", icon: "home", label: "Home" },
   { id: "reports", icon: "analytics", label: "Analytics" },
-  { id: "approvals", icon: "ai_sparkle", label: "HR Buddy", badge: leaderBadge },
+  { id: "approvals", icon: "ai_sparkle", label: "HR Buddy" },
   { id: "more", icon: "more_horizontal", label: "Menu" }] :
   [
   { id: "home", icon: "home", label: "Home" },
@@ -270,10 +270,10 @@ function App() {
         <div style={{ padding: "20px 16px 28px", display: "flex", flexDirection: "column", gap }}>
           {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
           {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-          {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
-          {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
           {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
           {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
+          {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
+          {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
           {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
           {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
           {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
