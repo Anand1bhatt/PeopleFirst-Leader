@@ -746,20 +746,34 @@ function TeamsHeadcount({ onOpen }) {
   const { total, present, vTotal, stats } = useTeamsData(onOpen);
   const presencePct = Math.round(present / total * 100);
   const cuTotal = useCountUp(total, { duration: 900 });
+  const cuPresent = useCountUp(present, { duration: 900, delay: 100 });
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={onOpen}>
       <Card surface="elev" pad={16}>
-        {/* Top: headcount + presence rate */}
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 12 }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
-            <span ref={cuTotal.ref} style={{ fontSize: 36, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums", display: "block" }}>{cuTotal.display}</span>
+        {/* 3-column header: Headcount | Present | Vs Yesterday */}
+        <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 14 }}>
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
+            <span ref={cuTotal.ref} style={{ fontSize: 32, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums", display: "block" }}>{cuTotal.display}</span>
           </div>
-          <div style={{ flex: 1 }} />
-          <div style={{ textAlign: "right", paddingBottom: 3 }}>
-            <div style={{ fontSize: 20, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.02em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)", marginTop: 2 }}>Present today</div>
+
+          <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 14px" }} />
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Present</div>
+            <span ref={cuPresent.ref} style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums", display: "block" }}>{cuPresent.display}</span>
+            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>{presencePct}% rate</div>
           </div>
+
+          <div style={{ width: 1, background: "var(--stroke-minimal)", alignSelf: "stretch", margin: "0 14px" }} />
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Vs</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
+            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>vs yesterday</div>
+          </div>
+
         </div>
 
         {/* Progress bar */}
