@@ -1270,7 +1270,7 @@ function ExpenseBudgetV2({ onOpen }) {
               <span style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{c.label}</span>
               {/* Spent / Budget */}
               <div style={{ display: "flex", alignItems: "baseline", gap: 1, flexShrink: 0 }}>
-                <span style={{ fontSize: 18, fontWeight: 900, color: spentColor(c.tone), fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>₹{c.spent}</span>
+                <span style={{ fontSize: 18, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>₹{c.spent}</span>
                 <span style={{ fontSize: 12.5, fontWeight: 500, color: "var(--content-minimal)", fontVariantNumeric: "tabular-nums" }}>/{c.budget}L</span>
               </div>
               {/* Variance badge / chip */}
