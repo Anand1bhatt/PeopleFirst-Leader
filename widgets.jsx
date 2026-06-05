@@ -538,12 +538,11 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
         {/* Critical item — AI comment style matching other widgets */}
         <button onClick={() => onOpen("Travel")} style={{ width: "100%", textAlign: "left", marginTop: 14, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "flex-start", gap: 7 }}>
           <Icon name="ai_sparkle" size={13} color="var(--sky)" style={{ marginTop: 2, flexShrink: 0 }} />
-          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>Rohan Das travels to Bengaluru tomorrow. Review and approve ₹38,500.</span>
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>2 travel requests scheduled for tomorrow are awaiting your approval. Review and approve ₹38,500.</span>
         </button>
 
         {/* Low-risk handled automatically */}
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 11, padding: "0 2px" }}>
-          <Icon name="ai_sparkle" size={15} color="var(--sky)" style={{ flexShrink: 0 }} />
           <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600, lineHeight: 1.35 }}>{state.lowRisk} low-risk approvals handled automatically</span>
         </div>
       </Card>
