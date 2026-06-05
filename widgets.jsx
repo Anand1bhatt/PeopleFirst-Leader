@@ -754,8 +754,8 @@ function TeamsHeadcount({ onOpen }) {
 
             {/* Presence Rate */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Presence Rate</div>
-              <div style={{ fontSize: 32, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Presence Rate</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
             </div>
 
             {/* Divider */}
@@ -763,18 +763,17 @@ function TeamsHeadcount({ onOpen }) {
 
             {/* vs yesterday */}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>vs yesterday</div>
-              <div style={{ fontSize: 32, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>vs yesterday</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: "var(--positive)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
             </div>
 
           </div>
         </div>
-        <div style={{ display: "flex", borderTop: "1px solid var(--stroke-minimal)" }}>
+        <div style={{ display: "flex", background: "var(--surface-subtle)", borderTop: "1px solid var(--stroke-minimal)" }}>
           {stats.map((s, i) => (
             <button key={s.label} onClick={() => onOpen(s.filter)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "14px 4px", background: "none", border: "none", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none", cursor: "pointer", fontFamily: "inherit" }}>
               <span style={{ fontSize: 22, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{s.val}</span>
               <span style={{ fontSize: 11, fontWeight: 600, color: "var(--content-moderate)", whiteSpace: "nowrap" }}>{s.label}</span>
-              <span style={{ width: 20, height: 3, borderRadius: 999, background: s.color, marginTop: 1 }} />
             </button>
           ))}
         </div>
