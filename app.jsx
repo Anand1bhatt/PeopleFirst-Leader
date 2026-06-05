@@ -171,12 +171,26 @@ function App() {
   const [search, setSearch] = useState(false);
   const [apprFilter, setApprFilter] = useState("All");
   const [toast, setToast] = useState(null);
-  // Boot sequence: splash → skeleton → ready
+  // Widget configuration — which widgets show + which variant
+  const [wCfg, setWCfg] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pf_widget_cfg") || "null") || {}; } catch { return {}; }
+  });
+  const updateWCfg = (key, val) => {
+    setWCfg(prev => {
+      const next = { ...prev, [key]: val };
+      try { localStorage.setItem("pf_widget_cfg", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+  const wOn = (key, def = true) => wCfg[key] === undefined ? def : wCfg[key];
+  const wVariant = (key, def) => wCfg[key] || def;
+  // Boot sequence: splash → award → skeleton → ready
   const [phase, setPhase] = useState("splash");
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("skeleton"), 4100);  // match Lottie duration (4s @ 60fps)
-    const t2 = setTimeout(() => setPhase("ready"), 5400);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const t1 = setTimeout(() => setPhase("award"),    4100);  // Lottie splash ends
+    const t2 = setTimeout(() => setPhase("skeleton"), 5900);  // award shows for ~1.8s
+    const t3 = setTimeout(() => setPhase("ready"),    7100);  // skeleton briefly
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
   // leader state
@@ -256,20 +270,20 @@ function App() {
         <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
         <div style={{ padding: "20px 16px 28px", display: "flex", flexDirection: "column", gap }}>
           <AIBriefing expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />
-          <Performance onOpen={() => go("reports")} />
-          <ExpenseBudgetBars onOpen={() => go("reports")} />
-          <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />
-          <TeamSnapshot onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />
-          <Recruitment onOpen={() => go("more")} />
-          <Bookings onOpen={() => flash("Opening calendar")} />
-          <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />
+          {wOn("projects") && <Performance onOpen={() => go("reports")} />}
+          {wOn("expense") && <ExpenseBudgetBars onOpen={() => go("reports")} />}
+          {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
+          {wOn("teams") && <Teams onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+          {wOn("recruitment") && <Recruitment onOpen={() => go("more")} />}
+          {wOn("upcoming") && <Bookings onOpen={() => flash("Opening calendar")} />}
+          {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
         </div>
       </div>;else
 
     if (screen === "approvals") body = <ApprovalsScreen onBack={() => go("home")} initialFilter={apprFilter} bulkApproved={approve.approved > 0} onBulkApprove={() => setApprove((s) => ({ ...s, approved: s.lowRisk }))} />;else
     if (screen === "team") body = <TeamScreen onBack={() => go("home")} />;else
     if (screen === "reports") body = <ReportsScreen onBack={() => go("home")} />;else
-    if (screen === "more") body = <MoreScreen onBack={() => go("home")} persona={persona} onSwitch={(p) => setTweak("persona", p)} />;
+    if (screen === "more") body = <MoreScreen onBack={() => go("home")} persona={persona} onSwitch={(p) => setTweak("persona", p)} wCfg={wCfg} updateWCfg={updateWCfg} wOn={wOn} />;
   } else {
     if (screen === "home") body =
     <div style={{ flex: 1, overflow: "auto", background: "var(--surface-subtle)" }}>
@@ -308,6 +322,19 @@ function App() {
   const appInner = (
     <div style={{ ...accentVars, display: "flex", flexDirection: "column", height: "100%", position: "relative", background: "var(--surface-subtle)", paddingTop: bare ? "env(safe-area-inset-top, 0px)" : 50 }}>
       {phase === "splash" && <SplashScreen />}
+      {phase === "award" &&
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 50,
+          animation: "fadeIn .3s ease both",
+          background: "#050e2e"
+        }}>
+          <img
+            src="assets/award.jpg"
+            alt="Award"
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", animation: "splashRise .5s ease both" }}
+          />
+        </div>
+      }
       {phase === "skeleton" && <HomeSkeleton persona={persona} />}
       {phase === "ready" &&
       <React.Fragment>

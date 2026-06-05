@@ -232,7 +232,42 @@ function PersonaSwitcher({ persona, onSwitch }) {
   );
 }
 
-function MoreScreen({ onBack, persona, onSwitch, onRow }) {
+function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, wOn }) {
+  const isOn = (key, def = true) => wOn ? wOn(key, def) : (wCfg[key] === undefined ? def : wCfg[key]);
+  const toggle = (key) => updateWCfg && updateWCfg(key, !isOn(key));
+
+  // Toggle pill switch component
+  const Toggle = ({ on, onToggle }) => (
+    React.createElement('button', {
+      onClick: onToggle,
+      style: {
+        width: 42, height: 24, borderRadius: 999, padding: "2px",
+        background: on ? "var(--reliance-base)" : "var(--stroke-heavy)",
+        border: "none", cursor: "pointer", flexShrink: 0,
+        transition: "background .2s ease",
+        display: "flex", alignItems: "center",
+        justifyContent: on ? "flex-end" : "flex-start"
+      }
+    }, React.createElement('span', {
+      style: {
+        width: 20, height: 20, borderRadius: 999, background: "#fff",
+        boxShadow: "0 1px 3px rgba(0,0,0,.2)",
+        transition: "all .2s ease", display: "block"
+      }
+    }))
+  );
+
+  // Leader widgets list
+  const leaderWidgets = [
+    { key: "projects",    icon: "analytics", label: "Critical Projects",  desc: "Carousel with AI insights" },
+    { key: "expense",     icon: "card",      label: "Expense & Budget",   desc: "Category bars + pie chart" },
+    { key: "approvals",   icon: "confirm",   label: "Approvals",          desc: "Pending approval queue" },
+    { key: "teams",       icon: "group",     label: "Teams",              desc: "Gauge + headcount view" },
+    { key: "recruitment", icon: "id",        label: "Recruitment",        desc: "Pipeline health by role" },
+    { key: "upcoming",    icon: "calendar",  label: "Upcoming",           desc: "Next meetings & events" },
+    { key: "news",        icon: "flag",      label: "News & Updates",     desc: "Policy, people, celebrations" },
+  ];
+
   const p = PROFILES[persona];
   const routes = { "My profile": "profile", "Attendance history": "attendance", "My tasks": "tasks", "Pay & benefits": "pay" };
   const goRow = (label) => onRow && routes[label] && onRow(routes[label]);
@@ -245,10 +280,13 @@ function MoreScreen({ onBack, persona, onSwitch, onRow }) {
     { head: "Work", rows: [["list", "My tasks"], ["rupee", "Pay & benefits"], ["id", "Documents"]] },
     { head: "App", rows: [["settings", "Settings"], ["help", "Help & support"], ["logout", "Sign out"]] },
   ];
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--surface-subtle)" }}>
       <ScreenHeader title="More" onBack={onBack} />
       <div style={{ flex: 1, overflow: "auto", padding: "14px 16px 28px" }}>
+
+        {/* Profile card */}
         <Card surface="elev" pad={16} onClick={() => goRow("My profile")} style={{ display: "flex", alignItems: "center", gap: 13, cursor: "pointer" }}>
           <span style={{ width: 52, height: 52, borderRadius: 999, background: "var(--reliance-base)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>{p.initials}</span>
           <div style={{ flex: 1 }}>
@@ -257,9 +295,39 @@ function MoreScreen({ onBack, persona, onSwitch, onRow }) {
           </div>
           {persona === "employee" && <Icon name="chevron_right" size={18} color="var(--content-minimal)" />}
         </Card>
+
+        {/* Persona switcher */}
         <div style={{ marginTop: 18 }}>
           <PersonaSwitcher persona={persona} onSwitch={onSwitch} />
         </div>
+
+        {/* ── WIDGETS section (Leader only) ── */}
+        {persona === "leader" && (
+          <div style={{ marginTop: 22 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".02em", color: "var(--content-moderate)", padding: "0 2px 10px" }}>Dashboard widgets</div>
+            <Card surface="elev" pad={4}>
+              {leaderWidgets.map((w, i) => (
+                <div key={w.key} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+                  <span style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: isOn(w.key) ? "var(--reliance-50)" : "var(--surface-subtle)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "background .2s ease"
+                  }}>
+                    <Icon name={w.icon} size={18} color={isOn(w.key) ? "var(--reliance-base)" : "var(--content-minimal)"} />
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: isOn(w.key) ? "var(--content-heavy)" : "var(--content-minimal)", letterSpacing: "-.01em" }}>{w.label}</div>
+                    <div style={{ fontSize: 12, color: "var(--content-minimal)", marginTop: 1 }}>{w.desc}</div>
+                  </div>
+                  <Toggle on={isOn(w.key)} onToggle={() => toggle(w.key)} />
+                </div>
+              ))}
+            </Card>
+          </div>
+        )}
+
+        {/* Other sections */}
         {sections.map((s) => (
           <div key={s.head} style={{ marginTop: 18 }}>
             <div style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".02em", color: "var(--content-moderate)", padding: "0 2px 9px" }}>{s.head}</div>
