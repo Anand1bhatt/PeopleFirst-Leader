@@ -275,7 +275,7 @@ function WidgetsSection({ leaderWidgets, isOn, toggle, Icon, Card, Toggle }) {
                       <div style={{ fontSize: 13.5, fontWeight: 700, color: isOn(child.key, child.def) ? "var(--content-heavy)" : "var(--content-moderate)", letterSpacing: "-.01em" }}>{child.label}</div>
                       <div style={{ fontSize: 11.5, color: "var(--content-minimal)", marginTop: 1 }}>{child.desc}</div>
                     </div>
-                    <Toggle on={isOn(child.key, child.def)} onToggle={() => toggle(child.key)} />
+                    <Toggle on={isOn(child.key, child.def)} onToggle={() => toggle(child.key, child.def)} />
                   </div>
                 ))}
               </div>
@@ -289,7 +289,7 @@ function WidgetsSection({ leaderWidgets, isOn, toggle, Icon, Card, Toggle }) {
 
 function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, wOn }) {
   const isOn = (key, def = true) => wOn ? wOn(key, def) : (wCfg[key] === undefined ? def : wCfg[key]);
-  const toggle = (key) => updateWCfg && updateWCfg(key, !isOn(key));
+  const toggle = (key, def = true) => updateWCfg && updateWCfg(key, !isOn(key, def));
 
   // Toggle pill switch component
   const Toggle = ({ on, onToggle }) => (
