@@ -47,39 +47,48 @@ function Header({ name, initials, onBell, onSearch, onProfile, badge, scrolled }
 }
 
 // ─────────────────────────────────────────────────────────────
-// Bottom navigation — clean glass bar
+// Floating Bottom Nav — pill overlays scroll content
 // ─────────────────────────────────────────────────────────────
-function BottomNav({ items, active, onChange }) {
+function FloatingNav({ items, active, onChange }) {
   return (
     <div style={{
-      flexShrink: 0,
-      display: "flex",
-      background: "rgba(255,255,255,0.88)",
-      backdropFilter: "blur(20px)",
-      WebkitBackdropFilter: "blur(20px)",
-      borderTop: "1px solid rgba(0,0,0,0.07)",
-      padding: "8px 4px 26px",
+      position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 30,
+      pointerEvents: "none",
     }}>
-      {items.map((it) => {
-        const on = active === it.id;
-        return (
-          <button key={it.id} onClick={() => onChange(it.id)} style={{
-            flex: 1, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "4px 0",
-          }}>
-            {/* Active indicator dot above icon */}
-            <span style={{ position: "relative" }}>
-              {on && <span style={{ position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)", width: 18, height: 3, borderRadius: 999, background: "var(--reliance-base)" }} />}
-              <Icon name={it.icon} size={23} color={on ? "var(--reliance-base)" : "var(--content-minimal)"} />
-              {it.badge > 0 &&
-                <span className="nav-badge" style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #fff", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>
-              }
-            </span>
-            <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 600, color: on ? "var(--reliance-base)" : "var(--content-minimal)" }}>{it.label}</span>
-          </button>);
-      })}
-    </div>);
+      {/* Gradient fade so content dissolves before the pill */}
+      <div style={{ height: 52, background: "linear-gradient(to bottom, rgba(232,235,242,0) 0%, rgba(232,235,242,1) 100%)" }} />
+      {/* Pill */}
+      <div style={{ background: "rgba(232,235,242,1)", padding: "0 14px 24px", pointerEvents: "all" }}>
+        <div style={{
+          background: "#ffffff",
+          borderRadius: 26,
+          boxShadow: "0 2px 16px rgba(15,23,42,.12), 0 0 0 1px rgba(15,23,42,.06)",
+          display: "flex",
+          padding: "6px 4px",
+        }}>
+          {items.map((it) => {
+            const on = active === it.id;
+            return (
+              <button key={it.id} onClick={() => onChange(it.id)} style={{
+                flex: 1, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "4px 0",
+              }}>
+                <span style={{ position: "relative" }}>
+                  {on && <span style={{ position: "absolute", top: -5, left: "50%", transform: "translateX(-50%)", width: 16, height: 3, borderRadius: 999, background: "var(--reliance-base)" }} />}
+                  <Icon name={it.icon} size={23} color={on ? "var(--reliance-base)" : "var(--content-minimal)"} />
+                  {it.badge > 0 &&
+                    <span className="nav-badge" style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid #fff", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>
+                  }
+                </span>
+                <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 600, color: on ? "var(--reliance-base)" : "var(--content-minimal)" }}>{it.label}</span>
+              </button>);
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }
+function BottomNav() { return null; }
 
 // ─────────────────────────────────────────────────────────────
 // Toast
@@ -284,7 +293,7 @@ function App() {
     <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
         {/* Scroll fills full height — content starts at top, padded to clear glass header */}
         <div onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
-          <div style={{ padding: "76px 16px 28px", display: "flex", flexDirection: "column", gap }}>
+          <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap }}>
             {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
             {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
             {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
@@ -313,7 +322,7 @@ function App() {
     if (screen === "home") body =
     <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
         <div onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
-        <div style={{ padding: "76px 16px 28px", display: "flex", flexDirection: "column", gap, textAlign: "left" }}>
+        <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap, textAlign: "left" }}>
           <EmpBrief items={empItems} onItem={(it) => go(it.target)} onOpenAssistant={() => setAssistant(true)} />
           <Attendance att={att} onMark={markAtt} onOpen={() => go("attendance")} />
           <QuickLinks onGo={quickGo} />
@@ -367,12 +376,14 @@ function App() {
       {phase === "skeleton" && <HomeSkeleton persona={persona} />}
       {phase === "ready" &&
       <React.Fragment>
-        <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>{body}</div>
+        <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>
+          {body}
+          <FloatingNav items={navItems} active={screen} onChange={go} />
+        </div>
         <Toast toast={toast} />
         {assistant && <AssistantSheet onClose={() => setAssistant(false)} onPick={openChat} prompts={prompts} sub={assistantSub} />}
         {chat && <ChatScreen persona={persona} seed={chatSeed} onClose={() => setChat(false)} />}
         {search && <SearchSheet onClose={() => setSearch(false)} suggestions={searchSuggestions} onPick={(s) => { setSearch(false); go(s.to); }} />}
-        <BottomNav items={navItems} active={screen} onChange={go} />
       </React.Fragment>
       }
     </div>);
