@@ -90,13 +90,13 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
       borderRadius: 20, overflow: "hidden",
       border: "1px solid var(--sky-border)",
       boxShadow: "0 1px 3px rgba(15,23,42,.05), 0 8px 24px -12px var(--sky-shadow)",
-      background: "var(--surface-minimal)",
+      background: "var(--sky-light)",
       animation: "fadeInScale .5s cubic-bezier(.2,0,0,1) .1s both"
     }}>
 
       {/* ── Sky header band — always visible ── */}
       <div style={{
-        background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)",
+        background: "var(--sky-border)",
         padding: "15px 16px 14px"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
@@ -125,7 +125,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
       <div style={{ minHeight: 0, overflow: "hidden" }}>
 
         {/* Decisions */}
-        <div style={{ padding: "6px 12px 12px", background: "var(--surface-minimal)" }}>
+        <div style={{ padding: "6px 12px 12px", background: "var(--sky-light)" }}>
           {decisions.map((d, i) =>
           <div key={d.id} style={{
             display: "flex", gap: 11, padding: "13px 6px 14px",
@@ -163,8 +163,8 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
           transition: `opacity .4s ease ${decisions.length * 120 + 80}ms, transform .4s cubic-bezier(.2,0,0,1) ${decisions.length * 120 + 80}ms`
         }}>
           <button onClick={onToggle} style={{
-            width: "100%", border: "none", borderTop: "1px solid var(--stroke-minimal)",
-            background: "var(--surface-subtle)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
+            width: "100%", border: "none", borderTop: "1px solid var(--sky-border)",
+            background: "var(--sky-light)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
             display: "flex", alignItems: "center", gap: 8
           }}>
             <Icon name="check" size={16} color="var(--positive)" />
@@ -172,7 +172,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
             <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
           </button>
           {expanded &&
-          <div style={{ background: "var(--surface-subtle)", padding: "0 16px 14px" }}>
+          <div style={{ background: "var(--sky-light)", padding: "0 16px 14px" }}>
               {handled.map((h) =>
             <div key={h.cat} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--stroke-minimal)" }}>
                   <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", width: 78, flexShrink: 0 }}>{h.cat}</span>
