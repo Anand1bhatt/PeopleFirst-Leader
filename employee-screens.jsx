@@ -315,6 +315,13 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
   // Leader widgets list — items with `children` are expandable
   const leaderWidgets = [
     {
+      key: "ai_briefing_group", icon: "ai_sparkle", label: "PeopleFirst AI", desc: "Morning briefing & AI decisions",
+      children: [
+        { key: "ai_briefing_v1", label: "View 1", desc: "Cinematic reveal with decisions", def: true },
+        { key: "ai_briefing_v2", label: "View 2", desc: "Compact summary card", def: false },
+      ]
+    },
+    {
       key: "projects_group", icon: "analytics", label: "Critical Projects", desc: "Project pipeline overview",
       children: [
         { key: "projects_carousel", label: "Carousel view",       desc: "Sticky summary + swipeable cards", def: true },
