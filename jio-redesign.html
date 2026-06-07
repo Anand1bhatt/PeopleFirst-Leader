@@ -7,465 +7,423 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --ease-out-expo:cubic-bezier(0.16,1,0.3,1);
-  --ease-in-out:cubic-bezier(0.4,0,0.2,1);
   --nav-h:64px;
-  --slide-dur:900ms;
+  --easing:cubic-bezier(0.16,1,0.3,1);
+  --easing-in:cubic-bezier(0.4,0,1,1);
 }
 html{scroll-behavior:smooth;}
 body{
   font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
-  background:#060810;color:#fff;overflow-x:hidden;
+  background:#08060f;color:#fff;overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
 
-/* ── AMBIENT CANVAS (behind everything) ── */
-#ambient-canvas{
+/* ── AMBIENT BG ── */
+#bg{
   position:fixed;inset:0;z-index:0;pointer-events:none;
-  transition:opacity 1.6s var(--ease-in-out);
+  transition:background 1.5s cubic-bezier(0.4,0,0.2,1);
+  background:radial-gradient(ellipse 90% 80% at 25% 50%,rgba(130,0,200,0.42) 0%,transparent 65%),
+             radial-gradient(ellipse 70% 60% at 80% 70%,rgba(180,0,130,0.3) 0%,transparent 60%),
+             #08060f;
 }
 
 /* ── GRAIN ── */
 body::after{
   content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
-  opacity:0.028;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity:0.032;mix-blend-mode:overlay;
 }
 
 /* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:200;
+  position:fixed;top:0;left:0;right:0;z-index:300;
   height:var(--nav-h);
   display:flex;align-items:center;justify-content:space-between;
   padding:0 52px;
-  background:rgba(6,8,16,0.4);
-  backdrop-filter:blur(24px) saturate(200%);
-  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  background:rgba(8,6,15,0.5);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
   border-bottom:1px solid rgba(255,255,255,0.055);
 }
-.nav-logo{
-  display:flex;align-items:center;gap:11px;text-decoration:none;
+.logo{
+  display:flex;align-items:center;gap:10px;text-decoration:none;
 }
-.nav-logo-mark{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,#1a6fff,#c030e0);
+.logo-mark{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,#2060ff,#c030e0);
   display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:0.78rem;letter-spacing:-0.3px;color:#fff;
-  box-shadow:0 0 20px rgba(100,80,255,0.5);
+  font-weight:900;font-size:0.78rem;color:#fff;
+  box-shadow:0 0 18px rgba(150,50,255,0.55);
 }
-.nav-logo-text{
-  font-size:1.3rem;font-weight:800;letter-spacing:-0.04em;color:#fff;
+.logo-name{
+  font-size:1.3rem;font-weight:800;letter-spacing:-0.03em;color:#fff;
 }
-.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links{display:flex;gap:34px;list-style:none;}
 .nav-links a{
-  color:rgba(255,255,255,0.6);text-decoration:none;
-  font-size:0.875rem;font-weight:500;letter-spacing:0.01em;
+  color:rgba(255,255,255,0.62);text-decoration:none;
+  font-size:0.88rem;font-weight:500;
   transition:color 0.2s;
 }
 .nav-links a:hover{color:#fff;}
-.nav-end{display:flex;gap:10px;align-items:center;}
-.nav-btn{
+.nav-end{display:flex;gap:10px;}
+.nav-icon{
   width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.09);
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
   color:rgba(255,255,255,0.65);
   display:flex;align-items:center;justify-content:center;
   transition:background 0.2s,color 0.2s;
 }
-.nav-btn:hover{background:rgba(255,255,255,0.13);color:#fff;}
-.nav-btn svg{width:15px;height:15px;}
+.nav-icon:hover{background:rgba(255,255,255,0.14);color:#fff;}
+.nav-icon svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
 
-/* ── FOLD 1 ── */
+/* ═══════════════════════════════════
+   FOLD 1
+═══════════════════════════════════ */
 #fold1{
   position:relative;z-index:2;
-  min-height:100vh;
-  display:flex;flex-direction:column;
+  height:100vh;min-height:600px;
   padding-top:var(--nav-h);
+  display:flex;align-items:stretch;
   overflow:hidden;
 }
 
-/* ── SLIDE WRAPPER ── */
-.slides-wrap{
-  flex:1;position:relative;
-  display:flex;align-items:center;
+/* ── STACK RAIL (left) ── */
+#stack-rail{
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:120px;z-index:20;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  gap:0;padding:var(--nav-h) 0 0 0;
+  pointer-events:none;
 }
-.slide{
-  position:absolute;inset:0;
-  display:grid;grid-template-columns:1fr 1.35fr;
-  align-items:center;
-  padding:32px 52px 100px;
-  opacity:0;pointer-events:none;
-  transition:opacity var(--slide-dur) var(--ease-in-out);
+.stack-thumb{
+  position:absolute;
+  width:72px;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  border:1px solid rgba(255,255,255,0.1);
+  opacity:0;
+  transform:scale(0.6) translateY(60px);
+  transition:opacity 0.6s var(--easing),transform 0.8s var(--easing),top 0.6s var(--easing);
 }
-.slide.active{opacity:1;pointer-events:all;}
+.stack-thumb.visible{
+  opacity:1;
+  transform:scale(1) translateY(0) rotate(var(--rot));
+}
 
-/* ── SLIDE LEFT (text) ── */
-.s-text{
-  padding-right:32px;
-  transform:translateY(28px);opacity:0;
-  transition:transform 0.9s var(--ease-out-expo),opacity 0.7s ease;
+/* ── MAIN LAYOUT ── */
+.fold1-inner{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  align-items:center;
+  padding:0 52px 60px 140px; /* left padding to clear stack rail */
+  gap:32px;
 }
-.slide.active .s-text{
-  transform:translateY(0);opacity:1;
-  transition-delay:0.18s;
+
+/* ── LEFT TEXT ── */
+.hero-text{
+  position:relative;z-index:10;
 }
-.s-eyebrow{
+.eyebrow{
   display:inline-flex;align-items:center;gap:8px;
   padding:5px 14px;border-radius:999px;
-  font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;
+  font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.12);
-  margin-bottom:24px;
+  margin-bottom:22px;
   backdrop-filter:blur(8px);
+  white-space:nowrap;
+  transition:color 0.6s,border-color 0.6s;
 }
-.s-eyebrow-dot{
+.eyebrow-dot{
   width:5px;height:5px;border-radius:50%;
-  animation:pulse-dot 2s ease-in-out infinite;
+  background:currentColor;
+  animation:blink 2s ease-in-out infinite;
 }
-@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:0.5}}
-.s-title{
-  font-size:clamp(2.6rem,5vw,4.6rem);
-  font-weight:900;line-height:1.04;letter-spacing:-0.04em;
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.35;transform:scale(1.5)}}
+
+.hero-title{
+  font-size:clamp(2.4rem,4.5vw,4.4rem);
+  font-weight:900;line-height:1.06;letter-spacing:-0.04em;
   margin-bottom:20px;
 }
-.s-title .grad{
-  display:block;
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+/* Fix: gradient words as inline spans with correct clip */
+.grad-word{
+  display:inline;
   background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
 }
-.s-body{
-  font-size:1.05rem;line-height:1.72;
-  color:rgba(255,255,255,0.58);
-  max-width:400px;margin-bottom:36px;
+
+.hero-body{
+  font-size:1rem;line-height:1.75;
+  color:rgba(255,255,255,0.55);
+  max-width:390px;margin-bottom:32px;
 }
-.s-body strong{color:rgba(255,255,255,0.9);font-weight:600;}
-.s-cta-row{display:flex;gap:12px;flex-wrap:wrap;}
-.cta-main{
-  padding:13px 30px;border-radius:999px;border:none;cursor:pointer;
-  font-size:0.92rem;font-weight:700;color:#fff;
+.hero-body strong{color:rgba(255,255,255,0.88);font-weight:600;}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-fill{
+  padding:13px 30px;border-radius:999px;border:none;
+  font-size:0.9rem;font-weight:700;color:#fff;cursor:pointer;
   position:relative;overflow:hidden;
-  transition:transform 0.25s var(--ease-out-expo),box-shadow 0.25s;
+  transition:transform 0.25s var(--easing),box-shadow 0.25s;
 }
-.cta-main::before{
+.btn-fill::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 60%);
+  background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent 60%);
   opacity:0;transition:opacity 0.3s;
 }
-.cta-main:hover{transform:translateY(-2px);}
-.cta-main:hover::before{opacity:1;}
-.cta-ghost{
-  padding:13px 30px;border-radius:999px;cursor:pointer;
-  font-size:0.92rem;font-weight:600;color:rgba(255,255,255,0.8);
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.14);
-  transition:background 0.25s,color 0.25s,border-color 0.25s;
+.btn-fill:hover{transform:translateY(-2px);}
+.btn-fill:hover::after{opacity:1;}
+.btn-out{
+  padding:13px 30px;border-radius:999px;
+  font-size:0.9rem;font-weight:600;color:rgba(255,255,255,0.8);
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.15);cursor:pointer;
+  transition:background 0.25s,color 0.25s;
   backdrop-filter:blur(10px);
 }
-.cta-ghost:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.28);}
+.btn-out:hover{background:rgba(255,255,255,0.13);color:#fff;}
 
-/* ── SLIDE RIGHT (banner stage) ── */
-.s-stage{
+/* ── RIGHT: BANNER STAGE ── */
+.banner-stage{
   position:relative;
   display:flex;align-items:center;justify-content:center;
-  height:100%;min-height:480px;
-  perspective:1100px;
-  transform:translateY(18px) scale(0.97);opacity:0;
-  transition:transform 1s var(--ease-out-expo),opacity 0.8s ease;
-}
-.slide.active .s-stage{
-  transform:translateY(0) scale(1);opacity:1;
-  transition-delay:0.06s;
+  height:100%;
 }
 
-/* banner cluster = 3 cards arranged */
-.banner-cluster{
+/* The outer container that clips & handles perspective */
+.banner-viewport{
   position:relative;
-  width:100%;max-width:640px;
-  height:420px;
-  transform-style:preserve-3d;
-  transition:transform 0.12s ease;
+  width:100%;max-width:700px;
+  perspective:1200px;
 }
 
-/* Center card */
-.card-center{
-  position:absolute;
-  left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:48%;
-  z-index:10;
-  border-radius:24px;
-  overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.1);
-  transition:box-shadow 0.4s;
-}
-
-/* Side cards */
-.card-left,.card-right{
-  position:absolute;
-  top:50%;
-  width:36%;
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 20px 50px rgba(0,0,0,0.6);
-  transition:transform 0.4s var(--ease-out-expo),box-shadow 0.4s,filter 0.4s;
-}
-.card-left{
-  left:0;
-  transform:translateY(-50%) translateX(16px) rotateY(12deg) scale(0.9);
-  transform-origin:right center;
-  z-index:5;filter:brightness(0.75) saturate(0.8);
-}
-.card-right{
-  right:0;
-  transform:translateY(-50%) translateX(-16px) rotateY(-12deg) scale(0.9);
+/* ACTIVE BANNER WRAPPER — slides in/out */
+.banner-wrap{
+  position:relative;
+  width:100%;
   transform-origin:left center;
-  z-index:5;filter:brightness(0.75) saturate(0.8);
+  transition:transform 0.85s var(--easing),opacity 0.6s ease;
 }
-.banner-cluster:hover .card-left{
-  transform:translateY(-50%) translateX(-8px) rotateY(8deg) scale(0.93);
-  filter:brightness(0.88) saturate(0.9);
+.banner-wrap.exit-left{
+  transform:translateX(-120%) scale(0.55) rotate(-6deg);
+  opacity:0;
+  pointer-events:none;
 }
-.banner-cluster:hover .card-right{
-  transform:translateY(-50%) translateX(8px) rotateY(-8deg) scale(0.93);
-  filter:brightness(0.88) saturate(0.9);
+.banner-wrap.enter-right{
+  transform:translateX(80px) scale(0.95);
+  opacity:0;
+}
+.banner-wrap.active{
+  transform:translateX(0) scale(1);
+  opacity:1;
 }
 
-/* ── OTT PASS CARD (center) ── */
-.ott-card{
-  background:#fff;color:#0a0a2a;
-  padding:28px 24px 20px;
-  position:relative;
-  min-height:360px;
+/* ── BANNER CARD GROUP ── */
+/* The white rounded rectangle that contains all three cards */
+.banner-group{
+  background:rgba(30,20,50,0.7);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:28px;
+  padding:20px;
+  display:flex;
+  gap:12px;
+  align-items:stretch;
+  box-shadow:0 40px 100px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.06);
+  backdrop-filter:blur(10px);
+  position:relative;overflow:hidden;
+  transition:transform 0.15s ease;
 }
-/* ticket notches */
-.ott-card::before,.ott-card::after{
-  content:'';position:absolute;
-  width:28px;height:28px;border-radius:50%;
-  background:#060810;
-  top:50%;transform:translateY(-50%);
-  z-index:5;
+.banner-group::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 50%);
+  pointer-events:none;border-radius:28px;
 }
-.ott-card::before{left:-14px;box-shadow:inset -4px 0 8px rgba(0,0,0,0.3);}
-.ott-card::after{right:-14px;box-shadow:inset 4px 0 8px rgba(0,0,0,0.3);}
-.ott-divider{
-  border:none;border-top:2px dashed rgba(100,80,200,0.3);
-  margin:10px 0;position:relative;
+
+/* Tilt on hover */
+.banner-group:hover{transform:perspective(1000px) rotateY(-3deg) rotateX(1deg) scale(1.01);}
+
+/* poster cards */
+.poster{
+  border-radius:16px;overflow:hidden;flex:0 0 30%;
+  min-height:300px;position:relative;
 }
-.ott-header-row{
-  display:flex;align-items:center;justify-content:center;gap:6px;
+.poster-img{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:14px;
+  position:relative;overflow:hidden;
+}
+.poster-img::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 55%);
+}
+.poster-meta{position:relative;z-index:2;}
+.poster-badge{
+  display:inline-block;padding:3px 9px;border-radius:999px;
+  font-size:0.58rem;letter-spacing:0.06em;font-weight:700;
+  background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);
   margin-bottom:6px;
 }
-.ott-logo-dot{
-  width:10px;height:10px;border-radius:50%;
-  background:linear-gradient(135deg,#5b00e0,#d020c0);
+.poster-title{font-size:1rem;font-weight:900;letter-spacing:-0.02em;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,0.8);}
+.poster-sub{font-size:0.62rem;opacity:0.6;margin-top:2px;}
+
+/* OTT ticket card */
+.ott-ticket{
+  flex:0 0 38%;
+  background:#fff;
+  border-radius:18px;
+  padding:20px 18px 16px;
+  color:#080820;
+  position:relative;
+  display:flex;flex-direction:column;
+  box-shadow:0 8px 30px rgba(0,0,0,0.25);
 }
-.ott-pass-label{
-  font-size:0.8rem;letter-spacing:0.18em;text-transform:uppercase;
-  font-weight:800;color:#5b00e0;
+/* ticket punch holes */
+.ott-ticket::before,.ott-ticket::after{
+  content:'';position:absolute;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(30,20,50,0.8);
+  top:50%;transform:translateY(-50%);z-index:5;
 }
-.ott-strike-row{
-  text-align:center;margin:4px 0;
+.ott-ticket::before{left:-13px;}
+.ott-ticket::after{right:-13px;}
+
+.ott-head{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding-bottom:10px;
+  border-bottom:2px dashed rgba(80,50,180,0.2);
 }
-.ott-strike-val{
-  font-size:1.7rem;font-weight:900;color:#666;
-  text-decoration:line-through;text-decoration-color:#e00;
+.ott-dot{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,#6020d0,#c020c0);}
+.ott-label{font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:800;color:#5010b0;}
+.ott-body{flex:1;padding:8px 0;text-align:center;}
+.ott-old-price{
+  font-size:1.4rem;font-weight:800;color:#999;
+  text-decoration:line-through;text-decoration-color:#cc0000;
+  line-height:1;
 }
-.ott-worth{
-  font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;
-  color:#888;text-align:center;margin-bottom:4px;
-}
+.ott-worth{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:3px 0;}
 .ott-for-just{
-  text-align:center;
-  display:flex;align-items:center;gap:8px;margin:6px 0;
+  display:flex;align-items:center;gap:6px;margin:6px 0;
 }
-.ott-for-just::before,.ott-for-just::after{
-  content:'';flex:1;height:1px;background:rgba(0,0,0,0.12);
-}
-.ott-for-just span{font-size:0.65rem;letter-spacing:0.1em;color:#999;text-transform:uppercase;}
-.ott-price-big{
-  text-align:center;
-  font-size:4rem;font-weight:900;letter-spacing:-2px;
+.ott-for-just::before,.ott-for-just::after{content:'';flex:1;height:1px;background:rgba(0,0,0,0.12);}
+.ott-for-just span{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;}
+.ott-price{
+  font-size:3.4rem;font-weight:900;letter-spacing:-3px;
   color:#0040c0;line-height:1;
 }
-.ott-rupee{font-size:2.2rem;vertical-align:top;margin-top:8px;display:inline-block;}
-.ott-per-mo{text-align:center;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-top:2px;}
-.ott-chips-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px;
-}
+.ott-rupee-sym{font-size:1.8rem;vertical-align:top;margin-top:7px;display:inline-block;letter-spacing:0;}
+.ott-per-mo{font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin-top:2px;}
+.ott-divider{border:none;border-top:1px dashed rgba(0,0,0,0.1);margin:8px 0;}
+.ott-chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
 .ott-chip{
-  padding:9px 0;border-radius:10px;
-  text-align:center;font-size:0.82rem;font-weight:800;
-  background:linear-gradient(135deg,#1a6fff,#0044cc);color:#fff;
+  padding:8px 6px;border-radius:10px;text-align:center;
+  font-size:0.78rem;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,#1a5fff,#0038cc);
 }
-.ott-apps-row{
+.ott-apps{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding-top:8px;border-top:1px solid rgba(0,0,0,0.07);
+}
+.app-icon-sq{
+  width:32px;height:32px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;
-  gap:8px;margin-top:14px;padding-top:12px;
-  border-top:1px solid rgba(0,0,0,0.08);
+  font-size:1rem;background:#f4f4f8;box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  overflow:hidden;
 }
-.app-pill{
-  width:34px;height:34px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.1rem;background:#f4f4f8;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
-}
-.more-pill{
-  padding:6px 10px;border-radius:8px;
-  font-size:0.65rem;font-weight:800;color:#444;
-  background:#f0f0f6;border:1px solid #e0e0ee;
-  line-height:1.2;text-align:center;
+.app-more{
+  padding:5px 8px;border-radius:8px;
+  font-size:0.58rem;font-weight:800;color:#555;
+  background:#efefef;text-align:center;line-height:1.3;
+  white-space:nowrap;
 }
 
-/* ── MOVIE POSTER CARDS ── */
-.poster-card{
-  height:360px;position:relative;overflow:hidden;
-}
-.poster-inner{
-  width:100%;height:100%;
-  display:flex;flex-direction:column;
-  justify-content:flex-end;
-  padding:16px;
-}
-.poster-dhurandhar{
-  background:linear-gradient(160deg,#120520 0%,#2a0a50 35%,#4a1080 70%,#1a0440 100%);
-}
-.poster-matka{
-  background:linear-gradient(160deg,#3a2a10 0%,#5a3a18 30%,#2a1a08 70%,#1a0e04 100%);
-}
-.poster-label{
-  font-size:1.1rem;font-weight:900;letter-spacing:-0.02em;
-  text-shadow:0 2px 12px rgba(0,0,0,0.8);
-  line-height:1.2;
-}
-.poster-sub{font-size:0.65rem;opacity:0.65;margin-top:3px;letter-spacing:0.05em;}
-.poster-badge{
-  display:inline-block;padding:3px 8px;border-radius:999px;
-  font-size:0.6rem;font-weight:700;letter-spacing:0.05em;
-  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);
-  margin-bottom:8px;
-}
-/* Decorative scene elements */
-.poster-dhurandhar .scene{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 70% 40% at 50% 20%,rgba(150,80,220,0.3) 0%,transparent 60%),
-    radial-gradient(ellipse 80% 60% at 30% 80%,rgba(60,20,120,0.4) 0%,transparent 60%);
-}
-.poster-dhurandhar .figure{
-  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
-  width:60%;
-  display:flex;align-items:flex-end;justify-content:center;
-}
-.figure-silhouette{
-  width:80px;height:180px;
-  background:linear-gradient(180deg,rgba(200,160,255,0.08),rgba(100,60,180,0.15));
-  border-radius:40px 40px 0 0;
-  position:relative;
-  box-shadow:0 0 40px rgba(180,100,255,0.2);
-}
-.poster-matka .scene{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 30%,rgba(180,120,40,0.25) 0%,transparent 60%);
-}
+/* apps icons inline */
+.yt-icon{background:#fff;}
+.jh-icon{background:linear-gradient(135deg,#4020b0,#c030c0);}
+.pv-icon{background:#00173d;color:#00a8ff;font-size:0.5rem;font-weight:900;line-height:1.1;text-align:center;padding:3px;}
 
-/* Lifestyle card (slide 2) */
-.lifestyle-card{
-  height:420px;
-  background:linear-gradient(160deg,#1a1208 0%,#3a2810 50%,#1a1208 100%);
-  position:relative;overflow:hidden;border-radius:24px;
+/* Peek card on right */
+.peek-card{
+  position:absolute;right:-60px;top:50%;transform:translateY(-50%);
+  width:180px;height:85%;
+  border-radius:20px;overflow:hidden;
+  box-shadow:0 16px 40px rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.1);
+  opacity:0.5;
+  pointer-events:none;
+  transition:opacity 0.4s;
 }
-.lifestyle-people{
-  position:absolute;inset:0;
-  display:flex;align-items:flex-end;justify-content:center;
-  padding-bottom:20px;
-}
-.people-group{
-  display:flex;gap:-10px;align-items:flex-end;
-}
-.person{
-  width:60px;border-radius:20px 20px 0 0;
-  background:linear-gradient(180deg,rgba(255,200,150,0.3),rgba(200,150,100,0.2));
-}
+.banner-viewport:hover .peek-card{opacity:0.7;}
 
-/* ── AMBIENT GLOW behind cluster ── */
-.stage-glow{
-  position:absolute;
-  width:120%;height:120%;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  filter:blur(90px);
-  opacity:0;pointer-events:none;
-  transition:background 1.4s var(--ease-in-out),opacity 1.4s;
-  z-index:-1;
-}
-
-/* ── CAROUSEL BOTTOM BAR ── */
-.carousel-bar{
+/* ── BOTTOM CONTROLS ── */
+.fold1-controls{
   position:absolute;bottom:0;left:0;right:0;
-  height:80px;
+  height:72px;
   display:flex;align-items:center;
-  padding:0 52px;
-  gap:28px;
-  background:linear-gradient(to top,rgba(6,8,16,0.7),transparent);
+  padding:0 52px 0 140px;
+  gap:24px;
+  background:linear-gradient(to top,rgba(8,6,15,0.7),transparent);
   z-index:20;
 }
-.progress-tracks{
-  display:flex;gap:10px;align-items:center;flex:1;
+.prog-bar{
+  flex:1;display:flex;gap:10px;
 }
-.p-track{
+.prog-track{
   flex:1;height:2px;border-radius:1px;
   background:rgba(255,255,255,0.15);
-  position:relative;cursor:pointer;overflow:hidden;
-  transition:height 0.25s,background 0.25s;
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:height 0.2s;
 }
-.p-track:hover{height:3px;background:rgba(255,255,255,0.25);}
-.p-fill{
+.prog-track:hover{height:3px;}
+.prog-fill{
   position:absolute;left:0;top:0;bottom:0;
-  background:#fff;border-radius:1px;
-  width:0%;
-  transition:width 0.05s linear;
+  width:0%;border-radius:1px;background:#fff;
 }
-.p-track.active .p-fill{transition:none;}
-.carousel-nav{display:flex;gap:8px;}
-.c-btn{
-  width:36px;height:36px;border-radius:50%;
+.ctrl-arrows{display:flex;gap:8px;}
+.arr-btn{
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
   background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.75);cursor:pointer;
+  color:rgba(255,255,255,0.7);font-size:1rem;
   display:flex;align-items:center;justify-content:center;
-  font-size:1rem;
   transition:background 0.2s,color 0.2s,transform 0.2s;
   backdrop-filter:blur(8px);
 }
-.c-btn:hover{background:rgba(255,255,255,0.14);color:#fff;transform:scale(1.08);}
-.slide-num{
-  font-size:0.75rem;color:rgba(255,255,255,0.35);
-  letter-spacing:0.08em;min-width:36px;text-align:right;
-}
+.arr-btn:hover{background:rgba(255,255,255,0.14);color:#fff;transform:scale(1.08);}
+.slide-count{font-size:0.72rem;color:rgba(255,255,255,0.32);letter-spacing:0.08em;min-width:40px;}
 
-/* scroll indicator */
-.scroll-cue{
-  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  opacity:0;pointer-events:none;
-  z-index:30;
-  animation:cue-in 1s 2s ease both;
+/* scroll hint */
+.scroll-hint{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;
+  animation:hint-in 1s 2.5s ease both;
+  z-index:25;
 }
-@keyframes cue-in{to{opacity:0.4;pointer-events:all;}}
-.scroll-cue span{font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5);}
-.scroll-mouse{
-  width:22px;height:34px;border-radius:11px;
-  border:1.5px solid rgba(255,255,255,0.4);
+@keyframes hint-in{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:0.4;transform:translateX(-50%) translateY(0)}}
+.scroll-hint:hover{opacity:0.75 !important;}
+.scroll-hint span{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;}
+.scroll-mouse-icon{
+  width:20px;height:30px;border-radius:10px;
+  border:1.5px solid rgba(255,255,255,0.45);
   display:flex;justify-content:center;padding-top:5px;
 }
 .scroll-wheel{
-  width:3px;height:7px;border-radius:2px;background:rgba(255,255,255,0.7);
-  animation:scroll-w 1.6s ease-in-out infinite;
+  width:2.5px;height:6px;border-radius:2px;
+  background:rgba(255,255,255,0.7);
+  animation:wheel-scroll 1.6s ease-in-out infinite;
 }
-@keyframes scroll-w{0%,100%{transform:translateY(0);opacity:1}80%{transform:translateY(10px);opacity:0}}
+@keyframes wheel-scroll{0%,100%{transform:translateY(0);opacity:1}80%{transform:translateY(10px);opacity:0}}
 
-/* ─── FOLD 2: RECHARGE ─── */
+/* ═══════════════════════════════════
+   FOLD 2 — RECHARGE
+═══════════════════════════════════ */
 #fold2{
   position:relative;z-index:2;
   min-height:100vh;
@@ -474,174 +432,159 @@ nav{
   overflow:hidden;
 }
 #fold2::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 100% 60% at 50% 0%,rgba(40,20,80,0.4),transparent 60%);
-  pointer-events:none;
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(50,20,100,0.45),transparent 55%);
 }
-.f2-inner{width:100%;max-width:860px;position:relative;z-index:1;}
+.f2-wrap{width:100%;max-width:860px;position:relative;z-index:1;}
 .f2-kicker{
-  text-align:center;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;
-  color:rgba(255,255,255,0.35);margin-bottom:10px;
+  text-align:center;font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(255,255,255,0.3);margin-bottom:10px;
 }
-.f2-heading{
+.f2-title{
   text-align:center;
-  font-size:clamp(2.4rem,5vw,3.8rem);
+  font-size:clamp(2.2rem,4.5vw,3.6rem);
   font-weight:900;letter-spacing:-0.04em;line-height:1.08;
-  margin-bottom:52px;
+  margin-bottom:48px;
 }
-.f2-heading span{
-  background:linear-gradient(90deg,#60c0ff,#4060ff,#b040ff);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+.f2-title .grad-word{
+  background:linear-gradient(90deg,#60c0ff,#4466ff,#a040ff);
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
 }
 
-/* Tab bar */
+/* tab bar */
 .f2-tabs{
-  display:flex;gap:6px;
+  display:flex;gap:5px;
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.07);
-  border-radius:999px;padding:5px;
-  margin-bottom:28px;
+  border-radius:999px;padding:4px;
+  margin-bottom:24px;
   backdrop-filter:blur(16px);
 }
 .f2-tab{
-  flex:1;padding:11px 0;border-radius:999px;
-  font-size:0.86rem;font-weight:600;cursor:pointer;border:none;
-  background:transparent;color:rgba(255,255,255,0.45);
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  transition:background 0.3s,color 0.3s,box-shadow 0.3s;
+  flex:1;padding:10px 0;border-radius:999px;
+  font-size:0.85rem;font-weight:600;cursor:pointer;border:none;
+  background:transparent;color:rgba(255,255,255,0.42);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all 0.3s var(--easing);
 }
-.f2-tab.active{
+.f2-tab.on{
   background:rgba(255,255,255,0.1);color:#fff;
-  border:1px solid rgba(255,255,255,0.14);
-  box-shadow:0 2px 16px rgba(0,0,0,0.3);
+  border:1px solid rgba(255,255,255,0.13);
+  box-shadow:0 2px 14px rgba(0,0,0,0.3);
 }
 
-/* Main glass card */
+/* glass card */
 .f2-card{
   background:rgba(255,255,255,0.035);
   border:1px solid rgba(255,255,255,0.07);
-  border-radius:32px;
-  padding:40px 40px 36px;
-  backdrop-filter:blur(28px) saturate(160%);
-  -webkit-backdrop-filter:blur(28px) saturate(160%);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.04),
-    0 40px 120px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.07);
+  border-radius:28px;
+  padding:36px 38px 30px;
+  backdrop-filter:blur(24px) saturate(150%);
+  -webkit-backdrop-filter:blur(24px) saturate(150%);
+  box-shadow:0 40px 100px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.07);
   position:relative;overflow:hidden;
 }
 .f2-card::before{
-  content:'';position:absolute;
-  top:0;left:50%;transform:translateX(-50%);
-  width:55%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:50%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
 }
-
-.input-wrap{
-  display:flex;gap:12px;
-}
-.num-field{
-  flex:1;position:relative;
-}
-.num-prefix{
-  position:absolute;left:22px;top:50%;transform:translateY(-50%);
-  font-size:0.95rem;font-weight:600;color:rgba(255,255,255,0.4);
+.inp-row{display:flex;gap:10px;}
+.inp-wrap{flex:1;position:relative;}
+.inp-pre{
+  position:absolute;left:20px;top:50%;transform:translateY(-50%);
+  font-size:0.9rem;font-weight:600;color:rgba(255,255,255,0.38);
   pointer-events:none;
 }
-.num-input{
-  width:100%;height:56px;
+.inp{
+  width:100%;height:54px;
   background:rgba(255,255,255,0.055);
   border:1px solid rgba(255,255,255,0.09);
   border-radius:999px;outline:none;
-  padding:0 22px 0 62px;
-  font-size:0.98rem;color:#fff;font-weight:500;
-  transition:border-color 0.3s,background 0.3s,box-shadow 0.3s;
+  padding:0 20px 0 58px;
+  font-size:0.96rem;color:#fff;font-weight:500;
+  transition:border-color 0.3s,box-shadow 0.3s,background 0.3s;
 }
-.num-input::placeholder{color:rgba(255,255,255,0.25);}
-.num-input:focus{
-  border-color:rgba(90,120,255,0.55);
+.inp::placeholder{color:rgba(255,255,255,0.22);}
+.inp:focus{
+  border-color:rgba(100,130,255,0.5);
   background:rgba(255,255,255,0.08);
   box-shadow:0 0 0 4px rgba(80,100,255,0.1);
 }
 .go-btn{
-  height:56px;padding:0 34px;border-radius:999px;border:none;cursor:pointer;
-  font-size:0.92rem;font-weight:800;color:#fff;white-space:nowrap;
-  background:linear-gradient(135deg,#2050e0,#7030d0);
-  box-shadow:0 6px 28px rgba(40,60,200,0.45);
-  position:relative;overflow:hidden;
-  transition:transform 0.25s var(--ease-out-expo),box-shadow 0.25s;
+  height:54px;padding:0 32px;border-radius:999px;border:none;
+  font-size:0.9rem;font-weight:800;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,#2050de,#7030d0);
+  box-shadow:0 6px 26px rgba(40,60,200,0.42);
+  position:relative;overflow:hidden;white-space:nowrap;
+  transition:transform 0.25s var(--easing),box-shadow 0.25s;
 }
 .go-btn::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent 55%);
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 55%);
   opacity:0;transition:opacity 0.3s;
 }
-.go-btn:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(40,60,200,0.6);}
+.go-btn:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(40,60,200,0.58);}
 .go-btn:hover::before{opacity:1;}
-
-/* quick links */
-.q-links{
-  display:flex;gap:9px;margin-top:22px;flex-wrap:wrap;
-}
-.q-link{
-  display:flex;align-items:center;gap:7px;
-  padding:9px 18px;border-radius:999px;
+.q-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
+.q-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:999px;
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.07);
-  font-size:0.8rem;color:rgba(255,255,255,0.55);cursor:pointer;
-  transition:all 0.25s;backdrop-filter:blur(8px);
+  font-size:0.78rem;color:rgba(255,255,255,0.52);cursor:pointer;
+  transition:all 0.22s;backdrop-filter:blur(8px);
 }
-.q-link:hover{background:rgba(255,255,255,0.09);color:#fff;border-color:rgba(255,255,255,0.15);}
+.q-chip:hover{background:rgba(255,255,255,0.09);color:#fff;border-color:rgba(255,255,255,0.15);}
 
-/* Stats */
+/* stats */
 .f2-stats{
   display:grid;grid-template-columns:repeat(4,1fr);
-  gap:0;margin-top:44px;
-  border-radius:20px;overflow:hidden;
+  margin-top:40px;
+  border-radius:18px;overflow:hidden;
   border:1px solid rgba(255,255,255,0.06);
   background:rgba(255,255,255,0.025);
-  backdrop-filter:blur(16px);
+  backdrop-filter:blur(14px);
 }
 .f2-stat{
-  padding:26px 20px;text-align:center;
+  padding:24px 16px;text-align:center;
   border-right:1px solid rgba(255,255,255,0.05);
-  transition:background 0.3s;
+  transition:background 0.25s;
 }
-.f2-stat:last-child{border-right:none;}
+.f2-stat:last-child{border:none;}
 .f2-stat:hover{background:rgba(255,255,255,0.04);}
-.stat-val{
-  font-size:1.9rem;font-weight:900;letter-spacing:-0.04em;
-  background:linear-gradient(90deg,#80d0ff,#4080ff);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+.sv{
+  font-size:1.8rem;font-weight:900;letter-spacing:-0.04em;
+  background:linear-gradient(90deg,#80d0ff,#4488ff);
+  background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
 }
-.stat-lbl{font-size:0.74rem;color:rgba(255,255,255,0.38);margin-top:5px;letter-spacing:0.03em;}
+.sl{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:4px;}
 
 /* ── RESPONSIVE ── */
 @media(max-width:960px){
   nav{padding:0 20px;}
   .nav-links{display:none;}
-  .slide{grid-template-columns:1fr;padding:20px 20px 96px;}
-  .s-stage{display:none;}
-  .carousel-bar{padding:0 20px;}
+  .fold1-inner{grid-template-columns:1fr;padding:16px 20px 80px 20px;}
+  .banner-stage{display:none;}
+  #stack-rail{display:none;}
+  .fold1-controls{padding:0 20px;}
   #fold2{padding:60px 20px;}
-  .f2-card{padding:28px 20px;}
-  .input-wrap{flex-direction:column;}
-  .go-btn{width:100%;height:52px;}
+  .f2-card{padding:24px 18px;}
+  .inp-row{flex-direction:column;}
+  .go-btn{width:100%;}
   .f2-stats{grid-template-columns:1fr 1fr;}
-  .f2-stat:nth-child(2){border-right:none;}
-  .f2-stat:nth-child(3){border-bottom:none;}
-  .f2-stat:nth-child(4){border-bottom:none;border-right:none;}
 }
 </style>
 </head>
 <body>
 
-<canvas id="ambient-canvas"></canvas>
+<div id="bg"></div>
 
 <!-- ═══ NAV ═══ -->
 <nav>
-  <a class="nav-logo" href="#">
-    <div class="nav-logo-mark">Jio</div>
+  <a class="logo" href="#">
+    <div class="logo-mark">Jio</div>
+    <span class="logo-name" style="display:none;"></span>
   </a>
   <ul class="nav-links">
     <li><a href="#">Mobile</a></li>
@@ -650,484 +593,585 @@ nav{
     <li><a href="#">Customer Care</a></li>
   </ul>
   <div class="nav-end">
-    <button class="nav-btn" title="Search">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-    </button>
-    <button class="nav-btn" title="Account">
-      <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
-    </button>
+    <button class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
   </div>
 </nav>
 
 <!-- ═══ FOLD 1 ═══ -->
 <section id="fold1">
-  <div class="slides-wrap" id="slidesWrap">
 
-    <!-- ── SLIDE 0: OTT PASS ── -->
-    <div class="slide active" data-slide="0"
-         data-c1="130,0,200" data-c2="200,20,140" data-c3="80,0,160"
-         data-btn="linear-gradient(135deg,#b020e0,#7020c0)"
-         data-grad="linear-gradient(90deg,#e060ff,#a030e0,#7020c0)">
-      <div class="s-text">
-        <div class="s-eyebrow" style="color:#e080ff;">
-          <span class="s-eyebrow-dot" style="background:#e080ff;"></span>
-          New · OTT Pass
-        </div>
-        <h1 class="s-title">
-          Grab your<br/>
-          <span class="grad" style="background:linear-gradient(90deg,#ff80e0,#c040f0,#7020d0);">Jio OTT</span>
-          <span class="grad" style="background:linear-gradient(90deg,#c040f0,#7020d0,#4010a0);">Pass now</span>
-        </h1>
-        <p class="s-body">
-          Start streaming movies, shows, sports and more from <strong>15 OTT apps</strong>.
-          ₹1500+ worth of subscriptions — for just <strong>₹200/month</strong>.
-        </p>
-        <div class="s-cta-row">
-          <button class="cta-main" style="background:linear-gradient(135deg,#b020e0,#7020c0);box-shadow:0 6px 28px rgba(160,20,200,0.45);">Get Now</button>
-          <button class="cta-ghost">View Plans</button>
-        </div>
+  <!-- Stack Rail -->
+  <div id="stack-rail"></div>
+
+  <div class="fold1-inner">
+    <!-- LEFT TEXT — updated per slide by JS -->
+    <div class="hero-text" id="heroText">
+      <div class="eyebrow" id="eyebrow" style="color:#e070ff;border-color:rgba(200,80,255,0.25);">
+        <span class="eyebrow-dot"></span>
+        <span id="eyebrow-text">New · OTT Pass</span>
       </div>
-      <div class="s-stage">
-        <div class="stage-glow" id="glow0"></div>
-        <div class="banner-cluster" id="cluster0">
-          <!-- Left: Dhurandhar -->
-          <div class="card-left">
-            <div class="poster-card poster-dhurandhar">
-              <div class="scene"></div>
-              <div class="figure"><div class="figure-silhouette"></div></div>
-              <div class="poster-inner">
-                <div class="poster-badge">Now Streaming · JioHotstar</div>
-                <div class="poster-label">DHURANDHAR</div>
-                <div class="poster-sub">Ram &amp; Undekha</div>
-              </div>
-            </div>
-          </div>
-          <!-- Center: OTT ticket -->
-          <div class="card-center">
-            <div class="ott-card">
-              <div class="ott-header-row">
-                <div class="ott-logo-dot"></div>
-                <div class="ott-pass-label">OTT Pass</div>
-              </div>
-              <hr class="ott-divider" style="border-style:dotted;border-color:rgba(100,80,200,0.25);margin:8px 0;"/>
-              <div class="ott-strike-row">
-                <span class="ott-strike-val">₹1500+</span>
-              </div>
-              <div class="ott-worth">Worth of Subscriptions</div>
-              <div class="ott-for-just"><span>For Just</span></div>
-              <div class="ott-price-big">
-                <span class="ott-rupee">₹</span>200
-              </div>
-              <div class="ott-per-mo">Per Month</div>
-              <hr class="ott-divider" style="margin:10px 0;"/>
-              <div class="ott-chips-row">
-                <div class="ott-chip">30 GB</div>
-                <div class="ott-chip">Unlimited 5G</div>
-              </div>
-              <div class="ott-apps-row">
-                <div class="app-pill" style="background:#fff0f0;">▶️</div>
-                <div class="app-pill" style="background:linear-gradient(135deg,#4020c0,#c030d0);">✦</div>
-                <div class="app-pill" style="background:#0e1c44;color:#00a8ff;font-size:0.6rem;font-weight:900;">prime</div>
-                <div class="more-pill">+12<br/>More</div>
-              </div>
-            </div>
-          </div>
-          <!-- Right: Matka King -->
-          <div class="card-right">
-            <div class="poster-card poster-matka">
-              <div class="scene"></div>
-              <div class="poster-inner">
-                <div class="poster-badge" style="background:rgba(200,140,40,0.2);border-color:rgba(200,140,40,0.3);">prime original</div>
-                <div class="poster-label">MATKA KING</div>
-                <div class="poster-sub">New Series · Watch Now</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <h1 class="hero-title" id="heroTitle"></h1>
+      <p class="hero-body" id="heroBody"></p>
+      <div class="cta-row">
+        <button class="btn-fill" id="ctaMain">Get Now</button>
+        <button class="btn-out" id="ctaSecond">View Plans</button>
       </div>
     </div>
 
-    <!-- ── SLIDE 1: JioFiber ── -->
-    <div class="slide" data-slide="1"
-         data-c1="0,80,220" data-c2="0,180,255" data-c3="0,40,160"
-         data-btn="linear-gradient(135deg,#0055e0,#00aaff)"
-         data-grad="linear-gradient(90deg,#80d4ff,#0088ff,#0044dd)">
-      <div class="s-text">
-        <div class="s-eyebrow" style="color:#80cfff;">
-          <span class="s-eyebrow-dot" style="background:#80cfff;"></span>
-          JioFiber · Home Broadband
-        </div>
-        <h1 class="s-title">
-          Experience<br/>
-          <span class="grad" style="background:linear-gradient(90deg,#80d4ff,#0088ff);">1 Gbps</span>
-          <span style="font-weight:300;opacity:0.55;font-size:0.65em;">at home</span>
-        </h1>
-        <p class="s-body">
-          Ultra-fast gigabit broadband with unlimited data.
-          Get <strong>1 month FREE</strong> plus Pro Google One storage included.
-        </p>
-        <div class="s-cta-row">
-          <button class="cta-main" style="background:linear-gradient(135deg,#0055e0,#00aaff);box-shadow:0 6px 28px rgba(0,80,220,0.45);">Explore Plans</button>
-          <button class="cta-ghost">Check Coverage</button>
-        </div>
-      </div>
-      <div class="s-stage">
-        <div class="stage-glow" id="glow1"></div>
-        <div class="banner-cluster" id="cluster1">
-          <div class="card-left">
-            <div class="poster-card" style="background:linear-gradient(160deg,#001240 0%,#003090 60%,#0050c0 100%);height:360px;">
-              <div class="poster-inner">
-                <div class="poster-badge" style="background:rgba(0,160,255,0.2);border-color:rgba(0,160,255,0.3);">JioFiber 100 Mbps</div>
-                <div class="poster-label">Ultra Fast<br/>Broadband</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-center">
-            <div style="background:linear-gradient(160deg,#001850,#003490,#0055d0);padding:40px 28px;min-height:360px;position:relative;overflow:hidden;">
-              <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(0,160,255,0.2),transparent);"></div>
-              <div style="font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;opacity:0.55;margin-bottom:12px;">Download Speed</div>
-              <div style="font-size:5.5rem;font-weight:900;letter-spacing:-4px;line-height:1;background:linear-gradient(90deg,#80d4ff,#0088ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">1<span style="font-size:2rem;opacity:0.7;">Gbps</span></div>
-              <div style="margin:16px 0 24px;opacity:0.65;font-size:0.88rem;line-height:1.65;">Unlimited data · 4K streaming<br/>Smart home · Zero buffering</div>
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <div style="padding:11px 20px;border-radius:999px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);font-size:0.85rem;font-weight:700;text-align:center;">🎁 1 Month FREE</div>
-                <div style="padding:11px 20px;border-radius:999px;background:rgba(0,160,255,0.18);border:1px solid rgba(0,160,255,0.3);font-size:0.85rem;font-weight:700;text-align:center;">Google One Pro</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:24px;">
-                <div style="width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 10px #00ff88;"></div>
-                <span style="font-size:0.75rem;opacity:0.6;">Live in 6,000+ cities</span>
-              </div>
-            </div>
-          </div>
-          <div class="card-right">
-            <div class="poster-card" style="background:linear-gradient(160deg,#001030,#002070,#003090);height:360px;">
-              <div class="poster-inner">
-                <div class="poster-badge" style="background:rgba(0,200,255,0.15);border-color:rgba(0,200,255,0.25);">JioFiber Max</div>
-                <div class="poster-label">Smart Home<br/>Ready</div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- RIGHT BANNER STAGE -->
+    <div class="banner-stage">
+      <div class="banner-viewport" id="bannerViewport">
+        <!-- Active banner injected by JS -->
+        <div id="bannerWrap" class="banner-wrap active"></div>
+        <!-- Peek card (next slide hint) -->
+        <div class="peek-card" id="peekCard"></div>
       </div>
     </div>
-
-    <!-- ── SLIDE 2: Lifestyle / 5G ── -->
-    <div class="slide" data-slide="2"
-         data-c1="160,80,0" data-c2="100,160,0" data-c3="40,120,0"
-         data-btn="linear-gradient(135deg,#c05000,#e09000)"
-         data-grad="linear-gradient(90deg,#ffcc60,#ff8020,#c04000)">
-      <div class="s-text">
-        <div class="s-eyebrow" style="color:#ffcc70;">
-          <span class="s-eyebrow-dot" style="background:#ffcc70;"></span>
-          Jio True 5G
-        </div>
-        <h1 class="s-title">
-          Stay connected,<br/>
-          <span class="grad" style="background:linear-gradient(90deg,#ffcc60,#ff8020,#e04000);">always.</span>
-        </h1>
-        <p class="s-body">
-          India's fastest 5G network keeps you and your people connected
-          everywhere, every moment. <strong>Unlimited. Uninterrupted.</strong>
-        </p>
-        <div class="s-cta-row">
-          <button class="cta-main" style="background:linear-gradient(135deg,#c05000,#e09000);box-shadow:0 6px 28px rgba(180,70,0,0.45);">Get Jio 5G</button>
-          <button class="cta-ghost">Find Coverage</button>
-        </div>
-      </div>
-      <div class="s-stage">
-        <div class="stage-glow" id="glow2"></div>
-        <div class="banner-cluster" id="cluster2">
-          <div class="card-left">
-            <div class="poster-card" style="background:linear-gradient(160deg,#1a0e04,#3a2010,#2a1808);height:360px;">
-              <div class="poster-inner">
-                <div class="poster-badge" style="background:rgba(255,180,60,0.15);border-color:rgba(255,180,60,0.25);">5G · Pan India</div>
-                <div class="poster-label">True 5G<br/>Network</div>
-              </div>
-            </div>
-          </div>
-          <div class="card-center">
-            <!-- Lifestyle visual recreation -->
-            <div style="background:linear-gradient(160deg,#1a1208,#3a2810,#2a1c0c);min-height:360px;position:relative;overflow:hidden;padding:28px;">
-              <div style="position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 50% 40%,rgba(220,160,60,0.18),transparent 60%);"></div>
-              <!-- Stylised people group -->
-              <div style="position:absolute;bottom:0;left:0;right:0;height:70%;display:flex;align-items:flex-end;justify-content:center;gap:-4px;">
-                <div style="width:90px;height:190px;background:linear-gradient(180deg,rgba(240,200,160,0.25),rgba(200,160,100,0.15));border-radius:30px 30px 0 0;transform:rotate(-5deg) translateX(8px);"></div>
-                <div style="width:95px;height:210px;background:linear-gradient(180deg,rgba(255,210,170,0.3),rgba(220,170,110,0.2));border-radius:30px 30px 0 0;z-index:2;"></div>
-                <div style="width:88px;height:185px;background:linear-gradient(180deg,rgba(235,195,155,0.22),rgba(195,155,95,0.14));border-radius:30px 30px 0 0;transform:rotate(4deg) translateX(-8px);"></div>
-              </div>
-              <div style="position:relative;z-index:3;">
-                <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;opacity:0.5;margin-bottom:10px;">Connected. Always.</div>
-                <div style="font-size:2.2rem;font-weight:900;letter-spacing:-0.04em;line-height:1.1;background:linear-gradient(90deg,#ffcc60,#ff8020);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Jio 5G</div>
-                <div style="font-size:0.85rem;opacity:0.6;margin-top:6px;">Connecting a billion people</div>
-              </div>
-              <div style="position:absolute;bottom:20px;left:28px;right:28px;">
-                <div style="display:flex;justify-content:space-between;font-size:0.7rem;opacity:0.5;margin-bottom:6px;"><span>Signal</span><span>Excellent</span></div>
-                <div style="height:3px;border-radius:2px;background:rgba(255,255,255,0.12);overflow:hidden;">
-                  <div style="height:100%;width:92%;background:linear-gradient(90deg,#ffcc40,#ff8020);border-radius:2px;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card-right">
-            <div class="poster-card" style="background:linear-gradient(160deg,#0e1808,#1a2c0a,#142208);height:360px;">
-              <div class="poster-inner">
-                <div class="poster-badge" style="background:rgba(80,200,60,0.15);border-color:rgba(80,200,60,0.25);">450M+ Users</div>
-                <div class="poster-label">India's #1<br/>Network</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /slides-wrap -->
-
-  <!-- Carousel bottom bar -->
-  <div class="carousel-bar">
-    <div class="progress-tracks" id="progressTracks">
-      <div class="p-track active" data-t="0"><div class="p-fill" id="fill0"></div></div>
-      <div class="p-track" data-t="1"><div class="p-fill" id="fill1"></div></div>
-      <div class="p-track" data-t="2"><div class="p-fill" id="fill2"></div></div>
-    </div>
-    <div class="carousel-nav">
-      <button class="c-btn" id="cPrev">&#8592;</button>
-      <button class="c-btn" id="cNext">&#8594;</button>
-    </div>
-    <span class="slide-num" id="slideNum">01 / 03</span>
   </div>
 
-  <!-- Scroll cue -->
-  <div class="scroll-cue" onclick="scrollTo2()">
-    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+  <!-- Controls -->
+  <div class="fold1-controls">
+    <div class="prog-bar" id="progBar">
+      <div class="prog-track" data-i="0"><div class="prog-fill" id="pf0"></div></div>
+      <div class="prog-track" data-i="1"><div class="prog-fill" id="pf1"></div></div>
+      <div class="prog-track" data-i="2"><div class="prog-fill" id="pf2"></div></div>
+    </div>
+    <div class="ctrl-arrows">
+      <button class="arr-btn" id="btnPrev">&#8592;</button>
+      <button class="arr-btn" id="btnNext">&#8594;</button>
+    </div>
+    <span class="slide-count" id="slideCount">01 / 03</span>
+  </div>
+
+  <div class="scroll-hint" onclick="document.getElementById('fold2').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-mouse-icon"><div class="scroll-wheel"></div></div>
     <span>Recharge</span>
   </div>
 </section>
 
-<!-- ═══ FOLD 2: RECHARGE ═══ -->
+<!-- ═══ FOLD 2 ═══ -->
 <section id="fold2">
-  <div class="f2-inner">
+  <div class="f2-wrap">
     <p class="f2-kicker">Quick Access</p>
-    <h2 class="f2-heading">Recharge or<br/><span>Pay Your Bills</span></h2>
+    <h2 class="f2-title">Recharge or <span class="grad-word">Pay Bills</span></h2>
 
-    <div class="f2-tabs" id="f2Tabs">
-      <button class="f2-tab active" data-ph="Enter Jio number">📱 Mobile</button>
-      <button class="f2-tab" data-ph="Enter account ID">🏠 Home</button>
-      <button class="f2-tab" data-ph="Enter DTH account">📡 DTH</button>
+    <div class="f2-tabs">
+      <button class="f2-tab on" data-ph="Enter Jio number">📱 Mobile</button>
+      <button class="f2-tab" data-ph="Enter JioFiber account ID">🏠 Home</button>
+      <button class="f2-tab" data-ph="Enter JioDTH account">📡 DTH</button>
     </div>
 
     <div class="f2-card">
-      <div class="input-wrap">
-        <div class="num-field">
-          <span class="num-prefix">+91</span>
-          <input class="num-input" id="numInput" type="tel" maxlength="10" placeholder="Enter Jio number"/>
+      <div class="inp-row">
+        <div class="inp-wrap">
+          <span class="inp-pre">+91</span>
+          <input class="inp" id="numInp" type="tel" maxlength="10" placeholder="Enter Jio number"/>
         </div>
-        <button class="go-btn" onclick="proceedNow()">Proceed &nbsp;→</button>
+        <button class="go-btn" onclick="doSubmit()">Proceed →</button>
       </div>
-      <div class="q-links">
-        <div class="q-link">⚡ Quick Recharge</div>
-        <div class="q-link">📋 View Bill</div>
-        <div class="q-link">📶 Data Balance</div>
-        <div class="q-link">🎁 Offers for You</div>
-        <div class="q-link">📍 Store Locator</div>
+      <div class="q-row">
+        <div class="q-chip">⚡ Quick Recharge</div>
+        <div class="q-chip">📋 View Bill</div>
+        <div class="q-chip">📶 Data Balance</div>
+        <div class="q-chip">🎁 Offers</div>
+        <div class="q-chip">📍 Stores</div>
       </div>
     </div>
 
     <div class="f2-stats">
-      <div class="f2-stat"><div class="stat-val">450M+</div><div class="stat-lbl">Subscribers</div></div>
-      <div class="f2-stat"><div class="stat-val">True 5G</div><div class="stat-lbl">Pan-India Network</div></div>
-      <div class="f2-stat"><div class="stat-val">6L+</div><div class="stat-lbl">Villages Connected</div></div>
-      <div class="f2-stat"><div class="stat-val">99.9%</div><div class="stat-lbl">Network Uptime</div></div>
+      <div class="f2-stat"><div class="sv">450M+</div><div class="sl">Subscribers</div></div>
+      <div class="f2-stat"><div class="sv">True 5G</div><div class="sl">Pan-India</div></div>
+      <div class="f2-stat"><div class="sv">6L+</div><div class="sl">Villages</div></div>
+      <div class="f2-stat"><div class="sv">99.9%</div><div class="sl">Uptime</div></div>
     </div>
   </div>
 </section>
 
 <script>
-/* ─── CANVAS AMBIENT RENDERER ─── */
-const cvs = document.getElementById('ambient-canvas');
-const ctx = cvs.getContext('2d');
-let W, H, targetR1,targetG1,targetB1, targetR2,targetG2,targetB2, targetR3,targetG3,targetB3;
-let curR1=30,curG1=0,curB1=80, curR2=80,curG2=0,curB2=60, curR3=20,curG3=0,curB3=50;
-let raf;
-
-function resize(){
-  W=cvs.width=window.innerWidth;
-  H=cvs.height=window.innerHeight;
-}
-window.addEventListener('resize',resize);
-resize();
-
-function lerp(a,b,t){return a+(b-a)*t;}
-
-function drawAmbient(){
-  ctx.clearRect(0,0,W,H);
-  curR1=lerp(curR1,targetR1,0.025); curG1=lerp(curG1,targetG1,0.025); curB1=lerp(curB1,targetB1,0.025);
-  curR2=lerp(curR2,targetR2,0.025); curG2=lerp(curG2,targetG2,0.025); curB2=lerp(curB2,targetB2,0.025);
-  curR3=lerp(curR3,targetR3,0.025); curG3=lerp(curG3,targetG3,0.025); curB3=lerp(curB3,targetB3,0.025);
-
-  // orb 1 — top-left
-  const g1=ctx.createRadialGradient(W*0.15,H*0.25,0,W*0.15,H*0.25,W*0.55);
-  g1.addColorStop(0,`rgba(${curR1|0},${curG1|0},${curB1|0},0.38)`);
-  g1.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g1; ctx.fillRect(0,0,W,H);
-
-  // orb 2 — bottom-right
-  const g2=ctx.createRadialGradient(W*0.85,H*0.75,0,W*0.85,H*0.75,W*0.5);
-  g2.addColorStop(0,`rgba(${curR2|0},${curG2|0},${curB2|0},0.28)`);
-  g2.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
-
-  // orb 3 — center (breathing)
-  const t=Date.now()/3000;
-  const bx=W*(0.45+Math.sin(t)*0.06), by=H*(0.4+Math.cos(t*0.8)*0.08);
-  const g3=ctx.createRadialGradient(bx,by,0,bx,by,W*0.35);
-  g3.addColorStop(0,`rgba(${curR3|0},${curG3|0},${curB3|0},0.22)`);
-  g3.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g3; ctx.fillRect(0,0,W,H);
-
-  raf=requestAnimationFrame(drawAmbient);
-}
-drawAmbient();
-
-/* ─── SLIDE DATA ─── */
-const slideEls=document.querySelectorAll('.slide');
-const tracks=document.querySelectorAll('.p-track');
-const numEl=document.getElementById('slideNum');
-let cur=0, autoT, fillT, fillVal=0;
-const DURATION=5000;
-
-const slideColors=[
-  {r1:140,g1:0,b1:200, r2:200,g2:20,b2:140, r3:100,g3:0,b3:160},
-  {r1:0,g1:80,b1:220,  r2:0,g2:180,b2:255, r3:0,g3:40,b3:160},
-  {r1:160,g1:80,b1:0,  r2:80,g2:140,b2:0,  r3:40,g3:80,b3:0},
+/* ═══════════════════════════════════
+   SLIDE DATA
+═══════════════════════════════════ */
+const SLIDES = [
+  {
+    eyebrow: 'New · OTT Pass',
+    eyebrowColor: '#e070ff',
+    eyebrowBorder: 'rgba(200,80,255,0.25)',
+    titleLines: ['Grab your Jio', 'OTT Pass now'],
+    titleGradLine: 1, // which line gets gradient
+    titleGrad: 'linear-gradient(90deg,#ff80e0,#c040f0,#7020d0)',
+    body: 'Start streaming movies, shows, sports and more from <strong>15 OTT apps</strong>. ₹1500+ worth of subscriptions — for just <strong>₹200/month</strong>.',
+    cta: 'Get Now',
+    cta2: 'View Plans',
+    ctaGrad: 'linear-gradient(135deg,#b020e0,#6010c0)',
+    ctaShadow: 'rgba(160,20,220,0.45)',
+    bg: `radial-gradient(ellipse 90% 80% at 25% 50%,rgba(130,0,200,0.44) 0%,transparent 65%),
+         radial-gradient(ellipse 70% 60% at 80% 70%,rgba(180,0,130,0.32) 0%,transparent 60%),#08060f`,
+    banner: 'ott',
+  },
+  {
+    eyebrow: 'JioFiber · Home',
+    eyebrowColor: '#80cfff',
+    eyebrowBorder: 'rgba(80,180,255,0.25)',
+    titleLines: ['Experience', '1 Gbps at home'],
+    titleGradLine: 1,
+    titleGrad: 'linear-gradient(90deg,#80d4ff,#0088ff)',
+    body: 'Ultra-fast gigabit broadband. Get <strong>1 month FREE</strong> plus <strong>Pro Google One</strong> storage — unlimited data, 4K streaming, zero buffering.',
+    cta: 'Explore Plans',
+    cta2: 'Check Coverage',
+    ctaGrad: 'linear-gradient(135deg,#0055e0,#00aaff)',
+    ctaShadow: 'rgba(0,80,220,0.45)',
+    bg: `radial-gradient(ellipse 90% 80% at 20% 50%,rgba(0,60,200,0.42) 0%,transparent 65%),
+         radial-gradient(ellipse 70% 60% at 85% 65%,rgba(0,180,255,0.26) 0%,transparent 60%),#08060f`,
+    banner: 'fiber',
+  },
+  {
+    eyebrow: 'Jio True 5G',
+    eyebrowColor: '#ffcc70',
+    eyebrowBorder: 'rgba(255,200,80,0.25)',
+    titleLines: ['Stay connected,', 'always.'],
+    titleGradLine: 1,
+    titleGrad: 'linear-gradient(90deg,#ffcc60,#ff8020,#e03000)',
+    body: "India's fastest 5G network keeps you connected everywhere, every moment. <strong>Unlimited. Uninterrupted.</strong>",
+    cta: 'Get Jio 5G',
+    cta2: 'Find Coverage',
+    ctaGrad: 'linear-gradient(135deg,#c05000,#e09000)',
+    ctaShadow: 'rgba(180,70,0,0.45)',
+    bg: `radial-gradient(ellipse 90% 80% at 22% 50%,rgba(140,60,0,0.42) 0%,transparent 65%),
+         radial-gradient(ellipse 60% 60% at 82% 70%,rgba(80,120,0,0.26) 0%,transparent 60%),#08060f`,
+    banner: 'lifestyle',
+  },
 ];
 
-// Glow colors per slide
-const glowStyles=[
-  'radial-gradient(ellipse,rgba(180,0,255,0.55) 0%,transparent 70%)',
-  'radial-gradient(ellipse,rgba(0,120,255,0.55) 0%,transparent 70%)',
-  'radial-gradient(ellipse,rgba(220,120,0,0.5) 0%,transparent 70%)',
+/* ═══════════════════════════════════
+   BANNER HTML BUILDERS
+═══════════════════════════════════ */
+function buildBannerOTT(){
+  return `
+  <div class="banner-group" id="activeBannerGroup">
+    <div class="poster">
+      <div class="poster-img" style="background:linear-gradient(165deg,#0e0420 0%,#280850 40%,#3c1070 75%,#140330 100%);min-height:300px;">
+        <!-- Stylised figure -->
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 25%,rgba(140,60,220,0.25),transparent 60%);"></div>
+        <div style="position:absolute;bottom:40%;left:50%;transform:translateX(-50%);width:55px;height:130px;background:linear-gradient(180deg,rgba(200,150,255,0.1),rgba(120,60,200,0.15));border-radius:28px 28px 0 0;box-shadow:0 0 30px rgba(160,80,255,0.2);"></div>
+        <div class="poster-meta">
+          <div class="poster-badge">Now Streaming · JioHotstar</div>
+          <div class="poster-title">DHURANDHAR</div>
+          <div class="poster-sub">Ram &amp; Undekha</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ott-ticket">
+      <div class="ott-head">
+        <div class="ott-dot"></div>
+        <div class="ott-label">OTT Pass</div>
+      </div>
+      <div class="ott-body">
+        <div class="ott-old-price">₹1500+</div>
+        <div class="ott-worth">Worth of subscriptions</div>
+        <div class="ott-for-just"><span>For Just</span></div>
+        <div class="ott-price"><span class="ott-rupee-sym">₹</span>200</div>
+        <div class="ott-per-mo">Per Month</div>
+      </div>
+      <hr class="ott-divider"/>
+      <div class="ott-chips">
+        <div class="ott-chip">30 GB</div>
+        <div class="ott-chip">Unlimited 5G</div>
+      </div>
+      <div class="ott-apps">
+        <div class="app-icon-sq yt-icon" style="font-size:1.1rem;">▶️</div>
+        <div class="app-icon-sq jh-icon" style="color:#fff;font-size:0.9rem;">✦</div>
+        <div class="app-icon-sq pv-icon">prime<br/>video</div>
+        <div class="app-more">+12<br/>More</div>
+      </div>
+    </div>
+
+    <div class="poster">
+      <div class="poster-img" style="background:linear-gradient(165deg,#2a1600 0%,#4a2a10 40%,#3a1e08 75%,#1a0c04 100%);min-height:300px;">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(180,120,40,0.2),transparent 60%);"></div>
+        <div class="poster-meta">
+          <div class="poster-badge" style="background:rgba(200,140,40,0.22);border-color:rgba(200,140,40,0.3);">prime original</div>
+          <div class="poster-title">MATKA KING</div>
+          <div class="poster-sub">New Series · Watch Now</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildBannerFiber(){
+  return `
+  <div class="banner-group" id="activeBannerGroup">
+    <div class="poster">
+      <div class="poster-img" style="background:linear-gradient(165deg,#001040 0%,#002880 45%,#0044c0 80%,#001030 100%);min-height:300px;">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(0,160,255,0.22),transparent 60%);"></div>
+        <div class="poster-meta">
+          <div class="poster-badge" style="background:rgba(0,160,255,0.18);border-color:rgba(0,160,255,0.28);">JioFiber · Bronze</div>
+          <div class="poster-title">100 Mbps</div>
+          <div class="poster-sub">Perfect for families</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ott-ticket" style="background:linear-gradient(160deg,#001850,#003490,#0055d0);color:#fff;">
+      <div class="ott-head" style="border-color:rgba(0,200,255,0.2);">
+        <div class="ott-dot" style="background:linear-gradient(135deg,#00d4ff,#0066ff);"></div>
+        <div class="ott-label" style="color:#80d4ff;">JioFiber</div>
+      </div>
+      <div class="ott-body">
+        <div style="font-size:4rem;font-weight:900;letter-spacing:-4px;line-height:1;background:linear-gradient(90deg,#80d4ff,#0088ff);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">1<span style="font-size:1.6rem;font-weight:700;opacity:0.8;">Gbps</span></div>
+        <div style="font-size:0.72rem;opacity:0.6;margin:6px 0 12px;line-height:1.5;">Unlimited · 4K · Smart Home</div>
+        <div style="padding:9px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);font-size:0.8rem;font-weight:700;margin-bottom:8px;">🎁 1 Month FREE</div>
+        <div style="padding:9px;border-radius:10px;background:rgba(0,160,255,0.15);border:1px solid rgba(0,160,255,0.25);font-size:0.8rem;font-weight:700;">Google One Pro ✓</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
+        <div style="width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88;flex-shrink:0;"></div>
+        <span style="font-size:0.72rem;opacity:0.6;">Available in 6,000+ cities</span>
+      </div>
+    </div>
+
+    <div class="poster">
+      <div class="poster-img" style="background:linear-gradient(165deg,#000e30 0%,#001e60 45%,#002a80 80%,#000c28 100%);min-height:300px;">
+        <div class="poster-meta">
+          <div class="poster-badge" style="background:rgba(0,200,255,0.15);border-color:rgba(0,200,255,0.25);">JioFiber · Max</div>
+          <div class="poster-title">Smart<br/>Home</div>
+          <div class="poster-sub">IoT · 4K · Gaming</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildBannerLifestyle(){
+  return `
+  <div class="banner-group" id="activeBannerGroup">
+    <div class="poster">
+      <div class="poster-img" style="background:linear-gradient(165deg,#0e0e08 0%,#1e1c10 45%,#2a2618 80%,#0e0c08 100%);min-height:300px;">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 30%,rgba(255,180,40,0.15),transparent 60%);"></div>
+        <div class="poster-meta">
+          <div class="poster-badge" style="background:rgba(255,200,60,0.18);border-color:rgba(255,200,60,0.28);">5G · 450M+ Users</div>
+          <div class="poster-title">True 5G<br/>Network</div>
+          <div class="poster-sub">Pan-India Coverage</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ott-ticket" style="background:linear-gradient(160deg,#1a1208,#3c2c14,#2a1e0c);color:#fff;">
+      <div class="ott-head" style="border-color:rgba(255,200,60,0.2);">
+        <div class="ott-dot" style="background:linear-gradient(135deg,#ffcc40,#ff8020);"></div>
+        <div class="ott-label" style="color:#ffcc60;">Jio 5G</div>
+      </div>
+      <!-- Stylised people -->
+      <div style="position:relative;height:130px;margin:10px 0;display:flex;align-items:flex-end;justify-content:center;gap:4px;overflow:hidden;border-radius:12px;background:linear-gradient(180deg,rgba(50,30,10,0.4),rgba(30,20,8,0.2));">
+        <div style="width:36px;height:90px;background:linear-gradient(180deg,rgba(240,200,160,0.3),rgba(200,150,100,0.2));border-radius:18px 18px 0 0;transform:rotate(-3deg) translateX(4px);"></div>
+        <div style="width:38px;height:105px;background:linear-gradient(180deg,rgba(255,210,170,0.35),rgba(220,170,110,0.22));border-radius:19px 19px 0 0;z-index:2;"></div>
+        <div style="width:35px;height:85px;background:linear-gradient(180deg,rgba(235,195,155,0.28),rgba(195,155,95,0.18));border-radius:17px 17px 0 0;transform:rotate(3deg) translateX(-4px);"></div>
+        <div style="position:absolute;top:8px;right:10px;width:24px;height:44px;background:linear-gradient(180deg,rgba(100,160,255,0.6),rgba(60,120,220,0.4));border-radius:6px;transform:rotate(-8deg);"></div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:1.1rem;font-weight:900;letter-spacing:-0.03em;background:linear-gradient(90deg,#ffcc60,#ff8020);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">Connected. Always.</div>
+        <div style="font-size:0.72rem;opacity:0.5;margin-top:4px;">A billion stories, one network</div>
+      </div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex;justify-content:space-between;font-size:0.68rem;opacity:0.45;margin-bottom:5px;"><span>Network Quality</span><span>Excellent</span></div>
+        <div style="height:3px;border-radius:2px;background:rgba(255,255,255,0.1);overflow:hidden;"><div style="width:92%;height:100%;background:linear-gradient(90deg,#ffcc40,#ff8020);border-radius:2px;"></div></div>
+      </div>
+    </div>
+
+    <div class="poster">
+      <div class="poster-img" style="background:linear-gradient(165deg,#081408 0%,#142814 45%,#1e3c1e 80%,#081008 100%);min-height:300px;">
+        <div class="poster-meta">
+          <div class="poster-badge" style="background:rgba(60,200,60,0.15);border-color:rgba(60,200,60,0.25);">Business · IoT</div>
+          <div class="poster-title">Jio<br/>Business</div>
+          <div class="poster-sub">Enterprise 5G</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const BANNER_BUILDERS = [buildBannerOTT, buildBannerFiber, buildBannerLifestyle];
+const PEEK_COLORS = [
+  'linear-gradient(135deg,#280850,#4a10a0)',
+  'linear-gradient(135deg,#001850,#0040c0)',
+  'linear-gradient(135deg,#1a1208,#3c2814)',
+];
+const STACK_COLORS = [
+  'linear-gradient(135deg,#3a0070,#9010a0)',
+  'linear-gradient(135deg,#001850,#0055e0)',
+  'linear-gradient(135deg,#2a1800,#8b4500)',
 ];
 
-function setSlide(idx){
-  slideEls[cur].classList.remove('active');
-  tracks[cur].classList.remove('active');
-  clearInterval(fillT);
-  fillVal=0;
-  document.getElementById(`fill${cur}`).style.width='0%';
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let cur = 0;
+let isAnimating = false;
+const N = SLIDES.length;
+const DURATION = 5500;
+let fillInterval = null, fillVal = 0;
+const stacked = []; // indices of stacked slides
 
-  cur=((idx%slideEls.length)+slideEls.length)%slideEls.length;
-  slideEls[cur].classList.add('active');
-  tracks[cur].classList.add('active');
-  numEl.textContent=`0${cur+1} / 0${slideEls.length}`;
-
-  const c=slideColors[cur];
-  targetR1=c.r1; targetG1=c.g1; targetB1=c.b1;
-  targetR2=c.r2; targetG2=c.g2; targetB2=c.b2;
-  targetR3=c.r3; targetG3=c.g3; targetB3=c.b3;
-
-  // update glow behind cluster
-  const g=document.getElementById(`glow${cur}`);
-  if(g){g.style.background=glowStyles[cur];g.style.opacity='1';}
-
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+function init(){
+  applySlideText(0);
+  document.getElementById('bannerWrap').innerHTML = BANNER_BUILDERS[0]();
+  bindBannerTilt();
+  updatePeek(1);
   startFill();
+  bindControls();
+  bindTabs();
+  bindInput();
 }
 
-function startFill(){
-  fillVal=0;
-  const fillEl=document.getElementById(`fill${cur}`);
-  const step=100/(DURATION/50);
-  fillT=setInterval(()=>{
-    fillVal=Math.min(100,fillVal+step);
-    fillEl.style.width=fillVal+'%';
-    if(fillVal>=100){clearInterval(fillT);setSlide(cur+1);startAuto();}
-  },50);
-}
+/* ═══════════════════════════════════
+   APPLY SLIDE TEXT
+═══════════════════════════════════ */
+function applySlideText(idx, animate){
+  const s = SLIDES[idx];
+  // eyebrow
+  const ew = document.getElementById('eyebrow');
+  const et = document.getElementById('eyebrow-text');
+  ew.style.color = s.eyebrowColor;
+  ew.style.borderColor = s.eyebrowBorder;
+  et.textContent = s.eyebrow;
+  // also color the dot
+  ew.querySelector('.eyebrow-dot').style.background = s.eyebrowColor;
 
-function startAuto(){
-  clearInterval(autoT);
-}
+  // title
+  const titleEl = document.getElementById('heroTitle');
+  titleEl.innerHTML = s.titleLines.map((line, i) => {
+    if(i === s.titleGradLine){
+      return `<span class="grad-word" style="background:${s.titleGrad};background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">${line}</span>`;
+    }
+    return `<span style="display:block;">${line}</span>`;
+  }).join('');
 
-document.getElementById('cPrev').addEventListener('click',()=>{clearInterval(fillT);clearInterval(autoT);setSlide(cur-1);});
-document.getElementById('cNext').addEventListener('click',()=>{clearInterval(fillT);clearInterval(autoT);setSlide(cur+1);});
-tracks.forEach(t=>t.addEventListener('click',()=>{clearInterval(fillT);clearInterval(autoT);setSlide(+t.dataset.t);}));
+  // body
+  document.getElementById('heroBody').innerHTML = s.body;
 
-// Init
-(()=>{
-  const c=slideColors[0];
-  targetR1=c.r1;targetG1=c.g1;targetB1=c.b1;
-  targetR2=c.r2;targetG2=c.g2;targetB2=c.b2;
-  targetR3=c.r3;targetG3=c.g3;targetB3=c.b3;
-  const g=document.getElementById('glow0');
-  if(g){g.style.background=glowStyles[0];g.style.opacity='1';}
-  startFill();
-})();
+  // CTAs
+  const ctaMain = document.getElementById('ctaMain');
+  ctaMain.textContent = s.cta;
+  ctaMain.style.background = s.ctaGrad;
+  ctaMain.style.boxShadow = `0 6px 28px ${s.ctaShadow}`;
+  document.getElementById('ctaSecond').textContent = s.cta2;
 
-/* ─── 3D TILT ─── */
-document.querySelectorAll('.banner-cluster').forEach(cl=>{
-  cl.addEventListener('mousemove',e=>{
-    const r=cl.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-0.5;
-    const y=(e.clientY-r.top)/r.height-0.5;
-    cl.style.transform=`perspective(1000px) rotateY(${x*8}deg) rotateX(${-y*6}deg)`;
-    cl.style.transition='transform 0.08s ease';
-  });
-  cl.addEventListener('mouseleave',()=>{
-    cl.style.transform='perspective(1000px) rotateY(0) rotateX(0)';
-    cl.style.transition='transform 0.7s var(--ease-out-expo)';
-  });
-});
+  // ambient bg
+  document.getElementById('bg').style.background = s.bg;
 
-/* ─── MOUSE PARALLAX ─── */
-let mx=0,my=0;
-document.addEventListener('mousemove',e=>{
-  mx=(e.clientX/window.innerWidth-0.5)*2;
-  my=(e.clientY/window.innerHeight-0.5)*2;
-});
-(function tickParallax(){
-  document.querySelectorAll('.card-left').forEach(c=>{
-    const cur=c.style.transform||'';
-    if(!c.closest('.slide.active'))return;
-  });
-  requestAnimationFrame(tickParallax);
-})();
+  // counter
+  document.getElementById('slideCount').textContent = `0${idx+1} / 0${N}`;
 
-/* ─── TABS ─── */
-document.querySelectorAll('.f2-tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.f2-tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('numInput').placeholder=tab.dataset.ph;
-    document.getElementById('numInput').value='';
-    document.getElementById('numInput').focus();
-  });
-});
-
-/* ─── INPUT ─── */
-document.getElementById('numInput').addEventListener('input',function(){
-  this.value=this.value.replace(/\D/g,'').slice(0,10);
-});
-
-function proceedNow(){
-  const v=document.getElementById('numInput').value.trim();
-  const inp=document.getElementById('numInput');
-  if(!v||v.length<10){
-    inp.style.boxShadow='0 0 0 3px rgba(255,60,60,0.25)';
-    inp.style.borderColor='rgba(255,80,80,0.5)';
-    setTimeout(()=>{inp.style.boxShadow='';inp.style.borderColor='';},1200);
-    inp.focus();return;
+  // animate in
+  if(animate){
+    const ht = document.getElementById('heroText');
+    ht.style.transition = 'none';
+    ht.style.opacity = '0';
+    ht.style.transform = 'translateY(20px)';
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        ht.style.transition = 'opacity 0.7s var(--easing), transform 0.8s var(--easing)';
+        ht.style.opacity = '1';
+        ht.style.transform = 'translateY(0)';
+      });
+    });
   }
-  inp.style.boxShadow='0 0 0 4px rgba(40,200,100,0.25)';
-  inp.style.borderColor='rgba(40,200,100,0.5)';
-  setTimeout(()=>{inp.style.boxShadow='';inp.style.borderColor='';},1500);
 }
 
-function scrollTo2(){
-  document.getElementById('fold2').scrollIntoView({behavior:'smooth'});
+/* ═══════════════════════════════════
+   TRANSITION TO SLIDE
+═══════════════════════════════════ */
+function goTo(next, skipPush){
+  if(isAnimating) return;
+  isAnimating = true;
+  clearInterval(fillInterval);
+  fillVal = 0;
+
+  const prev = cur;
+  const nextIdx = ((next % N) + N) % N;
+
+  // 1. Push prev banner to stack (unless going back)
+  if(!skipPush){ pushToStack(prev); }
+
+  // 2. Animate out current banner
+  const wrap = document.getElementById('bannerWrap');
+  wrap.classList.remove('active');
+  wrap.classList.add('exit-left');
+
+  // 3. After exit, swap content + enter
+  setTimeout(()=>{
+    cur = nextIdx;
+    applySlideText(cur, true);
+
+    // new banner HTML
+    wrap.className = 'banner-wrap enter-right';
+    wrap.innerHTML = BANNER_BUILDERS[cur]();
+    bindBannerTilt();
+
+    // update peek
+    updatePeek((cur+1) % N);
+
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        wrap.classList.remove('enter-right');
+        wrap.classList.add('active');
+      });
+    });
+
+    setTimeout(()=>{ isAnimating = false; startFill(); }, 500);
+  }, 620);
 }
+
+/* ═══════════════════════════════════
+   STACK ANIMATION
+═══════════════════════════════════ */
+function pushToStack(idx){
+  const rail = document.getElementById('stack-rail');
+  const ROTS = [-5, 5, -3, 4, -4];
+  const rot = ROTS[stacked.length % ROTS.length];
+
+  const thumb = document.createElement('div');
+  thumb.className = 'stack-thumb';
+  thumb.style.setProperty('--rot', `${rot}deg`);
+  thumb.style.background = STACK_COLORS[idx];
+
+  // position in stack: each thumb offset slightly
+  const stackOffset = stacked.length * 10; // px overlap
+  const baseTop = 50; // %
+  thumb.style.top = `calc(${baseTop}% - 90px + ${stackOffset}px)`;
+  thumb.style.height = '110px';
+
+  // Mini content label
+  thumb.innerHTML = `<div style="padding:10px 8px;text-align:center;">
+    <div style="font-size:0.55rem;opacity:0.5;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">0${idx+1}</div>
+    <div style="font-size:0.65rem;font-weight:700;opacity:0.8;line-height:1.3;">${['OTT Pass','JioFiber','Jio 5G'][idx]}</div>
+  </div>`;
+
+  rail.appendChild(thumb);
+  stacked.push(idx);
+
+  // Trigger animation
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{ thumb.classList.add('visible'); });
+  });
+}
+
+/* ═══════════════════════════════════
+   PEEK CARD
+═══════════════════════════════════ */
+function updatePeek(nextIdx){
+  const peek = document.getElementById('peekCard');
+  peek.style.background = PEEK_COLORS[nextIdx % N];
+  peek.innerHTML = `<div style="height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;">
+    <div style="font-size:0.6rem;opacity:0.4;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Next</div>
+    <div style="font-size:0.85rem;font-weight:700;opacity:0.7;">${['OTT Pass','JioFiber','Jio 5G'][nextIdx % N]}</div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════
+   PROGRESS BAR FILL
+═══════════════════════════════════ */
+function startFill(){
+  clearInterval(fillInterval);
+  fillVal = 0;
+  const fillEl = document.getElementById(`pf${cur}`);
+  // reset all
+  for(let i=0;i<N;i++){ document.getElementById(`pf${i}`).style.width='0%'; }
+
+  const step = 100 / (DURATION / 50);
+  fillInterval = setInterval(()=>{
+    fillVal = Math.min(100, fillVal + step);
+    fillEl.style.width = fillVal + '%';
+    if(fillVal >= 100){
+      clearInterval(fillInterval);
+      goTo(cur + 1);
+    }
+  }, 50);
+}
+
+/* ═══════════════════════════════════
+   CONTROLS
+═══════════════════════════════════ */
+function bindControls(){
+  document.getElementById('btnNext').addEventListener('click',()=>{
+    if(!isAnimating){ clearInterval(fillInterval); goTo(cur+1); }
+  });
+  document.getElementById('btnPrev').addEventListener('click',()=>{
+    if(!isAnimating){ clearInterval(fillInterval); goTo(cur-1, true); }
+  });
+  document.querySelectorAll('.prog-track').forEach(t=>{
+    t.addEventListener('click',()=>{
+      const i = +t.dataset.i;
+      if(i !== cur && !isAnimating){ clearInterval(fillInterval); goTo(i); }
+    });
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'ArrowRight') document.getElementById('btnNext').click();
+    if(e.key === 'ArrowLeft')  document.getElementById('btnPrev').click();
+  });
+}
+
+/* ═══════════════════════════════════
+   BANNER TILT
+═══════════════════════════════════ */
+function bindBannerTilt(){
+  const g = document.getElementById('activeBannerGroup');
+  if(!g) return;
+  g.addEventListener('mousemove', e=>{
+    const r = g.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    g.style.transform = `perspective(900px) rotateY(${x*7}deg) rotateX(${-y*5}deg) scale(1.015)`;
+    g.style.transition = 'transform 0.08s ease';
+  });
+  g.addEventListener('mouseleave', ()=>{
+    g.style.transform = '';
+    g.style.transition = 'transform 0.8s var(--easing)';
+  });
+  g.addEventListener('mouseenter', ()=>{
+    g.style.transition = 'transform 0.08s ease';
+  });
+}
+
+/* ═══════════════════════════════════
+   TABS + INPUT
+═══════════════════════════════════ */
+function bindTabs(){
+  document.querySelectorAll('.f2-tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.f2-tab').forEach(x=>x.classList.remove('on'));
+      t.classList.add('on');
+      document.getElementById('numInp').placeholder = t.dataset.ph;
+      document.getElementById('numInp').value = '';
+    });
+  });
+}
+function bindInput(){
+  document.getElementById('numInp').addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,10);
+  });
+}
+function doSubmit(){
+  const inp = document.getElementById('numInp');
+  const v = inp.value.trim();
+  if(!v || v.length < 10){
+    inp.style.boxShadow = '0 0 0 3px rgba(255,60,60,0.22)';
+    inp.style.borderColor = 'rgba(255,80,80,0.45)';
+    setTimeout(()=>{ inp.style.boxShadow=''; inp.style.borderColor=''; },1400);
+    inp.focus(); return;
+  }
+  inp.style.boxShadow = '0 0 0 3px rgba(40,200,100,0.22)';
+  inp.style.borderColor = 'rgba(40,200,100,0.45)';
+  setTimeout(()=>{ inp.style.boxShadow=''; inp.style.borderColor=''; },1400);
+}
+
+init();
 </script>
 </body>
 </html>
