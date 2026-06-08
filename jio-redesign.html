@@ -3,473 +3,660 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Jio – Experience the Future</title>
+<title>Jio</title>
 <!--
-  BANNER IMAGES:
-  Save your banner images in the same folder as this HTML file:
-    → banner1.png   (OTT Pass composite: Dhurandhar + ticket + Matka King)
-    → banner2.jpg   (Lifestyle photo: 3 women with phone)
-  The design will automatically use them.
+  IMAGES NEEDED (save in same folder as this HTML):
+    banner1.png  — OTT Pass composite (Dhurandhar + ticket + Matka King)
+    banner2.jpg  — Lifestyle photo (3 women)
 -->
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --nav-h:64px;
-  --ease:cubic-bezier(0.16,1,0.3,1);
-  --ease-io:cubic-bezier(0.4,0,0.2,1);
-}
-html{scroll-behavior:smooth;}
+html,body{height:100%;}
 body{
   font-family:-apple-system,'SF Pro Display','Segoe UI',system-ui,sans-serif;
-  background:#0a0614;color:#fff;overflow-x:hidden;
+  background:#1e0038;
+  color:#fff;
+  overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-/* ── AMBIENT BG ── */
-#bg{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  transition:background 1.6s var(--ease-io);
-  background:
-    radial-gradient(ellipse 85% 75% at 22% 55%,rgba(120,0,190,0.48) 0%,transparent 62%),
-    radial-gradient(ellipse 65% 60% at 82% 68%,rgba(170,0,120,0.34) 0%,transparent 58%),
-    #0a0614;
-}
-/* Grain */
-body::after{
-  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  opacity:0.025;mix-blend-mode:overlay;
-}
-
-/* ══════════════════════════════════
+/* ════════════════════════════════
    NAV
-══════════════════════════════════ */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  height:var(--nav-h);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 48px;
-  background:rgba(10,6,20,0.5);
-  backdrop-filter:blur(22px) saturate(180%);
-  -webkit-backdrop-filter:blur(22px) saturate(180%);
-  border-bottom:1px solid rgba(255,255,255,0.055);
-}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.nav-mark{
-  width:38px;height:38px;border-radius:50%;
-  background:linear-gradient(135deg,#2060ff,#c030e0);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:0.78rem;color:#fff;
-  box-shadow:0 0 18px rgba(140,40,255,0.55);
-}
-.nav-name{font-size:1.3rem;font-weight:800;letter-spacing:-0.03em;color:#fff;}
-.nav-links{display:flex;gap:32px;list-style:none;}
-.nav-links a{
-  color:rgba(255,255,255,0.6);text-decoration:none;
-  font-size:0.875rem;font-weight:500;transition:color 0.2s;
-}
-.nav-links a:hover{color:#fff;}
-.nav-end{display:flex;gap:10px;}
-.nav-btn{
-  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
-  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.65);
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.2s,color 0.2s;
-}
-.nav-btn:hover{background:rgba(255,255,255,0.13);color:#fff;}
-.nav-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-
-/* ══════════════════════════════════
-   FOLD 1
-══════════════════════════════════ */
-#fold1{
-  position:relative;z-index:2;
-  height:100vh;min-height:640px;
-  padding-top:var(--nav-h);
-  overflow:hidden;
-  display:flex;flex-direction:column;
-}
-
-/* ─ STACK RAIL ─ */
-#stack-rail{
-  position:absolute;
-  left:0;top:var(--nav-h);bottom:80px;
-  width:110px;z-index:30;
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
-  pointer-events:none;padding:20px 0;
-}
-.stack-card{
-  position:absolute;
-  width:76px;
-  border-radius:14px;overflow:hidden;
-  box-shadow:0 8px 28px rgba(0,0,0,0.65);
-  border:1px solid rgba(255,255,255,0.12);
-  opacity:0;
-  transition:opacity 0.7s var(--ease),transform 0.8s var(--ease);
-  transform:translateX(-40px) scale(0.7);
-}
-.stack-card.in{
-  opacity:1;
-  transform:translateX(0) scale(1) rotate(var(--rot));
-}
-.stack-card img{width:100%;display:block;}
-.stack-card .sc-label{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:8px 7px 7px;
-  background:linear-gradient(to top,rgba(0,0,0,0.8),transparent);
-  font-size:0.55rem;font-weight:700;letter-spacing:0.06em;
-  line-height:1.3;
-}
-
-/* ─ MAIN HERO LAYOUT ─ */
-.hero-layout{
-  flex:1;
-  display:grid;
-  grid-template-columns:380px 1fr;
-  align-items:center;
-  padding:0 48px 0 130px;
-  gap:24px;
-  overflow:hidden;
-}
-
-/* ─ TEXT SIDE ─ */
-.hero-text{
-  position:relative;z-index:10;
-  padding-right:16px;
-}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:5px 14px;border-radius:999px;
-  font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;
-  background:rgba(255,255,255,0.07);
-  border:1px solid currentColor;
-  border-color:rgba(255,255,255,0.15);
-  margin-bottom:22px;backdrop-filter:blur(8px);
-  transition:color 0.7s;
-}
-.e-dot{
-  width:5px;height:5px;border-radius:50%;background:currentColor;
-  animation:e-pulse 2s ease-in-out infinite;
-}
-@keyframes e-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(1.6)}}
-
-.hero-title{
-  font-size:clamp(2.2rem,3.8vw,3.8rem);
-  font-weight:900;line-height:1.06;letter-spacing:-0.04em;
-  margin-bottom:18px;
-}
-.hero-title .hl{
-  display:inline;
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;color:transparent;
-  transition:background-image 0.7s;
-}
-.hero-body{
-  font-size:0.98rem;line-height:1.75;
-  color:rgba(255,255,255,0.54);
-  max-width:360px;margin-bottom:30px;
-}
-.hero-body strong{color:rgba(255,255,255,0.88);font-weight:600;}
-.cta-row{display:flex;gap:11px;flex-wrap:wrap;}
-.btn-main{
-  padding:12px 28px;border-radius:999px;border:none;
-  font-size:0.88rem;font-weight:700;color:#fff;cursor:pointer;
-  position:relative;overflow:hidden;
-  transition:transform 0.25s var(--ease),box-shadow 0.25s;
-}
-.btn-main::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 55%);
-  opacity:0;transition:opacity 0.3s;
-  border-radius:inherit;
-}
-.btn-main:hover{transform:translateY(-2px);}
-.btn-main:hover::before{opacity:1;}
-.btn-sec{
-  padding:12px 28px;border-radius:999px;cursor:pointer;
-  font-size:0.88rem;font-weight:600;color:rgba(255,255,255,0.8);
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.15);
-  transition:background 0.25s,color 0.25s;backdrop-filter:blur(10px);
-}
-.btn-sec:hover{background:rgba(255,255,255,0.12);color:#fff;}
-
-/* ─ BANNER STAGE ─ */
-.banner-stage{
-  position:relative;
-  height:calc(100vh - var(--nav-h) - 80px);
+════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:56px;
   display:flex;align-items:center;
-  overflow:visible;
+  padding:0 40px;
+  background:rgba(18,4,36,0.88);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
 }
+.nav-logo{
+  display:flex;align-items:center;gap:0;
+  flex-shrink:0;
+  margin-right:auto;
+  cursor:pointer;
+}
+.nav-logo-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,#2060ff 0%,#9020e0 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.82rem;font-weight:900;color:#fff;letter-spacing:-0.3px;
+}
+.nav-links{
+  position:absolute;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:40px;
+  list-style:none;
+}
+.nav-links li a{
+  color:rgba(255,255,255,0.9);
+  text-decoration:none;
+  font-size:15px;
+  font-weight:500;
+  letter-spacing:0.01em;
+  transition:color 0.15s;
+}
+.nav-links li a:hover{color:#fff;}
+.nav-links li.active a{font-weight:600;color:#fff;}
+.nav-end{
+  margin-left:auto;
+  display:flex;align-items:center;gap:16px;
+}
+.nav-icon-btn{
+  width:36px;height:36px;
+  background:transparent;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,0.85);
+  transition:color 0.15s;
+}
+.nav-icon-btn:hover{color:#fff;}
+.nav-icon-btn svg{width:20px;height:20px;}
+.nav-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#2060ff,#9020e0);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.nav-avatar svg{width:20px;height:20px;fill:#fff;}
 
-/* The viewport that clips the peek cards */
-.banner-viewport{
+/* ════════════════════════════════
+   HERO SECTION
+════════════════════════════════ */
+.hero{
   position:relative;
-  width:100%;height:100%;
-  display:flex;align-items:center;
-}
-
-/* PEEK CARDS — partially visible next/prev */
-.peek{
-  position:absolute;
-  top:50%;transform:translateY(-50%);
-  border-radius:20px;overflow:hidden;
-  box-shadow:0 16px 50px rgba(0,0,0,0.5);
-  border:1px solid rgba(255,255,255,0.09);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.6s;
-}
-.peek.peek-right{
-  right:-30px;
-  width:160px;height:55%;
-  opacity:0.45;
-  z-index:5;
-}
-.peek img{width:100%;height:100%;object-fit:cover;display:block;}
-.peek .peek-fallback{width:100%;height:100%;}
-
-/* ACTIVE BANNER — the main visual */
-.banner-active{
-  position:relative;z-index:10;
   width:100%;
-  border-radius:26px;overflow:hidden;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.08),
-    0 30px 80px rgba(0,0,0,0.6),
-    0 0 60px rgba(0,0,0,0.3);
-  transform-origin:center center;
+  height:100vh;
+  min-height:600px;
+  padding-top:56px; /* nav height */
+  overflow:hidden;
+  /* Background: deep purple left → magenta/pink right */
+  background:
+    radial-gradient(ellipse 70% 100% at 85% 60%, #a8004e 0%, transparent 55%),
+    radial-gradient(ellipse 60% 80% at 15% 40%, #1e003a 0%, transparent 70%),
+    linear-gradient(135deg, #1e0038 0%, #4a0045 40%, #880042 75%, #a8004a 100%);
+}
+
+/* ── INNER LAYOUT ── */
+.hero-inner{
+  position:relative;
+  width:100%;
+  height:calc(100vh - 56px);
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+}
+
+/* ── TEXT BLOCK ── */
+.hero-text{
+  flex-shrink:0;
+  width:500px;
+  padding-left:80px;
+  padding-right:20px;
+  position:relative;
+  z-index:10;
+}
+.hero-title{
+  font-size:72px;
+  font-weight:800;
+  line-height:1.06;
+  letter-spacing:-1.5px;
+  color:#fff;
+  margin-bottom:16px;
+}
+.hero-sub{
+  font-size:18px;
+  font-weight:400;
+  line-height:1.55;
+  color:rgba(255,255,255,0.82);
+  margin-bottom:32px;
+  max-width:400px;
+}
+.btn-get{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:48px;
+  padding:0 32px;
+  background:#1a6aff;
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  letter-spacing:0.01em;
+  transition:background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow:0 4px 20px rgba(26,106,255,0.4);
+}
+.btn-get:hover{
+  background:#1a5fe8;
+  transform:translateY(-1px);
+  box-shadow:0 6px 28px rgba(26,106,255,0.55);
+}
+
+/* ── BANNER AREA ── */
+.hero-banners{
+  flex:1;
+  position:relative;
+  height:100%;
+  display:flex;
+  align-items:center;
+  /* extend past right edge */
+  overflow:visible;
+  min-width:0;
+}
+
+/* Previous slide hint (gray strip on left) */
+.prev-hint{
+  flex-shrink:0;
+  width:28px;
+  height:68%;
+  border-radius:10px;
+  background:rgba(180,160,200,0.22);
+  border:1px solid rgba(255,255,255,0.1);
+  margin-right:16px;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.prev-hint:hover{background:rgba(180,160,200,0.32);}
+
+/* Main banner container */
+.banner-container{
+  flex-shrink:0;
+  position:relative;
+  width:640px;
   transition:transform 0.12s ease;
-  will-change:transform;
 }
-/* Tilt on hover */
-.banner-active:hover{
-  transform:perspective(900px) rotateY(-2deg) rotateX(0.8deg) scale(1.008);
+/* Pink/magenta glow border */
+.banner-container-inner{
+  border-radius:22px;
+  padding:20px;
+  /* The distinctive pink glow border */
+  background:linear-gradient(135deg,#cc1070,#e8108a,#cc1070) padding-box,
+             linear-gradient(135deg,#ff40a0,#ff1480,#e0006a) border-box;
+  border:2px solid transparent;
+  box-shadow:
+    0 0 0 1px rgba(255,30,120,0.5),
+    0 0 40px rgba(255,30,120,0.35),
+    0 0 80px rgba(200,0,80,0.2),
+    0 20px 60px rgba(0,0,0,0.4);
+  /* Inner gradient background */
+  background:
+    linear-gradient(160deg,rgba(200,20,100,0.18) 0%,rgba(140,0,70,0.1) 100%),
+    rgba(20,6,40,0.7);
+  border:2px solid;
+  border-image:linear-gradient(135deg,#ff60b0,#ff1880,#e0006a,#ff1880,#ff60b0) 1;
+  border-radius:22px;
+  /* Force border-radius with outline trick */
+  border:none;
+  outline:2px solid;
+  outline-color:transparent;
+  box-shadow:
+    0 0 0 2px #e8108a,
+    0 0 30px rgba(232,16,138,0.5),
+    0 0 60px rgba(200,0,100,0.25),
+    inset 0 0 30px rgba(255,20,120,0.08),
+    0 24px 60px rgba(0,0,0,0.45);
 }
 
-/* Banner image */
-.banner-img{
-  width:100%;display:block;
-  border-radius:26px;
+/* Cards row inside the banner */
+.cards-row{
+  display:flex;
+  gap:10px;
+  align-items:stretch;
+  height:340px;
+  border-radius:14px;
+  overflow:hidden;
 }
-/* CSS fallback shown when image fails to load */
-.banner-fallback{
-  display:none;
-  width:100%;border-radius:26px;
-  background:linear-gradient(135deg,#1a0840 0%,#4a10a0 40%,#c020c0 100%);
-  padding:40px 32px;
-  min-height:320px;
-}
-.banner-active.no-img .banner-img{display:none;}
-.banner-active.no-img .banner-fallback{display:block;}
 
-/* App icons strip below banner (OTT slide) */
-.app-strip{
+/* Side poster cards */
+.poster-card{
+  flex:0 0 28%;
+  border-radius:14px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+.poster-card img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+.poster-card-fallback{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:14px 12px;
+  background:linear-gradient(165deg,#0e0420 0%,#280850 40%,#3c1070 75%,#140330 100%);
+}
+.poster-card-fallback.matka{
+  background:linear-gradient(165deg,#1a0a02 0%,#3a1a08 40%,#2a1206 75%,#120804 100%);
+}
+.poster-label{
+  font-size:14px;font-weight:800;letter-spacing:-0.3px;
+  text-shadow:0 2px 8px rgba(0,0,0,0.9);line-height:1.25;
+}
+.poster-sub{font-size:9px;opacity:0.6;margin-top:3px;letter-spacing:0.04em;}
+.poster-badge-small{
+  display:inline-block;padding:2px 7px;border-radius:999px;
+  font-size:8px;font-weight:700;letter-spacing:0.04em;
+  background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.28);
+  margin-bottom:7px;
+}
+.poster-overlay{
+  position:absolute;bottom:0;left:0;right:0;height:55%;
+  background:linear-gradient(to top,rgba(0,0,0,0.75),transparent);
+}
+.poster-meta{position:absolute;bottom:0;left:0;right:0;padding:14px 12px;}
+
+/* OTT Ticket card */
+.ott-card{
+  flex:0 0 44%;
+  border-radius:14px;
+  background:#ffffff;
+  color:#0a0820;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow:visible; /* punch holes extend outside */
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+/* Ticket punch holes */
+.ott-card::before,.ott-card::after{
+  content:'';
   position:absolute;
-  bottom:-52px;left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:10px;
-  opacity:0;transition:opacity 0.5s 0.3s;
+  width:24px;height:24px;border-radius:50%;
+  background:#140228;
+  top:50%;transform:translateY(-50%);
+  z-index:5;
+  box-shadow:inset 0 0 4px rgba(0,0,0,0.5);
+}
+.ott-card::before{left:-12px;}
+.ott-card::after{right:-12px;}
+
+.ott-inner{
+  flex:1;
+  display:flex;flex-direction:column;
+  padding:18px 16px 0;
+}
+.ott-head{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding-bottom:12px;
+  border-bottom:1.5px dashed rgba(100,60,200,0.2);
+}
+.ott-head-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:linear-gradient(135deg,#6020d0,#c020c0);
+}
+.ott-head-label{
+  font-size:13px;letter-spacing:0.2em;text-transform:uppercase;
+  font-weight:900;color:#5010b0;
+}
+.ott-body{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:10px 0 0;
+}
+.ott-old{
+  font-size:26px;font-weight:900;color:#888;
+  text-decoration:line-through;
+  text-decoration-color:#cc0000;
+  text-decoration-thickness:2.5px;
+  line-height:1;
+}
+.ott-worth{
+  font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+  color:#999;margin:4px 0 8px;text-align:center;
+  font-weight:600;
+}
+.ott-for-just{
+  display:flex;align-items:center;gap:8px;
+  width:100%;margin-bottom:6px;
+}
+.ott-for-just::before,.ott-for-just::after{
+  content:'';flex:1;height:1px;background:rgba(0,0,0,0.1);
+}
+.ott-for-just-text{
+  font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+  color:#bbb;font-weight:700;
+  padding:3px 8px;border:1px solid rgba(0,0,0,0.12);border-radius:4px;
+}
+.ott-price-row{
+  display:flex;align-items:flex-start;justify-content:center;
+  line-height:1;
+}
+.ott-rupee{
+  font-size:28px;font-weight:900;color:#0040c0;
+  margin-top:8px;line-height:1;
+}
+.ott-amount{
+  font-size:72px;font-weight:900;color:#0040c0;
+  letter-spacing:-4px;line-height:1;
+}
+.ott-per-mo{
+  font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+  color:#999;margin-top:4px;font-weight:600;
+}
+/* Blue bottom band */
+.ott-band{
+  margin:12px -0px 0;
+  background:linear-gradient(135deg,#1a6fff,#0044cc);
+  border-radius:0 0 14px 14px;
+  display:grid;grid-template-columns:1fr 1px 1fr;
+  align-items:center;
+  padding:14px 12px;
+  gap:0;
+}
+.ott-band-divider{
+  width:1px;height:32px;
+  background:rgba(255,255,255,0.25);
+}
+.ott-band-item{
+  text-align:center;
+  font-size:15px;font-weight:900;color:#fff;letter-spacing:-0.3px;
+}
+.ott-band-item span{
+  display:block;font-size:11px;font-weight:700;margin-top:1px;opacity:0.9;
+}
+
+/* App icons row (outside banner container) */
+.app-icons-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:12px;
+  margin-top:18px;
+  position:absolute;
+  bottom:-72px;
+  left:50%;transform:translateX(-50%);
   white-space:nowrap;
 }
-.app-strip.visible{opacity:1;}
-.app-ic{
-  width:40px;height:40px;border-radius:12px;
-  background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.14);
+.app-icon{
+  width:46px;height:46px;border-radius:14px;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.15rem;backdrop-filter:blur(8px);
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
-  transition:transform 0.2s;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.18);
+  backdrop-filter:blur(8px);
+  font-size:1.3rem;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  transition:transform 0.18s,box-shadow 0.18s;
+  cursor:pointer;
 }
-.app-ic:hover{transform:scale(1.12);}
-.app-more{
-  padding:8px 12px;border-radius:12px;
-  background:rgba(255,255,255,0.09);
-  border:1px solid rgba(255,255,255,0.13);
-  font-size:0.7rem;font-weight:700;
-  backdrop-filter:blur(8px);color:rgba(255,255,255,0.75);
+.app-icon:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.35);}
+.app-icon.yt{background:#fff;}
+.app-icon.jh{background:linear-gradient(135deg,#4020b0,#c030c0);}
+.app-icon.pv{background:#0e1c44;}
+.app-icon.more{
+  width:auto;padding:0 12px;
+  font-size:12px;font-weight:800;color:rgba(255,255,255,0.85);
+  letter-spacing:0.01em;
   line-height:1.3;text-align:center;
 }
 
-/* ─ SLIDE TRANSITION STATES ─ */
-.banner-wrap{
-  position:absolute;inset:0;
-  display:flex;align-items:center;
-  transition:transform 0.85s var(--ease),opacity 0.6s var(--ease-io);
+/* Lifestyle peek on right */
+.lifestyle-peek{
+  flex-shrink:0;
+  width:280px;
+  height:68%;
+  border-radius:18px 0 0 18px; /* cut off on right */
+  overflow:hidden;
+  margin-left:20px;
+  position:relative;
+  box-shadow:-8px 0 30px rgba(0,0,0,0.3);
 }
-.banner-wrap.state-active{
-  transform:translateX(0) scale(1);opacity:1;
-  pointer-events:all;
+.lifestyle-peek img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  display:block;
 }
-.banner-wrap.state-exit{
-  transform:translateX(-110%) scale(0.6) rotate(-5deg);
-  opacity:0;pointer-events:none;
-}
-.banner-wrap.state-enter{
-  transform:translateX(70px) scale(0.96);
-  opacity:0;pointer-events:none;
+.lifestyle-fallback{
+  width:100%;height:100%;
+  background:linear-gradient(160deg,#1a1208,#3a2810,#2a1e0c);
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;
 }
 
-/* ─ CONTROLS ─ */
-.fold1-bar{
-  height:80px;
+/* ── SLIDE TRANSITION ── */
+.banner-wrap{
+  position:absolute;
   display:flex;align-items:center;
-  padding:0 48px 0 130px;gap:22px;
-  background:linear-gradient(to top,rgba(10,6,20,0.72),transparent);
-  position:relative;z-index:20;
-  flex-shrink:0;
+  width:100%;
+  transition:transform 0.85s cubic-bezier(0.16,1,0.3,1),opacity 0.6s ease;
 }
-.prog-bar{flex:1;display:flex;gap:9px;}
+.banner-wrap.active{
+  transform:translateX(0) scale(1);opacity:1;pointer-events:all;
+  position:relative;
+}
+.banner-wrap.exit{
+  transform:translateX(-110%) scale(0.6) rotate(-4deg);
+  opacity:0;pointer-events:none;
+}
+.banner-wrap.enter{
+  transform:translateX(60px) scale(0.97);opacity:0;pointer-events:none;
+}
+
+/* ── CAROUSEL ARROWS (bottom-right) ── */
+.carousel-arrows{
+  position:absolute;
+  bottom:48px;
+  right:48px;
+  display:flex;gap:12px;
+  z-index:20;
+}
+.c-arrow{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.85);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  transition:background 0.2s,color 0.2s,transform 0.18s;
+  font-size:16px;
+}
+.c-arrow:hover{
+  background:rgba(255,255,255,0.22);
+  color:#fff;
+  transform:scale(1.08);
+}
+
+/* ── STACK RAIL (left) ── */
+#stack-rail{
+  position:absolute;
+  left:18px;
+  top:50%;transform:translateY(-50%);
+  z-index:30;
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:0;
+  pointer-events:none;
+  width:56px;
+}
+.stack-thumb{
+  width:56px;
+  border-radius:10px;
+  overflow:hidden;
+  position:absolute;
+  box-shadow:0 6px 20px rgba(0,0,0,0.55);
+  border:1px solid rgba(255,255,255,0.1);
+  opacity:0;
+  transform:translateX(-30px) scale(0.7);
+  transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  height:90px;
+}
+.stack-thumb.show{
+  opacity:1;
+  transform:translateX(0) scale(1) rotate(var(--rot));
+}
+.stack-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.stack-thumb-fallback{
+  width:100%;height:100%;
+}
+.stack-thumb-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:6px 5px;
+  background:linear-gradient(to top,rgba(0,0,0,0.8),transparent);
+  font-size:7px;font-weight:700;line-height:1.2;
+}
+
+/* Progress tracks (subtle, near bottom) */
+.prog-tracks{
+  position:absolute;
+  bottom:52px;
+  left:80px;
+  display:flex;gap:8px;
+  z-index:20;
+  width:240px;
+}
 .prog-t{
   flex:1;height:2px;border-radius:1px;
-  background:rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.2);
   position:relative;overflow:hidden;cursor:pointer;
-  transition:height 0.2s;
 }
-.prog-t:hover{height:3px;background:rgba(255,255,255,0.25);}
+.prog-t:hover{background:rgba(255,255,255,0.35);}
 .prog-f{
   position:absolute;left:0;top:0;bottom:0;
-  background:#fff;border-radius:1px;width:0%;
+  background:rgba(255,255,255,0.85);
+  border-radius:1px;width:0%;
 }
-.arrows{display:flex;gap:8px;}
-.arr{
-  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.75);font-size:1rem;
-  display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(8px);
-  transition:background 0.2s,color 0.2s,transform 0.2s;
-}
-.arr:hover{background:rgba(255,255,255,0.15);color:#fff;transform:scale(1.1);}
-.s-count{font-size:0.72rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;min-width:36px;}
 
-/* scroll cue */
-.scue{
-  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  opacity:0;pointer-events:none;z-index:25;
-  animation:scue-in 1s 3s ease both;
-}
-@keyframes scue-in{to{opacity:0.38;pointer-events:all;}}
-.scue span{font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;}
-.scue-m{width:20px;height:30px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.4);display:flex;justify-content:center;padding-top:5px;}
-.scue-w{width:2.5px;height:6px;border-radius:2px;background:rgba(255,255,255,0.75);animation:sw 1.7s ease-in-out infinite;}
-@keyframes sw{0%,100%{transform:translateY(0);opacity:1}80%{transform:translateY(10px);opacity:0}}
-
-/* ══════════════════════════════════
+/* ════════════════════════════════
    FOLD 2 — RECHARGE
-══════════════════════════════════ */
+════════════════════════════════ */
 #fold2{
-  position:relative;z-index:2;
+  position:relative;
   min-height:100vh;
   display:flex;align-items:center;justify-content:center;
-  padding:80px 48px;overflow:hidden;
+  padding:80px 48px;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,rgba(45,15,85,0.55),transparent 55%),
+    #0a0614;
+  overflow:hidden;
 }
-#fold2::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 80% 55% at 50% 0%,rgba(40,15,90,0.5),transparent 55%);
-}
-.f2-in{width:100%;max-width:840px;position:relative;z-index:1;}
-.f2-k{text-align:center;font-size:0.67rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;}
-.f2-h{
+.f2-wrap{width:100%;max-width:840px;}
+.f2-kicker{
   text-align:center;
-  font-size:clamp(2rem,4.5vw,3.5rem);
-  font-weight:900;letter-spacing:-0.04em;line-height:1.08;
-  margin-bottom:46px;
+  font-size:11px;letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(255,255,255,0.3);margin-bottom:10px;
 }
-.f2-h .hl{
+.f2-heading{
+  text-align:center;
+  font-size:clamp(2rem,4.5vw,3.4rem);
+  font-weight:900;letter-spacing:-0.04em;line-height:1.08;
+  margin-bottom:44px;
+}
+.f2-heading .hl{
+  background:linear-gradient(90deg,#70c8ff,#4070ff,#a040ff);
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;color:transparent;
-  background:linear-gradient(90deg,#70c8ff,#4070ff,#a040ff);
 }
 .f2-tabs{
-  display:flex;gap:5px;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
-  border-radius:999px;padding:4px;margin-bottom:22px;backdrop-filter:blur(16px);
+  display:flex;gap:4px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:999px;padding:4px;
+  margin-bottom:20px;backdrop-filter:blur(16px);
 }
 .f2-tab{
   flex:1;padding:10px;border-radius:999px;
-  font-size:0.84rem;font-weight:600;cursor:pointer;border:none;
+  font-size:14px;font-weight:600;cursor:pointer;border:none;
   background:transparent;color:rgba(255,255,255,0.42);
   display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:all 0.3s var(--ease);
+  transition:all 0.28s cubic-bezier(0.16,1,0.3,1);
 }
-.f2-tab.on{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.13);box-shadow:0 2px 14px rgba(0,0,0,0.3);}
+.f2-tab.on{
+  background:rgba(255,255,255,0.1);color:#fff;
+  border:1px solid rgba(255,255,255,0.13);
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);
+}
 .f2-card{
   background:rgba(255,255,255,0.035);
   border:1px solid rgba(255,255,255,0.07);
-  border-radius:28px;padding:34px 36px 28px;
+  border-radius:24px;padding:32px 36px 26px;
   backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
   box-shadow:0 40px 100px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.07);
   position:relative;overflow:hidden;
 }
 .f2-card::before{
   content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:52%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  width:50%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
 }
 .inp-row{display:flex;gap:10px;}
 .inp-g{flex:1;position:relative;}
-.inp-pre{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:0.9rem;font-weight:600;color:rgba(255,255,255,0.38);pointer-events:none;}
+.inp-pre{
+  position:absolute;left:20px;top:50%;transform:translateY(-50%);
+  font-size:15px;font-weight:600;color:rgba(255,255,255,0.38);pointer-events:none;
+}
 .inp{
-  width:100%;height:54px;
+  width:100%;height:52px;
   background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.09);
-  border-radius:999px;outline:none;padding:0 20px 0 58px;
-  font-size:0.96rem;color:#fff;font-weight:500;
-  transition:border-color 0.3s,box-shadow 0.3s,background 0.3s;
+  border-radius:999px;outline:none;padding:0 20px 0 56px;
+  font-size:15px;color:#fff;font-weight:500;
+  transition:border-color 0.28s,box-shadow 0.28s,background 0.28s;
 }
 .inp::placeholder{color:rgba(255,255,255,0.22);}
 .inp:focus{border-color:rgba(100,130,255,0.5);background:rgba(255,255,255,0.08);box-shadow:0 0 0 4px rgba(80,100,255,0.1);}
 .go-btn{
-  height:54px;padding:0 32px;border-radius:999px;border:none;
-  font-size:0.9rem;font-weight:800;color:#fff;cursor:pointer;white-space:nowrap;
+  height:52px;padding:0 30px;border-radius:999px;border:none;
+  font-size:15px;font-weight:800;color:#fff;cursor:pointer;white-space:nowrap;
   background:linear-gradient(135deg,#1e4ed8,#6a28c8);
-  box-shadow:0 6px 26px rgba(40,60,200,0.42);
+  box-shadow:0 6px 24px rgba(40,60,200,0.42);
   position:relative;overflow:hidden;
-  transition:transform 0.25s var(--ease),box-shadow 0.25s;
+  transition:transform 0.22s,box-shadow 0.22s;
 }
-.go-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 55%);opacity:0;transition:opacity 0.3s;}
-.go-btn:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(40,60,200,0.58);}
+.go-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 55%);opacity:0;transition:opacity 0.28s;}
+.go-btn:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(40,60,200,0.58);}
 .go-btn:hover::before{opacity:1;}
-.q-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
+.q-row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
 .q-c{
-  display:flex;align-items:center;gap:6px;
-  padding:8px 15px;border-radius:999px;
+  display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:999px;
   background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
-  font-size:0.78rem;color:rgba(255,255,255,0.5);cursor:pointer;
-  transition:all 0.22s;backdrop-filter:blur(8px);
+  font-size:13px;color:rgba(255,255,255,0.52);cursor:pointer;
+  transition:all 0.2s;backdrop-filter:blur(8px);
 }
 .q-c:hover{background:rgba(255,255,255,0.09);color:#fff;border-color:rgba(255,255,255,0.15);}
 .f2-stats{
   display:grid;grid-template-columns:repeat(4,1fr);
-  margin-top:36px;border-radius:18px;overflow:hidden;
+  margin-top:32px;border-radius:16px;overflow:hidden;
   border:1px solid rgba(255,255,255,0.06);
   background:rgba(255,255,255,0.025);backdrop-filter:blur(14px);
 }
 .f2-s{
-  padding:22px 16px;text-align:center;
+  padding:20px 12px;text-align:center;
   border-right:1px solid rgba(255,255,255,0.05);
-  transition:background 0.25s;
+  transition:background 0.2s;
 }
 .f2-s:last-child{border:none;}
 .f2-s:hover{background:rgba(255,255,255,0.04);}
-.sv{font-size:1.8rem;font-weight:900;letter-spacing:-0.04em;background:linear-gradient(90deg,#80d0ff,#4488ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
-.sl{font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;}
+.sv{font-size:1.75rem;font-weight:900;letter-spacing:-0.04em;background:linear-gradient(90deg,#80d0ff,#4488ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+.sl{font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;}
 
-/* ── RESPONSIVE ── */
-@media(max-width:1024px){
-  .hero-layout{grid-template-columns:320px 1fr;padding:0 24px 0 120px;}
-}
-@media(max-width:860px){
-  nav{padding:0 20px;}
+/* RESPONSIVE */
+@media(max-width:960px){
+  .nav{padding:0 20px;}
   .nav-links{display:none;}
-  .hero-layout{grid-template-columns:1fr;padding:16px 20px 80px 20px;}
-  .banner-stage{display:none;}
-  #stack-rail{display:none;}
-  .fold1-bar{padding:0 20px;}
+  .hero-text{padding-left:24px;width:100%;max-width:480px;}
+  .hero-title{font-size:44px;}
+  .hero-banners{display:none;}
+  .carousel-arrows{bottom:24px;right:24px;}
+  .prog-tracks{left:24px;}
   #fold2{padding:60px 20px;}
   .f2-card{padding:22px 16px;}
   .inp-row{flex-direction:column;}
@@ -480,129 +667,102 @@ nav{
 </head>
 <body>
 
-<div id="bg"></div>
-
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#">
-    <div class="nav-mark">Jio</div>
-  </a>
+<!-- ════ NAV ════ -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-circle">Jio</div>
+  </div>
   <ul class="nav-links">
-    <li><a href="#">Mobile</a></li>
+    <li class="active"><a href="#">Mobile</a></li>
     <li><a href="#">Home</a></li>
     <li><a href="#">Business</a></li>
-    <li><a href="#">Customer Care</a></li>
+    <li><a href="#">Customer support</a></li>
   </ul>
   <div class="nav-end">
-    <button class="nav-btn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-    <button class="nav-btn"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+    <button class="nav-icon-btn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7.5"/>
+        <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+      </svg>
+    </button>
+    <div class="nav-avatar">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
   </div>
 </nav>
 
-<!-- ═══ FOLD 1 ═══ -->
-<section id="fold1">
+<!-- ════ HERO ════ -->
+<section class="hero">
 
-  <!-- STACK RAIL (builds as slides advance) -->
+  <!-- Stack rail -->
   <div id="stack-rail"></div>
 
-  <div class="hero-layout">
+  <div class="hero-inner">
 
-    <!-- LEFT: TEXT (updated by JS per slide) -->
+    <!-- TEXT -->
     <div class="hero-text" id="heroText">
-      <div class="eyebrow" id="eyebrow">
-        <span class="e-dot" id="eDot"></span>
-        <span id="eText">New · OTT Pass</span>
-      </div>
-      <h1 class="hero-title" id="heroTitle">
-        <span style="display:block;">Grab your Jio</span>
-        <span class="hl" id="hlSpan" style="background:linear-gradient(90deg,#ff80e0,#c040f0,#7020d0);">OTT Pass now</span>
-      </h1>
-      <p class="hero-body" id="heroBody">
-        Start streaming movies, shows, sports and more from <strong>15 OTT apps</strong>.
-        ₹1500+ worth of subscriptions — for just <strong>₹200/month</strong>.
-      </p>
-      <div class="cta-row">
-        <button class="btn-main" id="btnMain" style="background:linear-gradient(135deg,#b020e0,#6010c0);box-shadow:0 6px 26px rgba(150,20,210,0.44);">Get Now</button>
-        <button class="btn-sec" id="btnSec">View Plans</button>
-      </div>
+      <h1 class="hero-title" id="heroTitle">Grab your Jio<br>OTT Pass now</h1>
+      <p class="hero-sub" id="heroSub">Start streaming movies, shows, sports and more from 15 OTT apps.</p>
+      <button class="btn-get" id="btnGet">Get now</button>
     </div>
 
-    <!-- RIGHT: BANNER STAGE -->
-    <div class="banner-stage" id="bannerStage">
-      <div class="banner-viewport" id="bannerVP">
+    <!-- BANNER AREA -->
+    <div class="hero-banners" id="heroBanners">
 
-        <!-- BANNER WRAP A (alternates with B for transitions) -->
-        <div class="banner-wrap state-active" id="wrapA">
-          <div style="position:relative;width:100%;">
-            <div class="banner-active" id="bannerA">
-              <!-- Real banner image — save as banner1.png next to this file -->
-              <img class="banner-img" src="./banner1.png"
-                   alt="Jio OTT Pass"
-                   onerror="this.closest('.banner-active').classList.add('no-img')"/>
-              <!-- CSS fallback -->
-              <div class="banner-fallback">
-                <div style="text-align:center;padding:20px 0;">
-                  <div style="font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;opacity:0.55;margin-bottom:8px;">OTT Pass</div>
-                  <div style="font-size:3.5rem;font-weight:900;line-height:1;color:#0040c0;">₹200<span style="font-size:1.2rem;font-weight:400;color:#888;">/mo</span></div>
-                  <div style="font-size:0.85rem;opacity:0.6;margin:10px 0;">30 GB + Unlimited 5G + 15 OTT Apps</div>
-                  <div style="display:flex;justify-content:center;gap:8px;margin-top:16px;">
-                    <div style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#1a5fff,#0038cc);font-size:0.8rem;font-weight:700;">30 GB</div>
-                    <div style="padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,#1a5fff,#0038cc);font-size:0.8rem;font-weight:700;">Unlimited 5G</div>
-                  </div>
-                </div>
-              </div>
+      <!-- Prev hint -->
+      <div class="prev-hint" id="prevHint" onclick="goPrev()"></div>
+
+      <!-- Banner slot (active + transitioning) -->
+      <div style="position:relative;flex:1;height:100%;display:flex;align-items:center;">
+
+        <!-- WRAP A -->
+        <div class="banner-wrap active" id="wrapA">
+          <div class="banner-container" id="ctrA">
+            <div class="banner-container-inner" id="bciA">
+              <div class="cards-row" id="cardsA"></div>
             </div>
-            <!-- App icons below (slide 0 only) -->
-            <div class="app-strip visible" id="appStripA">
-              <div class="app-ic">▶️</div>
-              <div class="app-ic" style="background:linear-gradient(135deg,rgba(80,20,180,0.6),rgba(180,30,180,0.6));">✦</div>
-              <div class="app-ic" style="background:rgba(0,20,60,0.8);font-size:0.45rem;font-weight:900;line-height:1.2;color:#00a8ff;text-align:center;">prime<br/>video</div>
-              <div class="app-more">+12<br/>More</div>
-            </div>
+            <div class="app-icons-row" id="appsA"></div>
           </div>
         </div>
 
-        <!-- BANNER WRAP B (for incoming slides) -->
-        <div class="banner-wrap state-enter" id="wrapB">
-          <div style="position:relative;width:100%;">
-            <div class="banner-active" id="bannerB"></div>
-            <div class="app-strip" id="appStripB"></div>
+        <!-- WRAP B -->
+        <div class="banner-wrap enter" id="wrapB">
+          <div class="banner-container" id="ctrB">
+            <div class="banner-container-inner" id="bciB">
+              <div class="cards-row" id="cardsB"></div>
+            </div>
+            <div class="app-icons-row" id="appsB"></div>
           </div>
         </div>
 
-        <!-- PEEK card (next slide) -->
-        <div class="peek peek-right" id="peekRight"></div>
-
       </div>
-    </div>
 
-  </div><!-- /hero-layout -->
+      <!-- Lifestyle peek -->
+      <div class="lifestyle-peek" id="lifestylePeek">
+        <img src="./banner2.jpg" alt="Lifestyle"
+             onerror="this.style.display='none';this.parentElement.querySelector('.lifestyle-fallback').style.display='flex'"/>
+        <div class="lifestyle-fallback" style="display:none;background:linear-gradient(160deg,#1a1208,#3a2810);">📱</div>
+      </div>
 
-  <!-- BOTTOM CONTROLS -->
-  <div class="fold1-bar">
-    <div class="prog-bar" id="progBar">
-      <div class="prog-t" data-i="0"><div class="prog-f" id="pf0"></div></div>
-      <div class="prog-t" data-i="1"><div class="prog-f" id="pf1"></div></div>
-    </div>
-    <div class="arrows">
-      <button class="arr" id="aPrev">&#8592;</button>
-      <button class="arr" id="aNext">&#8594;</button>
-    </div>
-    <span class="s-count" id="sCount">01 / 02</span>
+    </div><!-- /hero-banners -->
+  </div><!-- /hero-inner -->
+
+  <!-- Carousel arrows (bottom-right) -->
+  <div class="carousel-arrows">
+    <button class="c-arrow" id="arrowPrev" onclick="goPrev()">&#8249;</button>
+    <button class="c-arrow" id="arrowNext" onclick="goNext()">&#8250;</button>
   </div>
 
-  <div class="scue" onclick="document.getElementById('fold2').scrollIntoView({behavior:'smooth'})">
-    <div class="scue-m"><div class="scue-w"></div></div>
-    <span>Recharge</span>
-  </div>
+  <!-- Progress tracks -->
+  <div class="prog-tracks" id="progTracks"></div>
 
 </section>
 
-<!-- ═══ FOLD 2 ═══ -->
+<!-- ════ FOLD 2: RECHARGE ════ -->
 <section id="fold2">
-  <div class="f2-in">
-    <p class="f2-k">Quick Access</p>
-    <h2 class="f2-h">Recharge or <span class="hl">Pay Bills</span></h2>
+  <div class="f2-wrap">
+    <p class="f2-kicker">Quick Access</p>
+    <h2 class="f2-heading">Recharge or <span class="hl">Pay Bills</span></h2>
     <div class="f2-tabs">
       <button class="f2-tab on" data-ph="Enter Jio number">📱 Mobile</button>
       <button class="f2-tab" data-ph="Enter JioFiber account ID">🏠 Home</button>
@@ -634,199 +794,116 @@ nav{
 </section>
 
 <script>
-/* ══════════════════════════════════════
+/* ═══════════════════════════════
    SLIDE DATA
-   Images: banner1.png = OTT Pass composite
-           banner2.jpg = Lifestyle photo
-══════════════════════════════════════ */
+═══════════════════════════════ */
 const SLIDES = [
   {
-    eyebrow: 'New · OTT Pass',
-    eyebrowColor: '#e070ff',
-    titleLine1: 'Grab your Jio',
-    titleLine2: 'OTT Pass now',
-    titleGrad: 'linear-gradient(90deg,#ff80e0,#c040f0,#7020d0)',
-    body: 'Start streaming movies, shows, sports and more from <strong>15 OTT apps</strong>. ₹1500+ worth of subscriptions — for just <strong>₹200/month</strong>.',
-    cta: 'Get Now',
-    cta2: 'View Plans',
-    ctaBg: 'linear-gradient(135deg,#b020e0,#6010c0)',
-    ctaShadow: 'rgba(150,20,210,0.44)',
-    ambientBg: `radial-gradient(ellipse 85% 75% at 22% 55%,rgba(120,0,190,0.48) 0%,transparent 62%),
-                radial-gradient(ellipse 65% 60% at 82% 68%,rgba(170,0,120,0.34) 0%,transparent 58%),#0a0614`,
-    imgSrc: './banner1.png',
-    imgAlt: 'Jio OTT Pass',
+    title: 'Grab your Jio<br>OTT Pass now',
+    sub: 'Start streaming movies, shows, sports and more from 15 OTT apps.',
+    btn: 'Get now',
+    btnColor: '#1a6aff',
+    bg: `radial-gradient(ellipse 70% 100% at 85% 60%, #a8004e 0%, transparent 55%),
+         radial-gradient(ellipse 60% 80% at 15% 40%, #1e003a 0%, transparent 70%),
+         linear-gradient(135deg, #1e0038 0%, #4a0045 40%, #880042 75%, #a8004a 100%)`,
+    bannerImg: './banner1.png',
+    bannerAlt: 'Jio OTT Pass',
     showApps: true,
-    peekImgSrc: './banner2.jpg',
-    peekFallbackBg: 'linear-gradient(160deg,#1a1208,#3a2810)',
-    stackThumbColor: 'linear-gradient(135deg,#3a0070,#9010a0)',
+    stackColor: 'linear-gradient(135deg,#3a0070,#9010a0)',
     stackLabel: 'OTT Pass',
-    fallbackContent: `
-      <div style="text-align:center;color:#080820;padding:20px 10px;">
-        <div style="font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:#5010b0;margin-bottom:6px;font-weight:800;">OTT PASS</div>
-        <div style="font-size:1.5rem;text-decoration:line-through;text-decoration-color:#cc0000;color:#888;font-weight:800;line-height:1;">₹1500+</div>
-        <div style="font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:4px 0;">Worth of Subscriptions</div>
-        <div style="margin:8px 0 4px;font-size:0.65rem;color:#bbb;text-transform:uppercase;">For Just</div>
-        <div style="font-size:4rem;font-weight:900;letter-spacing:-3px;color:#0040c0;line-height:1;">₹200</div>
-        <div style="font-size:0.65rem;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Per Month</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px;">
-          <div style="padding:9px;border-radius:10px;background:linear-gradient(135deg,#1a5fff,#0038cc);color:#fff;font-size:0.78rem;font-weight:800;">30 GB</div>
-          <div style="padding:9px;border-radius:10px;background:linear-gradient(135deg,#1a5fff,#0038cc);color:#fff;font-size:0.78rem;font-weight:800;">Unlimited 5G</div>
-        </div>
-      </div>`,
   },
   {
-    eyebrow: 'JioFiber · Home',
-    eyebrowColor: '#80cfff',
-    titleLine1: 'Experience',
-    titleLine2: '1 Gbps at home',
-    titleGrad: 'linear-gradient(90deg,#80d4ff,#0088ff)',
-    body: 'Ultra-fast gigabit broadband. Get <strong>1 month FREE</strong> plus <strong>Pro Google One</strong> storage — unlimited data, 4K streaming, zero buffering.',
-    cta: 'Explore Plans',
-    cta2: 'Check Coverage',
-    ctaBg: 'linear-gradient(135deg,#0055e0,#00aaff)',
-    ctaShadow: 'rgba(0,80,220,0.44)',
-    ambientBg: `radial-gradient(ellipse 85% 75% at 20% 55%,rgba(0,55,200,0.46) 0%,transparent 62%),
-                radial-gradient(ellipse 65% 60% at 85% 65%,rgba(0,170,255,0.28) 0%,transparent 58%),#0a0614`,
-    imgSrc: './banner2.jpg',
-    imgAlt: 'JioFiber',
+    title: 'Experience<br>1 Gbps at home',
+    sub: 'Ultra-fast gigabit broadband. Get 1 month FREE plus Pro Google One storage.',
+    btn: 'Explore Plans',
+    btnColor: '#1a6aff',
+    bg: `radial-gradient(ellipse 70% 100% at 85% 60%, #0050c0 0%, transparent 55%),
+         radial-gradient(ellipse 60% 80% at 15% 40%, #050a20 0%, transparent 70%),
+         linear-gradient(135deg, #050a20 0%, #001850 40%, #003090 75%, #0050c0 100%)`,
+    bannerImg: './banner2.jpg',
+    bannerAlt: 'JioFiber',
     showApps: false,
-    peekImgSrc: './banner1.png',
-    peekFallbackBg: 'linear-gradient(160deg,#3a0070,#9010a0)',
-    stackThumbColor: 'linear-gradient(135deg,#001850,#0055e0)',
+    stackColor: 'linear-gradient(135deg,#001050,#0050c0)',
     stackLabel: 'JioFiber',
-    fallbackContent: `
-      <div style="padding:32px 24px;">
-        <div style="font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;opacity:0.55;margin-bottom:10px;">JioFiber</div>
-        <div style="font-size:4.5rem;font-weight:900;letter-spacing:-4px;line-height:1;background:linear-gradient(90deg,#80d4ff,#0088ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">1Gbps</div>
-        <div style="margin:14px 0 20px;opacity:0.65;font-size:0.9rem;line-height:1.6;">Unlimited · 4K · Smart Home<br/>Zero buffering</div>
-        <div style="padding:10px 18px;border-radius:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);font-size:0.85rem;font-weight:700;margin-bottom:8px;text-align:center;">🎁 1 Month FREE</div>
-        <div style="padding:10px 18px;border-radius:10px;background:rgba(0,160,255,0.18);border:1px solid rgba(0,160,255,0.3);font-size:0.85rem;font-weight:700;text-align:center;">Google One Pro ✓</div>
-      </div>`,
   },
 ];
-
-/* ══════════════════════════════════════
-   STATE
-══════════════════════════════════════ */
 const N = SLIDES.length;
+
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
 let cur = 0;
 let busy = false;
+let activeWrap = 'A';
 let fillTimer = null, fillPct = 0;
-const FILL_DURATION = 6000;
-let activeWrap = 'A'; // which wrap is currently showing
+const FILL_DUR = 6000;
+const stacked = [];
 
-/* ══════════════════════════════════════
-   BOOT
-══════════════════════════════════════ */
-function boot(){
-  applyText(0, false);
-  setupBannerImg('A', SLIDES[0]);
-  setupPeek(SLIDES[0]);
-  startFill();
-  bindControls();
-  bindTabs();
-  document.getElementById('numInp').addEventListener('input', function(){
-    this.value = this.value.replace(/\D/g,'').slice(0,10);
-  });
+/* ═══════════════════════════════
+   BUILD BANNER CARDS
+═══════════════════════════════ */
+function buildCards(cardsEl, appsEl, slide) {
+  // Cards row: use the banner image as a single full-width img
+  // If image loads, show it. Otherwise show OTT ticket recreation.
+  cardsEl.innerHTML = `
+    <div style="position:relative;width:100%;height:100%;border-radius:12px;overflow:hidden;">
+      <img src="${slide.bannerImg}" alt="${slide.bannerAlt}"
+           style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;border-radius:12px;"
+           onerror="this.style.display='none';document.getElementById('fb_${cardsEl.id}').style.display='flex'"/>
+      <div id="fb_${cardsEl.id}" style="display:none;width:100%;height:100%;border-radius:12px;
+           background:${slide.stackColor};align-items:center;justify-content:center;
+           font-size:1.1rem;font-weight:700;opacity:0.7;">${slide.stackLabel}</div>
+    </div>`;
+
+  // App icons (only for slide 0)
+  if(slide.showApps){
+    appsEl.innerHTML = `
+      <div class="app-icon yt">▶️</div>
+      <div class="app-icon jh" style="font-size:1.1rem;color:#fff;">✦</div>
+      <div class="app-icon pv" style="font-size:8px;font-weight:900;line-height:1.2;color:#00a8ff;text-align:center;">prime<br>video</div>
+      <div class="app-icon more">+12<br>More Apps</div>`;
+    appsEl.style.display = 'flex';
+  } else {
+    appsEl.innerHTML = '';
+    appsEl.style.display = 'none';
+  }
 }
 
-/* ══════════════════════════════════════
+/* ═══════════════════════════════
    APPLY TEXT
-══════════════════════════════════════ */
-function applyText(idx, animate){
+═══════════════════════════════ */
+function applyText(idx, animate) {
   const s = SLIDES[idx];
+  const titleEl = document.getElementById('heroTitle');
+  const subEl   = document.getElementById('heroSub');
+  const btnEl   = document.getElementById('btnGet');
 
-  // eyebrow
-  const eyebrow = document.getElementById('eyebrow');
-  eyebrow.style.color = s.eyebrowColor;
-  eyebrow.style.borderColor = s.eyebrowColor.replace(')',',0.25)').replace('rgb','rgba');
-  document.getElementById('eDot').style.background = s.eyebrowColor;
-  document.getElementById('eText').textContent = s.eyebrow;
-
-  // title
-  document.getElementById('heroTitle').innerHTML =
-    `<span style="display:block;">${s.titleLine1}</span>` +
-    `<span class="hl" style="background:${s.titleGrad};-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">${s.titleLine2}</span>`;
-
-  // body
-  document.getElementById('heroBody').innerHTML = s.body;
-
-  // CTAs
-  const bm = document.getElementById('btnMain');
-  bm.textContent = s.cta;
-  bm.style.background = s.ctaBg;
-  bm.style.boxShadow = `0 6px 26px ${s.ctaShadow}`;
-  document.getElementById('btnSec').textContent = s.cta2;
-
-  // ambient
-  document.getElementById('bg').style.background = s.ambientBg;
-
-  // counter
-  document.getElementById('sCount').textContent = `0${idx+1} / 0${N}`;
-
-  // animate text
   if(animate){
     const ht = document.getElementById('heroText');
     ht.style.transition = 'none';
     ht.style.opacity = '0';
-    ht.style.transform = 'translateY(18px)';
+    ht.style.transform = 'translateY(16px)';
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      ht.style.transition = 'opacity 0.7s var(--ease), transform 0.8s var(--ease)';
+      ht.style.transition = 'opacity 0.65s ease, transform 0.75s cubic-bezier(0.16,1,0.3,1)';
       ht.style.opacity = '1';
       ht.style.transform = 'translateY(0)';
     }));
   }
+
+  titleEl.innerHTML = s.title;
+  subEl.textContent = s.sub;
+  btnEl.textContent = s.btn;
+  document.querySelector('.hero').style.background = s.bg;
 }
 
-/* ══════════════════════════════════════
-   SETUP BANNER IMAGE (into wrap A or B)
-══════════════════════════════════════ */
-function setupBannerImg(which, slideData){
-  const bannerEl = document.getElementById(`banner${which}`);
-  const stripEl  = document.getElementById(`appStrip${which}`);
-
-  // Build inner HTML
-  bannerEl.innerHTML = `
-    <img class="banner-img" src="${slideData.imgSrc}" alt="${slideData.imgAlt}"
-         onerror="this.closest('.banner-active').classList.add('no-img')"/>
-    <div class="banner-fallback">${slideData.fallbackContent}</div>`;
-
-  // App strip
-  if(slideData.showApps){
-    stripEl.innerHTML = `
-      <div class="app-ic">▶️</div>
-      <div class="app-ic" style="background:linear-gradient(135deg,rgba(80,20,180,0.6),rgba(180,30,180,0.6));">✦</div>
-      <div class="app-ic" style="background:rgba(0,20,60,0.8);font-size:0.45rem;font-weight:900;line-height:1.2;color:#00a8ff;text-align:center;">prime<br/>video</div>
-      <div class="app-more">+12<br/>More</div>`;
-    stripEl.classList.add('visible');
-  } else {
-    stripEl.innerHTML = '';
-    stripEl.classList.remove('visible');
-  }
-}
-
-/* ══════════════════════════════════════
-   SETUP PEEK CARD
-══════════════════════════════════════ */
-function setupPeek(slideData){
-  const peek = document.getElementById('peekRight');
-  peek.innerHTML = `
-    <img src="${slideData.peekImgSrc}" alt="Next"
-         style="width:100%;height:100%;object-fit:cover;display:block;"
-         onerror="this.style.display='none';this.parentElement.style.background='${slideData.peekFallbackBg}'"/>`;
-}
-
-/* ══════════════════════════════════════
+/* ═══════════════════════════════
    TRANSITION
-══════════════════════════════════════ */
-function goTo(nextIdx){
+═══════════════════════════════ */
+function goTo(nextIdx) {
   if(busy) return;
   busy = true;
   clearInterval(fillTimer);
-  fillPct = 0;
-
-  // Reset all fills
-  for(let i=0;i<N;i++) document.getElementById(`pf${i}`).style.width='0%';
+  resetFills();
 
   const prevIdx = cur;
   cur = ((nextIdx % N) + N) % N;
@@ -834,137 +911,151 @@ function goTo(nextIdx){
   // Push prev to stack
   pushStack(prevIdx);
 
-  // Determine active / incoming wrap IDs
   const outId = activeWrap;
   const inId  = outId === 'A' ? 'B' : 'A';
   activeWrap  = inId;
 
-  const wrapOut = document.getElementById(`wrap${outId}`);
-  const wrapIn  = document.getElementById(`wrap${inId}`);
+  // Prepare incoming
+  buildCards(
+    document.getElementById(`cards${inId}`),
+    document.getElementById(`apps${inId}`),
+    SLIDES[cur]
+  );
+  document.getElementById(`wrap${inId}`).className = 'banner-wrap enter';
 
-  // Prepare incoming content (off screen)
-  setupBannerImg(inId, SLIDES[cur]);
-  wrapIn.className = 'banner-wrap state-enter';
-
-  // Update text immediately (with animation)
+  // Update text
   applyText(cur, true);
 
-  // Update peek for next-next
-  setupPeek(SLIDES[(cur+1) % N]);
-
-  // Kick off transition
+  // Animate
   requestAnimationFrame(()=>{
-    // Outgoing exits left
-    wrapOut.className = 'banner-wrap state-exit';
-    // Short delay then incoming slides in
+    document.getElementById(`wrap${outId}`).className = 'banner-wrap exit';
     setTimeout(()=>{
-      wrapIn.className = 'banner-wrap state-active';
-    }, 80);
+      document.getElementById(`wrap${inId}`).className = 'banner-wrap active';
+    }, 60);
   });
 
   setTimeout(()=>{
-    // Clean up outgoing
-    wrapOut.className = 'banner-wrap state-enter'; // park it
+    document.getElementById(`wrap${outId}`).className = 'banner-wrap enter';
     busy = false;
     startFill();
   }, 950);
 }
 
-/* ══════════════════════════════════════
-   STACK
-══════════════════════════════════════ */
-const stackedList = [];
-const ROTS = [-6, 5, -4, 6, -3, 4];
+function goNext(){ if(!busy){ clearInterval(fillTimer); goTo(cur+1); }}
+function goPrev(){ if(!busy){ clearInterval(fillTimer); goTo(cur-1); }}
 
+/* ═══════════════════════════════
+   STACK
+═══════════════════════════════ */
+const ROTS = [-5,5,-4,6];
 function pushStack(idx){
   const s = SLIDES[idx];
   const rail = document.getElementById('stack-rail');
-  const rot = ROTS[stackedList.length % ROTS.length];
-  const offset = stackedList.length * 12;
+  const rot = ROTS[stacked.length % ROTS.length];
+  const topOff = stacked.length * 14;
 
   const el = document.createElement('div');
-  el.className = 'stack-card';
+  el.className = 'stack-thumb';
   el.style.setProperty('--rot', `${rot}deg`);
-  el.style.top = `calc(50% - 55px + ${offset}px)`;
-  el.style.height = '110px';
-  el.style.background = s.stackThumbColor;
+  el.style.top = `calc(50% - 45px + ${topOff}px)`;
+  el.style.background = s.stackColor;
 
   el.innerHTML = `
-    <img src="${s.imgSrc}" alt="${s.stackLabel}"
+    <img src="${s.bannerImg}" alt="${s.stackLabel}"
          style="width:100%;height:100%;object-fit:cover;display:block;"
          onerror="this.style.display='none'"/>
-    <div class="sc-label">${s.stackLabel}</div>`;
+    <div class="stack-thumb-label">${s.stackLabel}</div>`;
 
   rail.appendChild(el);
-  stackedList.push(idx);
-  requestAnimationFrame(()=>requestAnimationFrame(()=> el.classList.add('in')));
+  stacked.push(idx);
+  requestAnimationFrame(()=>requestAnimationFrame(()=> el.classList.add('show')));
 }
 
-/* ══════════════════════════════════════
-   PROGRESS FILL
-══════════════════════════════════════ */
+/* ═══════════════════════════════
+   PROGRESS
+═══════════════════════════════ */
+function buildProgressTracks(){
+  const bar = document.getElementById('progTracks');
+  bar.innerHTML = '';
+  for(let i=0;i<N;i++){
+    const t = document.createElement('div');
+    t.className = 'prog-t';
+    t.dataset.i = i;
+    const f = document.createElement('div');
+    f.className = 'prog-f';
+    f.id = `pf${i}`;
+    t.appendChild(f);
+    t.addEventListener('click',()=>{ if(!busy && +t.dataset.i!==cur){ clearInterval(fillTimer); goTo(+t.dataset.i); }});
+    bar.appendChild(t);
+  }
+}
+function resetFills(){
+  for(let i=0;i<N;i++){
+    const el = document.getElementById(`pf${i}`);
+    if(el) el.style.width='0%';
+  }
+  fillPct=0;
+}
 function startFill(){
   clearInterval(fillTimer);
-  fillPct = 0;
-  const fillEl = document.getElementById(`pf${cur}`);
-  const step = 100 / (FILL_DURATION / 50);
+  fillPct=0;
+  const step = 100/(FILL_DUR/50);
   fillTimer = setInterval(()=>{
-    fillPct = Math.min(100, fillPct + step);
-    fillEl.style.width = fillPct + '%';
-    if(fillPct >= 100){
-      clearInterval(fillTimer);
-      goTo(cur + 1);
-    }
-  }, 50);
+    fillPct = Math.min(100, fillPct+step);
+    const el = document.getElementById(`pf${cur}`);
+    if(el) el.style.width = fillPct+'%';
+    if(fillPct>=100){ clearInterval(fillTimer); goTo(cur+1); }
+  },50);
 }
 
-/* ══════════════════════════════════════
-   CONTROLS
-══════════════════════════════════════ */
-function bindControls(){
-  document.getElementById('aNext').onclick = ()=>{ if(!busy){ clearInterval(fillTimer); goTo(cur+1); }};
-  document.getElementById('aPrev').onclick = ()=>{ if(!busy){ clearInterval(fillTimer); goTo(cur-1); }};
-  document.querySelectorAll('.prog-t').forEach(t=>{
-    t.addEventListener('click',()=>{
-      const i = +t.dataset.i;
-      if(i !== cur && !busy){ clearInterval(fillTimer); goTo(i); }
-    });
-  });
-  document.addEventListener('keydown', e=>{
-    if(e.key==='ArrowRight') document.getElementById('aNext').click();
-    if(e.key==='ArrowLeft')  document.getElementById('aPrev').click();
-  });
-}
+/* ═══════════════════════════════
+   KEYBOARD
+═══════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') goNext();
+  if(e.key==='ArrowLeft')  goPrev();
+});
 
-/* ══════════════════════════════════════
-   TABS
-══════════════════════════════════════ */
-function bindTabs(){
-  document.querySelectorAll('.f2-tab').forEach(t=>{
-    t.onclick = ()=>{
-      document.querySelectorAll('.f2-tab').forEach(x=>x.classList.remove('on'));
-      t.classList.add('on');
-      document.getElementById('numInp').placeholder = t.dataset.ph;
-      document.getElementById('numInp').value = '';
-    };
-  });
-}
-
+/* ═══════════════════════════════
+   TABS + INPUT
+═══════════════════════════════ */
+document.querySelectorAll('.f2-tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.f2-tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById('numInp').placeholder = t.dataset.ph;
+    document.getElementById('numInp').value='';
+  };
+});
+document.getElementById('numInp').addEventListener('input',function(){
+  this.value=this.value.replace(/\D/g,'').slice(0,10);
+});
 function doGo(){
-  const inp = document.getElementById('numInp');
-  const v = inp.value.trim();
-  if(!v || v.length<10){
+  const inp=document.getElementById('numInp');
+  if(!inp.value||inp.value.length<10){
     inp.style.boxShadow='0 0 0 3px rgba(255,60,60,0.22)';
     inp.style.borderColor='rgba(255,80,80,0.45)';
-    setTimeout(()=>{inp.style.boxShadow='';inp.style.borderColor='';},1400);
+    setTimeout(()=>{inp.style.boxShadow='';inp.style.borderColor='';},1300);
     inp.focus();return;
   }
   inp.style.boxShadow='0 0 0 3px rgba(40,200,100,0.22)';
   inp.style.borderColor='rgba(40,200,100,0.45)';
-  setTimeout(()=>{inp.style.boxShadow='';inp.style.borderColor='';},1400);
+  setTimeout(()=>{inp.style.boxShadow='';inp.style.borderColor='';},1300);
 }
 
-boot();
+/* ═══════════════════════════════
+   INIT
+═══════════════════════════════ */
+(function init(){
+  applyText(0, false);
+  buildCards(
+    document.getElementById('cardsA'),
+    document.getElementById('appsA'),
+    SLIDES[0]
+  );
+  buildProgressTracks();
+  startFill();
+})();
 </script>
 </body>
 </html>
