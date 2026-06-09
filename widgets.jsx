@@ -1097,36 +1097,36 @@ function BookingsV2({ onOpen }) {
         {events.map((e, i) => (
           <div key={e.title + i} style={{ borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
             {e.featured ? (
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "13px 13px", background: "var(--surface-minimal)" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px 14px", background: "#ddeeff", borderRadius: 14, margin: "8px 8px 0" }}>
                 {/* Left: time badge + connector + end time */}
                 <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 54 }}>
-                  <div style={{ width: 54, background: "var(--reliance-base)", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
+                  <div style={{ width: 54, background: "#2563eb", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
                     <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
                     <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.85)", marginTop: 1 }}>{e.ampm}</div>
                   </div>
-                  <div style={{ width: 2, flex: 1, minHeight: 16, background: "var(--reliance-base)", opacity: 0.3, marginTop: 2 }} />
-                  <div style={{ width: 7, height: 7, borderRadius: 999, background: "var(--reliance-base)", opacity: 0.6 }} />
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--reliance-base)", marginTop: 3, opacity: 0.8 }}>{e.endTime}</div>
+                  <div style={{ width: 2, flex: 1, minHeight: 20, background: "#2563eb", opacity: 0.4, marginTop: 3 }} />
+                  <div style={{ width: 7, height: 7, borderRadius: 999, background: "#2563eb", opacity: 0.65 }} />
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", marginTop: 3 }}>{e.endTime}</div>
                 </div>
-                {/* Right: card with sky-border bg */}
-                <div style={{ flex: 1, minWidth: 0, background: "var(--sky-border)", borderRadius: 12, padding: "10px 11px" }}>
+                {/* Right: content directly on light-blue bg */}
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".03em" }}>
-                        <Icon name={e.icon} size={13} color="var(--content-minimal)" />{e.type}
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".03em" }}>
+                        <Icon name={e.icon} size={13} color="#64748b" />{e.type}
                       </span>
-                      <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 2 }}>{e.title}</div>
-                      <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
-                      <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 5, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{e.desc}</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 2 }}>{e.title}</div>
+                      <div style={{ fontSize: 12.5, color: "#475569", marginTop: 2 }}>{e.sub}</div>
+                      <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{e.desc}</div>
                     </div>
                     <Signal tone="info" dot={false} style={{ flexShrink: 0 }}>{e.soon}</Signal>
                   </div>
                   {/* Avatar stack */}
-                  <div style={{ display: "flex", alignItems: "center", marginTop: 9 }}>
+                  <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
                     {e.avatarColors.map((c, j) => (
-                      <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid var(--sky-border)", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
+                      <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid #ddeeff", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
                     ))}
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "var(--sky-ink)", marginLeft: 7 }}>+7</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginLeft: 7 }}>+7</span>
                   </div>
                 </div>
               </div>
