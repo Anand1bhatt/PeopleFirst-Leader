@@ -958,7 +958,7 @@ function PerformanceDark({ onOpen }) {
               <div style={{ flex: summary.delayed, background: "#3b82f6" }} />
               <div style={{ flex: summary.onHold,  background: "#f97316" }} />
             </div>
-            {[{ label: "On time", val: summary.onTime, color: "#22c55e" }, { label: "Delayed", val: summary.delayed, color: "#3b82f6" }, { label: "On h0ld", val: summary.onHold, color: "#f97316" }].map((s) => (
+            {[{ label: "On time", val: summary.onTime, color: "#22c55e" }, { label: "Delayed", val: summary.delayed, color: "#3b82f6" }, { label: "On hold", val: summary.onHold, color: "#f97316" }].map((s) => (
               <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 9 }}>
                 <span style={{ width: 3, height: 14, background: s.color, borderRadius: 999, flexShrink: 0 }} />
                 <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.75)", flex: 1 }}>{s.label}</span>
@@ -1005,7 +1005,7 @@ function TeamsToday({ onOpen }) {
   ];
   const DARK = "#14375e";
   return (
-    <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
+    <Widget icon="group" title="Team today" action="Team" onAction={() => onOpen()}>
       <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
         {/* Dark header */}
         <div style={{ background: DARK, padding: "16px 16px 18px" }}>
@@ -1060,7 +1060,7 @@ function RecruitmentList({ onOpen }) {
   ];
   const pill = {
     healthy: { label: "Healthy",   color: "#16a34a", bg: "#dcfce7" },
-    risk:    { label: "At risk",   color: "#d97706", bg: "#fde68a" },
+    risk:    { label: "At risk",   color: "#ea580c", bg: "#ffedd5" },
     off:     { label: "Off track", color: "#dc2626", bg: "#fee2e2" },
   };
   return (
@@ -1087,7 +1087,7 @@ function RecruitmentList({ onOpen }) {
 // ═══════════════════════════════════════════════════════════════
 function BookingsV2({ onOpen }) {
   const events = [
-    { time: "10:00", ampm: "AM", title: "Q2 Leadership Review", sub: "You present · 12 attendees", soon: "in 1h 8m", featured: true, initials: ["KM","AV","DR","PN"] },
+    { time: "10:00", ampm: "AM", title: "Q2 Leadership Review", sub: "You present · 12 attendees", desc: "Q2 revenue, hiring plan & org restructure agenda. Slides shared.", soon: "in 1h 8m", featured: true, initials: ["KM","AV","DR","PN"] },
     { time: "02:30", ampm: "PM", title: "Board readout",        sub: "Boardroom A · prep deck shared", soon: null },
     { time: "05:00", ampm: "PM", title: "1:1 Karan Mehta",     sub: "Platform team · 30 min", soon: null },
   ];
@@ -1110,6 +1110,7 @@ function BookingsV2({ onOpen }) {
                       <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", background: "rgba(37,99,235,.1)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap", flexShrink: 0 }}>{e.soon}</span>
                     </div>
                     <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 3 }}>{e.sub}</div>
+                    {e.desc && <div style={{ fontSize: 12, color: "var(--content-moderate)", marginTop: 6, lineHeight: 1.45, opacity: 0.85 }}>{e.desc}</div>}
                     {/* Avatars */}
                     <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 0 }}>
                       {e.initials.map((ini, j) => (
