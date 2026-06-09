@@ -1145,7 +1145,7 @@ function TeamsAttendance({ onOpen }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
               {cats.map((c, i) => (
                 <div key={c.label} style={{
-                  background: "#f3f4f6", borderRadius: 14, padding: "14px 10px 12px",
+                  background: "#f3f4f6", borderRadius: 20, padding: "14px 10px 12px",
                   display: "flex", flexDirection: "column", alignItems: "center",
                   opacity: 0, animation: `fadeIn .35s ease ${0.3 + i * 0.07}s both`
                 }}>
