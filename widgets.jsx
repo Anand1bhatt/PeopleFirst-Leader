@@ -1110,50 +1110,55 @@ function TeamsAttendance({ onOpen }) {
   const { expanded, ref: sectionRef } = useStackReveal();
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
-      <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
-        {/* Peek cards */}
-        <div style={{ position: "absolute", bottom: 0, left: 12, right: 12, height: 22, background: "var(--surface-subtle)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.9 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 280ms, transform .4s ease 280ms", pointerEvents: "none", zIndex: 1 }} />
-        <div style={{ position: "absolute", bottom: 9, left: 6, right: 6, height: 22, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 1px 4px rgba(15,23,42,.06)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.95 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 200ms, transform .4s ease 200ms", pointerEvents: "none", zIndex: 2 }} />
-        {/* Main card */}
-        <div style={{ position: "relative", zIndex: 3, borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
-          {/* ── Section 1: KPI Header ── */}
-          <div style={{ background: TEAL, padding: "20px 18px 26px" }}>
-            <div style={{ display: "flex", alignItems: "flex-start" }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Headcount</div>
-                <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{total}</div>
-              </div>
-              <div style={{ flex: 1, textAlign: "center" }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Presence rate</div>
-                <div style={{ fontSize: 42, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
-              </div>
-              <div style={{ flex: 1, textAlign: "right" }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>vs yesterday</div>
-                <div style={{ fontSize: 42, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
-              </div>
+      <div ref={sectionRef} style={{ borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
+        {/* ── Section 1: KPI Header — always visible ── */}
+        <div style={{ background: TEAL, padding: "18px 16px 20px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Headcount</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{total}</div>
+            </div>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Presence rate</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
+            </div>
+            <div style={{ flex: 1, textAlign: "right" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>vs yesterday</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑3%</div>
             </div>
           </div>
-          {/* ── Section 2: White body ── */}
-          <div style={{ background: "#fff", padding: "18px 14px 16px" }}>
-            {/* Single segmented bar */}
-            <div style={{ display: "flex", gap: 4, height: 12, borderRadius: 999, overflow: "hidden", marginBottom: 16 }}>
-              {cats.map((c) => (
-                <div key={c.label} className="presence-seg" style={{ flex: c.val, background: c.color, borderRadius: 999 }} />
-              ))}
-            </div>
-            {/* 4-card grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
-              {cats.map((c, i) => (
-                <div key={c.label} style={{
-                  background: "#f3f4f6", borderRadius: 20, padding: "14px 10px 12px",
-                  display: "flex", flexDirection: "column", alignItems: "center",
-                  opacity: 0, animation: `fadeIn .35s ease ${0.3 + i * 0.07}s both`
-                }}>
-                  <div style={{ fontSize: 26, fontWeight: 900, color: "#0f172a", fontVariantNumeric: "tabular-nums", letterSpacing: "-.03em", lineHeight: 1 }}>{c.val}</div>
-                  <div style={{ fontSize: 11.5, fontWeight: 500, color: "#64748b", marginTop: 5, textAlign: "center" }}>{c.label}</div>
-                  <div style={{ width: 28, height: 4, borderRadius: 999, background: c.color, marginTop: 10 }} />
-                </div>
-              ))}
+        </div>
+        {/* ── Section 2: White body — expands on scroll ── */}
+        <div style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1)" }}>
+          <div style={{ minHeight: 0, overflow: "hidden" }}>
+            <div style={{
+              background: "#fff", padding: "16px 12px 14px",
+              opacity: expanded ? 1 : 0,
+              transform: expanded ? "translateY(0)" : "translateY(-8px)",
+              transition: expanded ? "opacity .35s ease .15s, transform .4s cubic-bezier(.4,0,.2,1) .1s" : "opacity .2s ease, transform .25s ease"
+            }}>
+              {/* Single segmented bar */}
+              <div style={{ display: "flex", gap: 4, height: 12, borderRadius: 999, overflow: "hidden", marginBottom: 14 }}>
+                {cats.map((c) => (
+                  <div key={c.label} className="presence-seg" style={{ flex: c.val, background: c.color, borderRadius: 999 }} />
+                ))}
+              </div>
+              {/* 4-card grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+                {cats.map((c, i) => (
+                  <div key={c.label} style={{
+                    background: "#f3f4f6", borderRadius: 20, padding: "14px 8px 12px",
+                    display: "flex", flexDirection: "column", alignItems: "center",
+                    opacity: expanded ? 1 : 0,
+                    transform: expanded ? "translateY(0)" : "translateY(6px)",
+                    transition: expanded ? `opacity .3s ease ${.2 + i * .06}s, transform .35s ease ${.18 + i * .06}s` : "none"
+                  }}>
+                    <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a", fontVariantNumeric: "tabular-nums", letterSpacing: "-.03em", lineHeight: 1 }}>{c.val}</div>
+                    <div style={{ fontSize: 11, fontWeight: 500, color: "#64748b", marginTop: 5, textAlign: "center" }}>{c.label}</div>
+                    <div style={{ width: 26, height: 4, borderRadius: 999, background: c.color, marginTop: 9 }} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
