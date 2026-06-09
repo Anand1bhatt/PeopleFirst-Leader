@@ -331,20 +331,34 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
     {
       key: "projects_group", icon: "analytics", label: "Projects", desc: "Project pipeline overview",
       children: [
-        { key: "projects_carousel", label: "Carousel view",       desc: "Sticky summary + swipeable cards", def: true },
-        { key: "projects_cards",    label: "Summary + Cards",     desc: "Stats strip + business-focused cards", def: false },
+        { key: "projects_carousel", label: "Carousel view",  desc: "Sticky summary + swipeable cards", def: true },
+        { key: "projects_cards",    label: "Summary + Cards", desc: "Stats strip + business-focused cards", def: false },
+        { key: "projects_dark",     label: "Dark view",       desc: "Navy card with scrollable projects", def: false },
       ]
     },
-    { key: "approvals",   icon: "confirm",   label: "Approvals",          desc: "Pending approval queue" },
+    { key: "approvals", icon: "confirm", label: "Approvals", desc: "Pending approval queue" },
     {
       key: "teams_group", icon: "group", label: "Teams", desc: "Attendance breakdown",
       children: [
-        { key: "teams_gauge",     label: "Gauge view",     desc: "Semicircle + 2×2 grid", def: true },
-        { key: "teams_headcount", label: "Headcount view", desc: "Large number + avatars", def: false },
+        { key: "teams_gauge",     label: "Gauge view",    desc: "Semicircle + 2×2 grid", def: true },
+        { key: "teams_headcount", label: "Headcount view", desc: "Large number + progress + grid", def: false },
+        { key: "teams_today",     label: "Team Today",    desc: "Dark header + colour-coded list", def: false },
       ]
     },
-    { key: "recruitment", icon: "id",        label: "Recruitment",        desc: "Pipeline health by role" },
-    { key: "upcoming",    icon: "calendar",  label: "Upcoming",           desc: "Next meetings & events" },
+    {
+      key: "recruitment_group", icon: "id", label: "Recruitment", desc: "Pipeline health by role",
+      children: [
+        { key: "recruitment",    label: "Pipeline view", desc: "CV count + stacked role cards", def: true },
+        { key: "recruitment_v2", label: "List view",     desc: "Clean rows with status pills", def: false },
+      ]
+    },
+    {
+      key: "upcoming_group", icon: "calendar", label: "Upcoming", desc: "Next meetings & events",
+      children: [
+        { key: "upcoming",    label: "Event cards", desc: "Type label + stacked expand", def: true },
+        { key: "upcoming_v2", label: "Time blocks", desc: "Calendar-style with featured event", def: false },
+      ]
+    },
     { key: "news",        icon: "flag",      label: "News & Updates",     desc: "Policy, people, celebrations" },
     { key: "floating_footer", icon: "more_horizontal", label: "Floating Footer", desc: "Glass pill navigation bar" },
   ];

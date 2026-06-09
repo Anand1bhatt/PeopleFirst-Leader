@@ -1,5 +1,6 @@
 /* global React, IOSDevice, Icon, ColorIcon, Button, Card, Signal, Dot,
-   AIBriefing, Performance, ExpenseBudget, ExpenseBudgetBars, ExpenseBudgetDonut, ActionItems, TeamSnapshot, Recruitment, Bookings, News,
+   AIBriefing, Performance, CriticalProjectsCards, PerformanceDark, ExpenseBudget, ExpenseBudgetBars, ExpenseBudgetDonut, ActionItems, TeamSnapshot, Recruitment, RecruitmentList, Bookings, BookingsV2, News,
+   TeamsGauge, TeamsHeadcount, TeamsToday,
    ApprovalsScreen, TeamScreen, ReportsScreen, MoreScreen, PROFILES, ProfileScreen, ChatScreen,
    SplashScreen, HomeSkeleton,
    EmpBrief, Attendance, QuickLinks, BookingsEmp, Tasks, LeaveBalance, PayBenefits, EmpNews, RefersCard,
@@ -303,11 +304,15 @@ function App() {
             {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
             {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
             {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
+            {wOn("projects_dark", false) && <PerformanceDark onOpen={() => go("reports")} />}
             {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
             {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
             {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-            {wOn("recruitment") && <Recruitment onOpen={() => go("more")} />}
-            {wOn("upcoming") && <Bookings onOpen={() => flash("Opening calendar")} />}
+            {wOn("teams_today", false) && <TeamsToday onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
+            {wOn("recruitment", true) && <Recruitment onOpen={() => go("more")} />}
+            {wOn("recruitment_v2", false) && <RecruitmentList onOpen={() => go("more")} />}
+            {wOn("upcoming", true) && <Bookings onOpen={() => flash("Opening calendar")} />}
+            {wOn("upcoming_v2", false) && <BookingsV2 onOpen={() => flash("Opening calendar")} />}
             {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
           </div>
         </div>

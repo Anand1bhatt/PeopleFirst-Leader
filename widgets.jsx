@@ -933,6 +933,212 @@ function Bookings({ onOpen }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// PROJECTS · View 3 — Dark navy card + carousel
+// ═══════════════════════════════════════════════════════════════
+function PerformanceDark({ onOpen }) {
+  const summary = { total: 74, onTime: 47, delayed: 19, onHold: 8 };
+  const PROJECTS = [
+    { name: "MyJio App",        pct: 56, trend: -12, status: "Delayed",  statusColor: "#ef4444", statusBg: "rgba(239,68,68,.12)",  ai: "3 sprints behind on payments rewrite." },
+    { name: "MyJio 3.1 revamp", pct: 76, trend: -8,  status: "Delayed",  statusColor: "#ef4444", statusBg: "rgba(239,68,68,.12)",  ai: "On-time delivery slipped 10pts since Feb." },
+    { name: "Jio Translate",    pct: 58, trend: -5,  status: "Delayed",  statusColor: "#ef4444", statusBg: "rgba(239,68,68,.12)",  ai: "Feature completion at 58%, 27pts below target." }
+  ];
+  const scrollRef = React.useRef(null);
+  const DARK = "#14375e";
+  return (
+    <Widget icon="analytics" title="Projects" action="All" onAction={onOpen}>
+      <div style={{ borderRadius: 16, overflow: "hidden", background: DARK }}>
+        <div style={{ display: "flex", alignItems: "stretch", overflow: "hidden" }}>
+          {/* Left summary */}
+          <div style={{ width: 144, flexShrink: 0, padding: "18px 14px 18px 16px" }}>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.55)", letterSpacing: ".02em" }}>All Projects</div>
+            <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
+            {/* Segmented bar */}
+            <div style={{ display: "flex", gap: 3, height: 6, borderRadius: 999, overflow: "hidden", margin: "13px 0 14px" }}>
+              <div style={{ flex: summary.onTime,  background: "#22c55e" }} />
+              <div style={{ flex: summary.delayed, background: "#3b82f6" }} />
+              <div style={{ flex: summary.onHold,  background: "#f97316" }} />
+            </div>
+            {[{ label: "On time", val: summary.onTime, color: "#22c55e" }, { label: "Delayed", val: summary.delayed, color: "#3b82f6" }, { label: "On h0ld", val: summary.onHold, color: "#f97316" }].map((s) => (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 9 }}>
+                <span style={{ width: 3, height: 14, background: s.color, borderRadius: 999, flexShrink: 0 }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.75)", flex: 1 }}>{s.label}</span>
+                <span style={{ fontSize: 17, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
+              </div>
+            ))}
+          </div>
+          {/* Right: scrollable white cards */}
+          <div ref={scrollRef} style={{ flex: 1, overflowX: "auto", display: "flex", gap: 8, padding: "12px 12px 12px 8px", WebkitOverflowScrolling: "touch" }}>
+            {PROJECTS.map((p) => (
+              <div key={p.name} style={{ flex: "0 0 170px", background: "#fff", borderRadius: 14, padding: "12px 11px", display: "flex", flexDirection: "column", gap: 6 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--content-heavy)", lineHeight: 1.25, flex: 1 }}>{p.name}</div>
+                  <span style={{ fontSize: 10.5, fontWeight: 700, color: p.statusColor, background: p.statusBg, borderRadius: 999, padding: "2px 7px", whiteSpace: "nowrap" }}>{p.status}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
+                  <span style={{ fontSize: 30, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--negative)" }}>↓ {Math.abs(p.trend)} pts</span>
+                </div>
+                <div style={{ flex: 1 }} />
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 5, padding: "6px 8px", borderRadius: 8, background: "var(--sky-light)" }}>
+                  <Icon name="ai_sparkle" size={11} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.ai}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Widget>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TEAMS · View 3 — "Team Today" dark header + list
+// ═══════════════════════════════════════════════════════════════
+function TeamsToday({ onOpen }) {
+  const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
+  const presencePct = Math.round(present / total * 100);
+  const rows = [
+    { label: "Present",  val: present, color: "#22c55e", bg: "#dcfce7", barFull: true },
+    { label: "On Leave", val: leave,   color: "#f97316", bg: "#fed7aa" },
+    { label: "Not in",   val: notIn,   color: "#ef4444", bg: "#fee2e2" },
+    { label: "WO/PH",    val: woph,    color: "#b0b8c4", bg: "#e5e7eb" },
+  ];
+  const DARK = "#14375e";
+  return (
+    <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
+      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
+        {/* Dark header */}
+        <div style={{ background: DARK, padding: "16px 16px 18px" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 0 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.55)" }}>Headcount</div>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>{total}</div>
+            </div>
+            <div style={{ width: 1, background: "rgba(255,255,255,.15)", alignSelf: "stretch", margin: "0 14px" }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.55)" }}>Presence rate</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#22c55e", letterSpacing: "-.03em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>{presencePct}</div>
+            </div>
+            <div style={{ width: 1, background: "rgba(255,255,255,.15)", alignSelf: "stretch", margin: "0 14px" }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.55)" }}>vs yesterday</div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: "#22c55e", letterSpacing: "-.03em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>↑ 3</div>
+            </div>
+          </div>
+        </div>
+        {/* White body with rows */}
+        <div style={{ padding: "12px 14px 14px" }}>
+          {rows.map((r, i) => (
+            <button key={r.label} onClick={() => onOpen(r.label)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderTop: i ? "1px solid var(--stroke-minimal)" : "none", background: "none", border: "none", borderTopWidth: i ? 1 : 0, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit" }}>
+              {r.barFull ? (
+                <div style={{ flex: 1, background: r.color, borderRadius: 10, padding: "7px 12px", display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 20, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{r.val}</span>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{r.label}</span>
+                </div>
+              ) : (
+                <React.Fragment>
+                  <span style={{ width: 40, height: 36, borderRadius: 10, background: r.bg, flexShrink: 0 }} />
+                  <span style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", minWidth: 32 }}>{r.val}</span>
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--content-moderate)" }}>{r.label}</span>
+                </React.Fragment>
+              )}
+            </button>
+          ))}
+        </div>
+      </Card>
+    </Widget>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RECRUITMENT · View 2 — Clean pill-badge list
+// ═══════════════════════════════════════════════════════════════
+function RecruitmentList({ onOpen }) {
+  const roles = [
+    { title: "Sr. Backend Engineer",          sub: "4 in final round",             tone: "healthy" },
+    { title: "Engineering Manager, Platform", sub: "Stalled 9 days · no movement", tone: "risk" },
+    { title: "Product Designer",              sub: "71 days open · 0 in pipeline", tone: "off" },
+  ];
+  const pill = {
+    healthy: { label: "Healthy",   color: "#16a34a", bg: "#dcfce7" },
+    risk:    { label: "At risk",   color: "#d97706", bg: "#fde68a" },
+    off:     { label: "Off track", color: "#dc2626", bg: "#fee2e2" },
+  };
+  return (
+    <Widget icon="id" title="Recruitment" action="View all" onAction={onOpen}>
+      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
+        {roles.map((r, i) => (
+          <div key={r.title} style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 16px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{r.title}</div>
+              <div style={{ fontSize: 13, color: "var(--content-moderate)", marginTop: 3 }}>{r.sub}</div>
+            </div>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: pill[r.tone].color, background: pill[r.tone].bg, borderRadius: 999, padding: "5px 12px", flexShrink: 0 }}>
+              <span style={{ width: 7, height: 7, borderRadius: 999, background: pill[r.tone].color }} />
+              {pill[r.tone].label}
+            </span>
+          </div>
+        ))}
+      </Card>
+    </Widget>);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UPCOMING · View 2 — Time-block calendar style
+// ═══════════════════════════════════════════════════════════════
+function BookingsV2({ onOpen }) {
+  const events = [
+    { time: "10:00", ampm: "AM", title: "Q2 Leadership Review", sub: "You present · 12 attendees", soon: "in 1h 8m", featured: true, initials: ["KM","AV","DR","PN"] },
+    { time: "02:30", ampm: "PM", title: "Board readout",        sub: "Boardroom A · prep deck shared", soon: null },
+    { time: "05:00", ampm: "PM", title: "1:1 Karan Mehta",     sub: "Platform team · 30 min", soon: null },
+  ];
+  return (
+    <Widget icon="calendar" title="Upcoming" action="Calendar" onAction={onOpen}>
+      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
+        {events.map((e, i) => (
+          <div key={e.title + i} style={{ borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+            {e.featured ? (
+              <div style={{ padding: "14px 14px", background: "#e8f1fb" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  {/* Time badge */}
+                  <div style={{ width: 56, flexShrink: 0, background: "#2563eb", borderRadius: 12, padding: "8px 0", textAlign: "center" }}>
+                    <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.01em" }}>{e.time}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.75)", marginTop: 1 }}>{e.ampm}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.25 }}>{e.title}</div>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", background: "rgba(37,99,235,.1)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap", flexShrink: 0 }}>{e.soon}</span>
+                    </div>
+                    <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 3 }}>{e.sub}</div>
+                    {/* Avatars */}
+                    <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 0 }}>
+                      {e.initials.map((ini, j) => (
+                        <span key={j} style={{ width: 26, height: 26, borderRadius: 999, background: "#2563eb", color: "#fff", fontSize: 9.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #e8f1fb", marginLeft: j ? -6 : 0 }}>{ini}</span>
+                      ))}
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", marginLeft: 6 }}>+7</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 14px" }}>
+                <div style={{ width: 56, flexShrink: 0, background: "var(--surface-subtle)", borderRadius: 12, padding: "8px 0", textAlign: "center" }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.01em" }}>{e.time}</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--content-minimal)", marginTop: 1 }}>{e.ampm}</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{e.title}</div>
+                  <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </Card>
+    </Widget>);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 7 · NEWS & UPDATES — a trusted colleague's morning note
 // ═══════════════════════════════════════════════════════════════
 function News({ onOpen, onWish }) {
