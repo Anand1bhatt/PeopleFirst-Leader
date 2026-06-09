@@ -936,52 +936,74 @@ function Bookings({ onOpen }) {
 // PROJECTS · View 3 — Dark navy card + carousel
 // ═══════════════════════════════════════════════════════════════
 function PerformanceDark({ onOpen }) {
-  const summary = { total: 74, onTime: 47, delayed: 19, onHold: 8 };
+  const summary = { total: 59, onTime: 30, delayed: 11, onHold: 8 };
   const PROJECTS = [
-    { name: "MyJio App",        pct: 56, trend: -12, status: "Delayed",  statusColor: "#ef4444", statusBg: "rgba(239,68,68,.12)",  ai: "3 sprints behind on payments rewrite." },
-    { name: "MyJio 3.1 revamp", pct: 76, trend: -8,  status: "Delayed",  statusColor: "#ef4444", statusBg: "rgba(239,68,68,.12)",  ai: "On-time delivery slipped 10pts since Feb." },
-    { name: "Jio Translate",    pct: 58, trend: -5,  status: "Delayed",  statusColor: "#ef4444", statusBg: "rgba(239,68,68,.12)",  ai: "Feature completion at 58%, 27pts below target." }
+    { name: "MyJio App",        desc: "Experience of International roaming journey", pct: 74, trend: -12, status: "Critical", statusColor: "#e53935", statusBg: "#fce8e8", due: "Due in 18 days", ai: "3 sprints behind on payments rewrite.", logo: { bg: "#1565c0", text: "Jio" } },
+    { name: "MyJio 3.1 revamp", desc: "Redesign of core app navigation & onboarding", pct: 76, trend: -8,  status: "Delayed",  statusColor: "#e53935", statusBg: "#fce8e8", due: "Due in 24 days", ai: "On-time delivery slipped 10pts since Feb.", logo: { bg: "#1565c0", text: "Jio" } },
+    { name: "Jio Translate",    desc: "Real-time multilingual translation engine",    pct: 58, trend: -5,  status: "Delayed",  statusColor: "#e53935", statusBg: "#fce8e8", due: "Due in 31 days", ai: "Feature completion at 58%, 27pts below target.", logo: { bg: "#6a1b9a", text: "JT" } },
   ];
-  const scrollRef = React.useRef(null);
   const DARK = "#14375e";
+  const SUMMARY_W = 148;
+  const scrollRef = React.useRef(null);
+  const [summaryOpacity, setSummaryOpacity] = React.useState(1);
+  const outerRef = React.useRef(null);
+
+  const handleScroll = (e) => {
+    const sl = e.target.scrollLeft;
+    setSummaryOpacity(Math.max(0, 1 - sl / SUMMARY_W));
+  };
+
   return (
     <Widget icon="analytics" title="Projects" action="All" onAction={onOpen}>
-      <div style={{ borderRadius: 16, overflow: "hidden", background: DARK }}>
-        <div style={{ display: "flex", alignItems: "stretch", overflow: "hidden" }}>
-          {/* Left summary */}
-          <div style={{ width: 144, flexShrink: 0, padding: "18px 14px 18px 16px" }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.55)", letterSpacing: ".02em" }}>All Projects</div>
-            <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
-            {/* Segmented bar */}
-            <div style={{ display: "flex", gap: 3, height: 6, borderRadius: 999, overflow: "hidden", margin: "13px 0 14px" }}>
+      <div ref={outerRef} style={{ borderRadius: 16, overflow: "hidden", background: DARK, position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "stretch" }}>
+          {/* Left summary — fades as cards scroll over */}
+          <div style={{ width: SUMMARY_W, flexShrink: 0, padding: "18px 12px 18px 16px", opacity: summaryOpacity, transition: "opacity .05s linear", pointerEvents: summaryOpacity < 0.1 ? "none" : "auto" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)", letterSpacing: ".02em" }}>All Projects</div>
+            <div style={{ fontSize: 44, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
+            <div style={{ display: "flex", gap: 3, height: 7, borderRadius: 999, overflow: "hidden", margin: "12px 0 13px" }}>
               <div style={{ flex: summary.onTime,  background: "#22c55e" }} />
               <div style={{ flex: summary.delayed, background: "#3b82f6" }} />
               <div style={{ flex: summary.onHold,  background: "#f97316" }} />
             </div>
             {[{ label: "On time", val: summary.onTime, color: "#22c55e" }, { label: "Delayed", val: summary.delayed, color: "#3b82f6" }, { label: "On hold", val: summary.onHold, color: "#f97316" }].map((s) => (
-              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 9 }}>
-                <span style={{ width: 3, height: 14, background: s.color, borderRadius: 999, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.75)", flex: 1 }}>{s.label}</span>
-                <span style={{ fontSize: 17, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+                <span style={{ width: 3, height: 16, background: s.color, borderRadius: 999, flexShrink: 0 }} />
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,.75)", flex: 1 }}>{s.label}</span>
+                <span style={{ fontSize: 18, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
               </div>
             ))}
           </div>
-          {/* Right: scrollable white cards */}
-          <div ref={scrollRef} style={{ flex: 1, overflowX: "auto", display: "flex", gap: 8, padding: "12px 12px 12px 8px", WebkitOverflowScrolling: "touch" }}>
+          {/* Right: scrollable white cards — slide over summary */}
+          <div ref={scrollRef} onScroll={handleScroll} style={{ flex: 1, overflowX: "auto", display: "flex", gap: 10, padding: "12px 12px 12px 10px", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
             {PROJECTS.map((p) => (
-              <div key={p.name} style={{ flex: "0 0 170px", background: "#fff", borderRadius: 14, padding: "12px 11px", display: "flex", flexDirection: "column", gap: 6 }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 6 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--content-heavy)", lineHeight: 1.25, flex: 1 }}>{p.name}</div>
-                  <span style={{ fontSize: 10.5, fontWeight: 700, color: p.statusColor, background: p.statusBg, borderRadius: 999, padding: "2px 7px", whiteSpace: "nowrap" }}>{p.status}</span>
+              <div key={p.name} style={{ flex: "0 0 192px", background: "#fff", borderRadius: 16, display: "flex", flexDirection: "column", overflow: "hidden", scrollSnapAlign: "start", boxShadow: "0 2px 12px rgba(15,23,42,.12)" }}>
+                {/* Card header */}
+                <div style={{ padding: "14px 13px 10px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", lineHeight: 1.25, flex: 1 }}>{p.name}</div>
+                    {/* Project logo */}
+                    <div style={{ width: 34, height: 34, borderRadius: 10, background: p.logo.bg, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontSize: 10, fontWeight: 900, color: "#fff", letterSpacing: "-.01em" }}>{p.logo.text}</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#64748b", marginTop: 5, lineHeight: 1.4 }}>{p.desc}</div>
                 </div>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
-                  <span style={{ fontSize: 30, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--negative)" }}>↓ {Math.abs(p.trend)} pts</span>
+                {/* Divider */}
+                <div style={{ height: 1, background: "#f1f5f9", margin: "0 13px" }} />
+                {/* Metrics */}
+                <div style={{ padding: "10px 13px", flex: 1 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: p.statusColor, background: p.statusBg, borderRadius: 999, padding: "4px 11px", display: "inline-block" }}>{p.status}</span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 8 }}>
+                    <span style={{ fontSize: 34, fontWeight: 900, color: "#0f172a", letterSpacing: "-.04em", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{p.pct}%</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#94a3b8" }}>-{Math.abs(p.trend)} pts</span>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", marginTop: 5 }}>{p.due}</div>
                 </div>
-                <div style={{ flex: 1 }} />
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 5, padding: "6px 8px", borderRadius: 8, background: "var(--sky-light)" }}>
-                  <Icon name="ai_sparkle" size={11} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
-                  <span style={{ fontSize: 11, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.ai}</span>
+                {/* AI comment */}
+                <div style={{ background: "var(--sky-light)", padding: "10px 13px", display: "flex", alignItems: "flex-start", gap: 7 }}>
+                  <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4 }}>{p.ai}</span>
                 </div>
               </div>
             ))}
