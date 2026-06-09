@@ -1138,8 +1138,7 @@ function BookingsV2({ onOpen }) {
                   <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 2 }}>{events[0].title}</div>
                   <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{events[0].desc}</div>
                 </div>
-                {/* Pill visible on sky-light: white bg + blue text */}
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", background: "#fff", borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap", flexShrink: 0, boxShadow: "0 1px 4px rgba(37,99,235,.15)" }}>{events[0].soon}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#1e3a5f", background: "#b8cce8", borderRadius: 999, padding: "5px 12px", whiteSpace: "nowrap", flexShrink: 0 }}>{events[0].soon}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
                 {events[0].avatars.map((src, j) => (
