@@ -1087,9 +1087,9 @@ function RecruitmentList({ onOpen }) {
 // ═══════════════════════════════════════════════════════════════
 function BookingsV2({ onOpen }) {
   const events = [
-    { time: "10:00", ampm: "AM", title: "Q2 Leadership Review", sub: "You present · 12 attendees", desc: "Q2 revenue, hiring plan & org restructure agenda. Slides shared.", soon: "in 1h 8m", featured: true, initials: ["KM","AV","DR","PN"] },
-    { time: "02:30", ampm: "PM", title: "Board readout",        sub: "Boardroom A · prep deck shared", soon: null },
-    { time: "05:00", ampm: "PM", title: "1:1 Karan Mehta",     sub: "Platform team · 30 min", soon: null },
+    { time: "10:00", ampm: "AM", endTime: "11:30", title: "Q2 Leadership Review", sub: "You present · 12 attendees", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...", soon: "in 1h 8m", featured: true, avatarColors: ["#c97b38","#c97b38","#c97b38","#c97b38","#c97b38"] },
+    { time: "02:30", ampm: "PM", title: "Board readout",    sub: "Boardroom A · prep deck shared" },
+    { time: "05:00", ampm: "PM", title: "1:1 Karan Mehta", sub: "Platform team · 30 min" },
   ];
   return (
     <Widget icon="calendar" title="Upcoming" action="Calendar" onAction={onOpen}>
@@ -1097,39 +1097,49 @@ function BookingsV2({ onOpen }) {
         {events.map((e, i) => (
           <div key={e.title + i} style={{ borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
             {e.featured ? (
-              <div style={{ padding: "14px 14px", background: "#e8f1fb" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  {/* Time badge */}
-                  <div style={{ width: 56, flexShrink: 0, background: "#2563eb", borderRadius: 12, padding: "8px 0", textAlign: "center" }}>
-                    <div style={{ fontSize: 15, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.01em" }}>{e.time}</div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,.75)", marginTop: 1 }}>{e.ampm}</div>
+              <div style={{ padding: "16px 14px 14px", background: "#e8f1fb" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                  {/* Left: time badge + connector + end time */}
+                  <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 58 }}>
+                    <div style={{ width: 58, background: "#2563eb", borderRadius: 14, padding: "10px 0 8px", textAlign: "center" }}>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{e.time}</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,.8)", marginTop: 2 }}>{e.ampm}</div>
+                    </div>
+                    {/* Connector */}
+                    <div style={{ width: 2, flex: 1, minHeight: 24, background: "#2563eb", opacity: 0.35 }} />
+                    <div style={{ width: 8, height: 8, borderRadius: 999, background: "#2563eb", opacity: 0.7 }} />
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginTop: 3, opacity: 0.8 }}>{e.endTime}</div>
                   </div>
+                  {/* Right: content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.25 }}>{e.title}</div>
-                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", background: "rgba(37,99,235,.1)", borderRadius: 999, padding: "3px 9px", whiteSpace: "nowrap", flexShrink: 0 }}>{e.soon}</span>
+                      <div style={{ fontSize: 17, fontWeight: 800, color: "#0f172a", letterSpacing: "-.02em", lineHeight: 1.2, flex: 1 }}>{e.title}</div>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", background: "rgba(37,99,235,.13)", borderRadius: 999, padding: "5px 12px", whiteSpace: "nowrap", flexShrink: 0 }}>{e.soon}</span>
                     </div>
-                    <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 3 }}>{e.sub}</div>
-                    {e.desc && <div style={{ fontSize: 12, color: "var(--content-moderate)", marginTop: 6, lineHeight: 1.45, opacity: 0.85 }}>{e.desc}</div>}
-                    {/* Avatars */}
-                    <div style={{ display: "flex", alignItems: "center", marginTop: 10, gap: 0 }}>
-                      {e.initials.map((ini, j) => (
-                        <span key={j} style={{ width: 26, height: 26, borderRadius: 999, background: "#2563eb", color: "#fff", fontSize: 9.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #e8f1fb", marginLeft: j ? -6 : 0 }}>{ini}</span>
+                    <div style={{ fontSize: 13.5, color: "#475569", marginTop: 4 }}>{e.sub}</div>
+                    <div style={{ fontSize: 13, color: "#64748b", marginTop: 8, lineHeight: 1.5 }}>{e.desc}</div>
+                    {/* Avatar stack */}
+                    <div style={{ display: "flex", alignItems: "center", marginTop: 12 }}>
+                      {e.avatarColors.map((c, j) => (
+                        <div key={j} style={{ width: 30, height: 30, borderRadius: 999, background: c, border: "2.5px solid #e8f1fb", marginLeft: j ? -9 : 0, overflow: "hidden", flexShrink: 0 }}>
+                          <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)` }} />
+                        </div>
                       ))}
-                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", marginLeft: 6 }}>+7</span>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "#2563eb", marginLeft: 8 }}>+7</span>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 14px" }}>
-                <div style={{ width: 56, flexShrink: 0, background: "var(--surface-subtle)", borderRadius: 12, padding: "8px 0", textAlign: "center" }}>
-                  <div style={{ fontSize: 15, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.01em" }}>{e.time}</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--content-minimal)", marginTop: 1 }}>{e.ampm}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 14px" }}>
+                {/* Plain time — no box */}
+                <div style={{ flexShrink: 0, textAlign: "center", width: 58 }}>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.03em", lineHeight: 1 }}>{e.time}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--content-minimal)", marginTop: 2 }}>{e.ampm}</div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{e.title}</div>
-                  <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{e.title}</div>
+                  <div style={{ fontSize: 13, color: "var(--content-moderate)", marginTop: 3 }}>{e.sub}</div>
                 </div>
               </div>
             )}
