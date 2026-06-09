@@ -1088,66 +1088,80 @@ function RecruitmentList({ onOpen }) {
 function BookingsV2({ onOpen }) {
   const events = [
     { time: "10:00", ampm: "AM", endTime: "11:30", type: "Meeting", icon: "analytics", title: "Q2 Leadership Review", sub: "You present · 12 attendees", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...", soon: "in 1h 8m", featured: true, avatarColors: ["#c97b38","#c97b38","#c97b38","#c97b38","#c97b38"] },
-    { time: "2:30",  ampm: "PM", type: "Meeting", icon: "group",     title: "1:1 with Karan Mehta", sub: "Platform team · 30 min" },
-    { time: "6:30",  ampm: "PM", type: "Gym",     icon: "time",      title: "Gym slot booked",      sub: "Level 2 · 45 min" },
+    { time: "2:30",  ampm: "PM", type: "Meeting", icon: "group", title: "1:1 with Karan Mehta", sub: "Platform team · 30 min" },
+    { time: "6:30",  ampm: "PM", type: "Gym",     icon: "time",  title: "Gym slot booked",      sub: "Level 2 · 45 min" },
   ];
+  const { expanded, ref: sectionRef } = useStackReveal();
   return (
     <Widget icon="calendar" title="Upcoming" action="Calendar" onAction={onOpen}>
-      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
-        {events.map((e, i) => (
-          <div key={e.title + i} style={{ borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
-            {e.featured ? (
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px 14px", background: "var(--sky-light)", borderRadius: 14, margin: "8px 8px 0", cursor: "pointer", transition: "transform .12s ease, box-shadow .12s ease", boxShadow: "0 2px 8px rgba(37,99,235,.10)" }} onPointerDown={ev => { ev.currentTarget.style.transform="scale(.97)"; ev.currentTarget.style.boxShadow="0 1px 4px rgba(37,99,235,.08)"; }} onPointerUp={ev => { ev.currentTarget.style.transform=""; ev.currentTarget.style.boxShadow="0 2px 8px rgba(37,99,235,.10)"; }} onPointerLeave={ev => { ev.currentTarget.style.transform=""; ev.currentTarget.style.boxShadow="0 2px 8px rgba(37,99,235,.10)"; }}>
-                {/* Left: time badge + connector + end time */}
-                <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 54 }}>
-                  <div style={{ width: 54, background: "#2563eb", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.85)", marginTop: 1 }}>{e.ampm}</div>
-                  </div>
-                  <div style={{ width: 2, flex: 1, minHeight: 20, background: "#2563eb", opacity: 0.4, marginTop: 3 }} />
-                  <div style={{ width: 7, height: 7, borderRadius: 999, background: "#2563eb", opacity: 0.65 }} />
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", marginTop: 3 }}>{e.endTime}</div>
-                </div>
-                {/* Right: content directly on light-blue bg */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: ".03em" }}>
-                        <Icon name={e.icon} size={13} color="#64748b" />{e.type}
-                      </span>
-                      <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 2 }}>{e.title}</div>
-                      <div style={{ fontSize: 12.5, color: "#475569", marginTop: 2 }}>{e.sub}</div>
-                      <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{e.desc}</div>
-                    </div>
-                    <Signal tone="info" dot={false} style={{ flexShrink: 0 }}>{e.soon}</Signal>
-                  </div>
-                  {/* Avatar stack */}
-                  <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-                    {e.avatarColors.map((c, j) => (
-                      <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
-                    ))}
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginLeft: 7 }}>+7</span>
-                  </div>
-                </div>
+      <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
+        {/* Peek back */}
+        <div style={{ position: "absolute", bottom: 0, left: 12, right: 12, height: 22, background: "var(--surface-subtle)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.9 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 280ms, transform .4s ease 280ms", pointerEvents: "none", zIndex: 1 }} />
+        {/* Peek middle */}
+        <div style={{ position: "absolute", bottom: 9, left: 6, right: 6, height: 22, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 1px 4px rgba(15,23,42,.06)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.95 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 200ms, transform .4s ease 200ms", pointerEvents: "none", zIndex: 2 }} />
+        {/* Foreground card */}
+        <div style={{ position: "relative", zIndex: 3, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)", overflow: "hidden" }}>
+          {/* Featured event — always visible */}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px", background: "var(--sky-light)", cursor: "pointer", transition: "transform .12s ease, filter .12s ease" }}
+            onPointerDown={ev => { ev.currentTarget.style.transform = "scale(.97)"; ev.currentTarget.style.filter = "brightness(.96)"; }}
+            onPointerUp={ev => { ev.currentTarget.style.transform = ""; ev.currentTarget.style.filter = ""; }}
+            onPointerLeave={ev => { ev.currentTarget.style.transform = ""; ev.currentTarget.style.filter = ""; }}>
+            {/* Left: time badge + connector + end time */}
+            <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 54 }}>
+              <div style={{ width: 54, background: "#2563eb", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
+                <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{events[0].time}</div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.85)", marginTop: 1 }}>{events[0].ampm}</div>
               </div>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", background: "var(--surface-minimal)" }}>
-                <div style={{ width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11, background: "var(--surface-subtle)", color: "var(--content-heavy)" }}>
-                  <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, opacity: .6, marginTop: 1 }}>{e.ampm}</div>
-                </div>
+              <div style={{ width: 2, flex: 1, minHeight: 20, background: "#2563eb", opacity: 0.35, marginTop: 3 }} />
+              <div style={{ width: 7, height: 7, borderRadius: 999, background: "#2563eb", opacity: 0.6 }} />
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", marginTop: 3 }}>{events[0].endTime}</div>
+            </div>
+            {/* Right content */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".03em" }}>
-                    <Icon name={e.icon} size={13} color="var(--content-minimal)" />{e.type}
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--sky-ink)", textTransform: "uppercase", letterSpacing: ".03em" }}>
+                    <Icon name={events[0].icon} size={13} color="var(--sky-ink)" />{events[0].type}
                   </span>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{e.title}</div>
-                  <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 2 }}>{events[0].title}</div>
+                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 2 }}>{events[0].sub}</div>
+                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{events[0].desc}</div>
+                </div>
+                {/* Pill visible on sky-light: white bg + blue text */}
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", background: "#fff", borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap", flexShrink: 0, boxShadow: "0 1px 4px rgba(37,99,235,.15)" }}>{events[0].soon}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+                {events[0].avatarColors.map((c, j) => (
+                  <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
+                ))}
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginLeft: 7 }}>+7</span>
+              </div>
+            </div>
+          </div>
+          {/* Events 2+3 — expand on scroll */}
+          {events.slice(1).map((e, i) => (
+            <div key={e.title} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(1 - i) * 50}ms` }}>
+              <div style={{ minHeight: 0 }}>
+                <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-8px)", transition: expanded ? `opacity .38s ease ${i * 70 + 160}ms, transform .42s cubic-bezier(.4,0,.2,1) ${i * 70 + 110}ms` : "opacity .22s ease 0ms, transform .28s ease 0ms" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "var(--surface-minimal)" }}>
+                    <div style={{ width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11, background: "var(--surface-subtle)", color: "var(--content-heavy)" }}>
+                      <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, opacity: .6, marginTop: 1 }}>{e.ampm}</div>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".03em" }}>
+                        <Icon name={e.icon} size={13} color="var(--content-minimal)" />{e.type}
+                      </span>
+                      <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{e.title}</div>
+                      <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
-      </Card>
+            </div>
+          ))}
+        </div>
+      </div>
     </Widget>);
 }
 
