@@ -1097,7 +1097,7 @@ function BookingsV2({ onOpen }) {
         {events.map((e, i) => (
           <div key={e.title + i} style={{ borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
             {e.featured ? (
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px 14px", background: "#ddeeff", borderRadius: 14, margin: "8px 8px 0" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px 14px", background: "var(--sky-light)", borderRadius: 14, margin: "8px 8px 0", cursor: "pointer", transition: "transform .12s ease, box-shadow .12s ease", boxShadow: "0 2px 8px rgba(37,99,235,.10)" }} onPointerDown={ev => { ev.currentTarget.style.transform="scale(.97)"; ev.currentTarget.style.boxShadow="0 1px 4px rgba(37,99,235,.08)"; }} onPointerUp={ev => { ev.currentTarget.style.transform=""; ev.currentTarget.style.boxShadow="0 2px 8px rgba(37,99,235,.10)"; }} onPointerLeave={ev => { ev.currentTarget.style.transform=""; ev.currentTarget.style.boxShadow="0 2px 8px rgba(37,99,235,.10)"; }}>
                 {/* Left: time badge + connector + end time */}
                 <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 54 }}>
                   <div style={{ width: 54, background: "#2563eb", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
@@ -1124,7 +1124,7 @@ function BookingsV2({ onOpen }) {
                   {/* Avatar stack */}
                   <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
                     {e.avatarColors.map((c, j) => (
-                      <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid #ddeeff", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
+                      <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
                     ))}
                     <span style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginLeft: 7 }}>+7</span>
                   </div>
