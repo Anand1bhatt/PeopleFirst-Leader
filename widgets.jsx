@@ -997,55 +997,67 @@ function PerformanceDark({ onOpen }) {
 function TeamsToday({ onOpen }) {
   const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
   const presencePct = Math.round(present / total * 100);
-  const rows = [
-    { label: "Present",  val: present, color: "#22c55e", bg: "#dcfce7", barFull: true },
-    { label: "On Leave", val: leave,   color: "#f97316", bg: "#fed7aa" },
-    { label: "Not in",   val: notIn,   color: "#ef4444", bg: "#fee2e2" },
-    { label: "WO/PH",    val: woph,    color: "#b0b8c4", bg: "#e5e7eb" },
+  const otherRows = [
+    { label: "On Leave", val: leave,  color: "#f97316", bg: "#f5a051" },
+    { label: "Not in",   val: notIn,  color: "#ef4444", bg: "#ef4444" },
+    { label: "WO/PH",    val: woph,   color: "#b0b8c4", bg: "#c8cdd4" },
   ];
-  const DARK = "#14375e";
+  const DARK = "#0d5070";
+  const { expanded, ref: sectionRef } = useStackReveal();
   return (
     <Widget icon="group" title="Team today" action="Team" onAction={() => onOpen()}>
-      <Card surface="elev" pad={0} style={{ overflow: "hidden" }}>
-        {/* Dark header */}
-        <div style={{ background: DARK, padding: "16px 16px 18px" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 0 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.55)" }}>Headcount</div>
-              <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>{total}</div>
-            </div>
-            <div style={{ width: 1, background: "rgba(255,255,255,.15)", alignSelf: "stretch", margin: "0 14px" }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.55)" }}>Presence rate</div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "#22c55e", letterSpacing: "-.03em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>{presencePct}</div>
-            </div>
-            <div style={{ width: 1, background: "rgba(255,255,255,.15)", alignSelf: "stretch", margin: "0 14px" }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.55)" }}>vs yesterday</div>
-              <div style={{ fontSize: 28, fontWeight: 900, color: "#22c55e", letterSpacing: "-.03em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>↑ 3</div>
+      <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
+        {/* Peek back */}
+        <div style={{ position: "absolute", bottom: 0, left: 12, right: 12, height: 22, background: "var(--surface-subtle)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.9 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 280ms, transform .4s ease 280ms", pointerEvents: "none", zIndex: 1 }} />
+        {/* Peek middle */}
+        <div style={{ position: "absolute", bottom: 9, left: 6, right: 6, height: 22, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 1px 4px rgba(15,23,42,.06)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.95 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 200ms, transform .4s ease 200ms", pointerEvents: "none", zIndex: 2 }} />
+        {/* Foreground card */}
+        <div style={{ position: "relative", zIndex: 3, borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 10px rgba(15,23,42,.08)", border: "1px solid var(--stroke-minimal)" }}>
+          {/* Dark header */}
+          <div style={{ background: DARK, padding: "20px 18px 22px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start" }}>
+              {/* Headcount — larger, left-aligned */}
+              <div style={{ flex: 1.2 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", letterSpacing: ".01em" }}>Headcount</div>
+                <div style={{ fontSize: 40, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{total}</div>
+              </div>
+              {/* Presence rate */}
+              <div style={{ flex: 1, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", letterSpacing: ".01em" }}>Presence rate</div>
+                <div style={{ fontSize: 40, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}</div>
+              </div>
+              {/* vs yesterday */}
+              <div style={{ flex: 1, textAlign: "right" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.7)", letterSpacing: ".01em" }}>vs yesterday</div>
+                <div style={{ fontSize: 40, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3</div>
+              </div>
             </div>
           </div>
-        </div>
-        {/* White body with rows */}
-        <div style={{ padding: "12px 14px 14px" }}>
-          {rows.map((r, i) => (
-            <button key={r.label} onClick={() => onOpen(r.label)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderTop: i ? "1px solid var(--stroke-minimal)" : "none", background: "none", border: "none", borderTopWidth: i ? 1 : 0, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit" }}>
-              {r.barFull ? (
-                <div style={{ flex: 1, background: r.color, borderRadius: 10, padding: "7px 12px", display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 20, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{r.val}</span>
-                  <span style={{ fontSize: 13.5, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{r.label}</span>
+          {/* White body */}
+          <div style={{ background: "#fff", padding: "14px 14px 6px" }}>
+            {/* Present full-width green bar */}
+            <div style={{ background: "#3ec93e", borderRadius: 12, padding: "11px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 4 }}>
+              <span style={{ fontSize: 24, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{present}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,.9)" }}>Present</span>
+            </div>
+            {/* Other rows — expand on scroll */}
+            {otherRows.map((r, i) => (
+              <div key={r.label} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(2 - i) * 50}ms` }}>
+                <div style={{ minHeight: 0 }}>
+                  <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-6px)", transition: expanded ? `opacity .35s ease ${i * 70 + 120}ms, transform .4s cubic-bezier(.4,0,.2,1) ${i * 70 + 80}ms` : "opacity .2s ease, transform .25s ease" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "11px 2px", borderTop: "1px solid #f1f3f6" }}>
+                      <div style={{ width: 76, height: 46, borderRadius: 12, background: r.bg, flexShrink: 0 }} />
+                      <span style={{ fontSize: 22, fontWeight: 900, color: "#0f172a", fontVariantNumeric: "tabular-nums", minWidth: 28 }}>{r.val}</span>
+                      <span style={{ fontSize: 14, fontWeight: 500, color: "#64748b" }}>{r.label}</span>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <React.Fragment>
-                  <span style={{ width: 40, height: 36, borderRadius: 10, background: r.bg, flexShrink: 0 }} />
-                  <span style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", minWidth: 32 }}>{r.val}</span>
-                  <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--content-moderate)" }}>{r.label}</span>
-                </React.Fragment>
-              )}
-            </button>
-          ))}
+              </div>
+            ))}
+            <div style={{ height: 8 }} />
+          </div>
         </div>
-      </Card>
+      </div>
     </Widget>);
 }
 
