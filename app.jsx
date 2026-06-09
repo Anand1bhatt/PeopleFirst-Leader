@@ -1,6 +1,6 @@
 /* global React, IOSDevice, Icon, ColorIcon, Button, Card, Signal, Dot,
    AIBriefing, Performance, CriticalProjectsCards, PerformanceDark, ExpenseBudget, ExpenseBudgetBars, ExpenseBudgetDonut, ActionItems, TeamSnapshot, Recruitment, RecruitmentList, Bookings, BookingsV2, News,
-   TeamsGauge, TeamsHeadcount, TeamsToday,
+   TeamsGauge, TeamsHeadcount, TeamsToday, TeamsAttendance,
    ApprovalsScreen, TeamScreen, ReportsScreen, MoreScreen, PROFILES, ProfileScreen, ChatScreen,
    SplashScreen, HomeSkeleton,
    EmpBrief, Attendance, QuickLinks, BookingsEmp, Tasks, LeaveBalance, PayBenefits, EmpNews, RefersCard,
@@ -309,6 +309,7 @@ function App() {
             {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
             {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
             {wOn("teams_today", false) && <TeamsToday onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
+            {wOn("teams_attendance", false) && <TeamsAttendance onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
             {wOn("recruitment", true) && <Recruitment onOpen={() => go("more")} />}
             {wOn("recruitment_v2", false) && <RecruitmentList onOpen={() => go("more")} />}
             {wOn("upcoming", true) && <Bookings onOpen={() => flash("Opening calendar")} />}

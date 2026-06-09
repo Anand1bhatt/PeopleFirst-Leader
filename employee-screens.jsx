@@ -342,7 +342,8 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
       children: [
         { key: "teams_gauge",     label: "Gauge view",    desc: "Semicircle + 2×2 grid", def: true },
         { key: "teams_headcount", label: "Headcount view", desc: "Large number + progress + grid", def: false },
-        { key: "teams_today",     label: "Team Today",    desc: "Dark header + colour-coded list", def: false },
+        { key: "teams_today",       label: "Team Today",      desc: "Dark header + colour-coded list", def: false },
+        { key: "teams_attendance",  label: "Attendance bars", desc: "KPI header + proportional bars",  def: false },
       ]
     },
     {

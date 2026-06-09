@@ -1095,6 +1095,63 @@ function RecruitmentList({ onOpen }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// TEAMS · View 4 — Attendance summary (proportional bars)
+// ═══════════════════════════════════════════════════════════════
+function TeamsAttendance({ onOpen }) {
+  const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
+  const presencePct = Math.round(present / total * 100);
+  const categories = [
+    { label: "Present",  val: present, color: "#22c55e", bg: "#f0fdf4", textColor: "#15803d" },
+    { label: "On Leave", val: leave,   color: "#f97316", bg: "#fff7ed", textColor: "#c2410c" },
+    { label: "Not In",   val: notIn,   color: "#ef4444", bg: "#fef2f2", textColor: "#b91c1c" },
+    { label: "WO / PH",  val: woph,    color: "#94a3b8", bg: "#f8fafc", textColor: "#475569" },
+  ];
+  const TEAL = "#0d5070";
+  return (
+    <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
+      <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
+        {/* ── Section 1: Executive KPI Header ── */}
+        <div style={{ background: TEAL, padding: "20px 18px 24px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)", letterSpacing: ".02em" }}>Headcount</div>
+              <div style={{ fontSize: 38, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 5, fontVariantNumeric: "tabular-nums" }}>{total}</div>
+            </div>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)", letterSpacing: ".02em" }}>Presence rate</div>
+              <div style={{ fontSize: 38, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 5, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
+            </div>
+            <div style={{ flex: 1, textAlign: "right" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)", letterSpacing: ".02em" }}>vs yesterday</div>
+              <div style={{ fontSize: 38, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 5, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
+            </div>
+          </div>
+        </div>
+        {/* ── Section 2: Attendance Breakdown with proportional bars ── */}
+        <div style={{ background: "#fff", padding: "16px 16px 12px" }}>
+          {categories.map((c, i) => {
+            const pct = Math.round(c.val / total * 100);
+            return (
+              <div key={c.label} style={{ marginBottom: i < categories.length - 1 ? 14 : 4 }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#475569" }}>{c.label}</span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
+                    <span style={{ fontSize: 20, fontWeight: 900, color: "#0f172a", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{c.val}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 600, color: "#94a3b8" }}>{pct}%</span>
+                  </div>
+                </div>
+                <div style={{ height: 10, borderRadius: 999, background: "#f1f5f9", overflow: "hidden" }}>
+                  <div className="anim-bar" style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: c.color }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </Widget>);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // UPCOMING · View 2 — Time-block calendar style
 // ═══════════════════════════════════════════════════════════════
 function BookingsV2({ onOpen }) {
