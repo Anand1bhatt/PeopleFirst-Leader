@@ -942,7 +942,7 @@ function PerformanceDark({ onOpen }) {
     { name: "MyJio 3.1 revamp", desc: "Redesign of core app navigation & onboarding", pct: 76, trend: -8,  status: "Delayed",  trendColor: "#f97316", statusColor: "#e53935", statusBg: "#fce8e8", due: "Due in 24 days", ai: "On-time delivery slipped 10pts since Feb.", logo: { bg: "#1565c0", text: "Jio" } },
     { name: "Jio Translate",    desc: "Real-time multilingual translation engine",     pct: 58, trend: -5,  status: "Delayed",  trendColor: "#f97316", statusColor: "#e53935", statusBg: "#fce8e8", due: "Due in 31 days", ai: "Feature completion at 58%, 27pts below target.", logo: { bg: "#6a1b9a", text: "JT" } },
   ];
-  const DARK = "#14375e";
+  const DARK = "#0d5070";
   const SUMMARY_W = 144;
   const CARD_W = 196;
   const [summaryOpacity, setSummaryOpacity] = React.useState(1);
@@ -963,7 +963,7 @@ function PerformanceDark({ onOpen }) {
         <div onScroll={handleScroll} style={{ display: "flex", overflowX: "auto", overflowY: "visible", WebkitOverflowScrolling: "touch", paddingBottom: 16 }}>
 
           {/* Summary — sticky left:0, center-aligned, fades as cards cover it */}
-          <div style={{ position: "sticky", left: 0, flexShrink: 0, width: SUMMARY_W, zIndex: 1, background: DARK, opacity: summaryOpacity, transition: "opacity .08s linear", pointerEvents: summaryOpacity < 0.15 ? "none" : "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "18px 10px 18px 14px", textAlign: "center" }}>
+          <div style={{ position: "sticky", left: 0, flexShrink: 0, width: SUMMARY_W, zIndex: 1, background: DARK, opacity: summaryOpacity, transition: "opacity .08s linear", pointerEvents: summaryOpacity < 0.15 ? "none" : "auto", display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "center", padding: "18px 10px 18px 16px" }}>
             <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.55)", letterSpacing: ".06em", textTransform: "uppercase" }}>All Projects</div>
             <div style={{ fontSize: 48, fontWeight: 900, color: "#fff", letterSpacing: "-.05em", lineHeight: 1, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
             <div style={{ display: "flex", gap: 3, height: 6, borderRadius: 999, overflow: "hidden", margin: "11px 0 14px", width: "100%" }}>
@@ -972,10 +972,10 @@ function PerformanceDark({ onOpen }) {
               <div style={{ flex: summary.onHold,  background: "#f97316" }} />
             </div>
             {[{ label: "On time", val: summary.onTime, color: "#22c55e" }, { label: "Delayed", val: summary.delayed, color: "#3b82f6" }, { label: "On hold", val: summary.onHold, color: "#f97316" }].map((s) => (
-              <div key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginBottom: 8 }}>
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 8 }}>
                 <span style={{ width: 7, height: 7, borderRadius: 999, background: s.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>{s.label}</span>
-                <span style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", marginLeft: 2 }}>{s.val}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.7)", flex: 1 }}>{s.label}</span>
+                <span style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
               </div>
             ))}
           </div>
