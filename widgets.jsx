@@ -1157,7 +1157,7 @@ function BookingsV2({ onOpen }) {
             <div key={e.title} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(1 - i) * 50}ms` }}>
               <div style={{ minHeight: 0 }}>
                 <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-8px)", transition: expanded ? `opacity .38s ease ${i * 70 + 160}ms, transform .42s cubic-bezier(.4,0,.2,1) ${i * 70 + 110}ms` : "opacity .22s ease 0ms, transform .28s ease 0ms" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", borderTop: "1px solid var(--stroke-minimal)", background: "var(--surface-minimal)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", borderTop: i > 0 ? "1px solid var(--stroke-minimal)" : "none", background: "var(--surface-minimal)" }}>
                     <div style={{ width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11, background: "var(--surface-subtle)", color: "var(--content-heavy)" }}>
                       <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
                       <div style={{ fontSize: 10.5, fontWeight: 700, opacity: .6, marginTop: 1 }}>{e.ampm}</div>
