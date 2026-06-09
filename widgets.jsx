@@ -1114,37 +1114,41 @@ function BookingsV2({ onOpen }) {
         {/* Foreground card */}
         <div style={{ position: "relative", zIndex: 3, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)", overflow: "hidden" }}>
           {/* Featured event — always visible */}
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px", background: "var(--sky-light)", cursor: "pointer", transition: "transform .12s ease, filter .12s ease" }}
+          <div style={{ margin: "10px 10px 0", background: "var(--sky-light)", borderRadius: 14, border: "1px solid var(--sky-border)", overflow: "hidden", cursor: "pointer", transition: "transform .12s ease, filter .12s ease" }}
             onPointerDown={ev => { ev.currentTarget.style.transform = "scale(.97)"; ev.currentTarget.style.filter = "brightness(.96)"; }}
             onPointerUp={ev => { ev.currentTarget.style.transform = ""; ev.currentTarget.style.filter = ""; }}
             onPointerLeave={ev => { ev.currentTarget.style.transform = ""; ev.currentTarget.style.filter = ""; }}>
-            {/* Left: time badge + connector + end time */}
-            <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 54 }}>
-              <div style={{ width: 54, background: "#2563eb", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
-                <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{events[0].time}</div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.85)", marginTop: 1 }}>{events[0].ampm}</div>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 13, padding: "14px 13px" }}>
+              {/* Left: time badge + connector + end time */}
+              <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", width: 54 }}>
+                <div style={{ width: 54, background: "#062FBA", borderRadius: 11, padding: "8px 0", textAlign: "center" }}>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{events[0].time}</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "rgba(255,255,255,.85)", marginTop: 1 }}>{events[0].ampm}</div>
+                </div>
+                <div style={{ width: 2, flex: 1, minHeight: 20, background: "#062FBA", opacity: 0.4, marginTop: 3 }} />
+                <div style={{ width: 7, height: 7, borderRadius: 999, background: "#062FBA", opacity: 0.65 }} />
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#062FBA", marginTop: 3 }}>{events[0].endTime}</div>
               </div>
-              <div style={{ width: 2, flex: 1, minHeight: 20, background: "#2563eb", opacity: 0.35, marginTop: 3 }} />
-              <div style={{ width: 7, height: 7, borderRadius: 999, background: "#2563eb", opacity: 0.6 }} />
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", marginTop: 3 }}>{events[0].endTime}</div>
-            </div>
-            {/* Right content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Right content */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {/* Row 1: type label + pill */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "var(--sky-ink)", textTransform: "uppercase", letterSpacing: ".03em" }}>
                     <Icon name={events[0].icon} size={13} color="var(--sky-ink)" />{events[0].type}
                   </span>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 2 }}>{events[0].title}</div>
-                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{events[0].desc}</div>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#1e3a5f", background: "#b8cce8", borderRadius: 999, padding: "5px 12px", whiteSpace: "nowrap", flexShrink: 0 }}>{events[0].soon}</span>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#1e3a5f", background: "#b8cce8", borderRadius: 999, padding: "5px 12px", whiteSpace: "nowrap", flexShrink: 0 }}>{events[0].soon}</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-                {events[0].avatars.map((src, j) => (
-                  <img key={j} src={src} alt="" style={{ width: 26, height: 26, borderRadius: 999, objectFit: "cover", border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0, display: "block" }} />
-                ))}
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginLeft: 7 }}>+7</span>
+                {/* Row 2: title */}
+                <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 3 }}>{events[0].title}</div>
+                {/* Row 3: description full width, 2 lines */}
+                <div style={{ fontSize: 12.5, color: "#475569", marginTop: 6, lineHeight: 1.55, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{events[0].desc}</div>
+                {/* Avatars */}
+                <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+                  {events[0].avatars.map((src, j) => (
+                    <img key={j} src={src} alt="" style={{ width: 26, height: 26, borderRadius: 999, objectFit: "cover", border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0, display: "block" }} />
+                  ))}
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#062FBA", marginLeft: 7 }}>+7</span>
+                </div>
               </div>
             </div>
           </div>
