@@ -943,74 +943,75 @@ function PerformanceDark({ onOpen }) {
     { name: "Jio Translate",    desc: "Real-time multilingual translation engine",     pct: 58, trend: -5,  status: "Delayed",  trendColor: "#f97316", statusColor: "#e53935", statusBg: "#fce8e8", due: "Due in 31 days", ai: "Feature completion at 58%, 27pts below target.", logo: { bg: "#6a1b9a", text: "JT" } },
   ];
   const DARK = "#14375e";
-  const SUMMARY_W = 148;
-  const CARD_W = 192;
-  const scrollRef = React.useRef(null);
+  const SUMMARY_W = 144;
+  const CARD_W = 196;
   const [summaryOpacity, setSummaryOpacity] = React.useState(1);
 
   const handleScroll = (e) => {
-    setSummaryOpacity(Math.max(0, 1 - e.target.scrollLeft / (SUMMARY_W * 0.85)));
+    setSummaryOpacity(Math.max(0, 1 - e.target.scrollLeft / (SUMMARY_W * 0.75)));
   };
 
   return (
     <Widget icon="analytics" title="Projects" action="All" onAction={onOpen}>
       {/*
-        KEY: summary is position:sticky left:0, solid DARK bg, z-index:1.
-        Cards z-index:2 — physically slide over and cover summary.
-        Opacity fades summary as cards cover it → premium layered depth.
-        No overflow:hidden on outer — breaks sticky.
+        Overlay trick: outer clips with overflow:hidden + borderRadius.
+        Inner scroll container has overflowX:auto — sticky is relative to IT, not outer.
+        Summary: position:sticky left:0 zIndex:1, solid DARK bg fills behind.
+        Cards: zIndex:2, no gap from summary — physically slide over it.
       */}
-      <div style={{ background: DARK, borderRadius: 16 }}>
-        <div ref={scrollRef} onScroll={handleScroll} style={{ display: "flex", gap: 10, overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch", padding: "16px 12px 16px 0" }}>
+      <div style={{ background: DARK, borderRadius: 16, overflow: "hidden" }}>
+        <div onScroll={handleScroll} style={{ display: "flex", overflowX: "auto", overflowY: "visible", WebkitOverflowScrolling: "touch", paddingBottom: 16 }}>
 
-          {/* Summary — sticky left, fades as cards slide over */}
-          <div style={{ position: "sticky", left: 0, flexShrink: 0, width: SUMMARY_W, zIndex: 1, background: DARK, opacity: summaryOpacity, transition: "opacity .06s linear", pointerEvents: summaryOpacity < 0.2 ? "none" : "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 12px 0 16px", textAlign: "center" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.6)", letterSpacing: ".02em" }}>All Projects</div>
-            <div style={{ fontSize: 44, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
-            <div style={{ display: "flex", gap: 3, height: 7, borderRadius: 999, overflow: "hidden", margin: "12px 0 13px", width: "100%" }}>
+          {/* Summary — sticky left:0, center-aligned, fades as cards cover it */}
+          <div style={{ position: "sticky", left: 0, flexShrink: 0, width: SUMMARY_W, zIndex: 1, background: DARK, opacity: summaryOpacity, transition: "opacity .08s linear", pointerEvents: summaryOpacity < 0.15 ? "none" : "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "18px 10px 18px 14px", textAlign: "center" }}>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.55)", letterSpacing: ".06em", textTransform: "uppercase" }}>All Projects</div>
+            <div style={{ fontSize: 48, fontWeight: 900, color: "#fff", letterSpacing: "-.05em", lineHeight: 1, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
+            <div style={{ display: "flex", gap: 3, height: 6, borderRadius: 999, overflow: "hidden", margin: "11px 0 14px", width: "100%" }}>
               <div style={{ flex: summary.onTime,  background: "#22c55e" }} />
               <div style={{ flex: summary.delayed, background: "#3b82f6" }} />
               <div style={{ flex: summary.onHold,  background: "#f97316" }} />
             </div>
             {[{ label: "On time", val: summary.onTime, color: "#22c55e" }, { label: "Delayed", val: summary.delayed, color: "#3b82f6" }, { label: "On hold", val: summary.onHold, color: "#f97316" }].map((s) => (
-              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 9, width: "100%" }}>
-                <span style={{ width: 3, height: 16, background: s.color, borderRadius: 999, flexShrink: 0 }} />
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,.75)", flex: 1 }}>{s.label}</span>
-                <span style={{ fontSize: 18, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
+              <div key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, marginBottom: 8 }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: s.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>{s.label}</span>
+                <span style={{ fontSize: 16, fontWeight: 900, color: "#fff", fontVariantNumeric: "tabular-nums", marginLeft: 2 }}>{s.val}</span>
               </div>
             ))}
           </div>
 
-          {/* Cards — z-index:2, slide over summary creating depth */}
-          {PROJECTS.map((p, idx) => (
-            <div key={p.name} style={{ flex: `0 0 ${CARD_W}px`, flexShrink: 0, marginLeft: idx === 0 ? 8 : 0, position: "relative", zIndex: 2, background: "#fff", borderRadius: 16, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 4px 20px rgba(10,20,50,.25)" }}>
-              {/* Header */}
-              <div style={{ padding: "13px 13px 10px" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", lineHeight: 1.25, flex: 1 }}>{p.name}</div>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: p.logo.bg, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 10, fontWeight: 900, color: "#fff" }}>{p.logo.text}</span>
+          {/* Cards — zIndex:2, start flush with summary edge, slide over it */}
+          <div style={{ display: "flex", gap: 10, padding: "16px 14px 0 8px", flexShrink: 0 }}>
+            {PROJECTS.map((p) => (
+              <div key={p.name} style={{ width: CARD_W, flexShrink: 0, position: "relative", zIndex: 2, background: "#fff", borderRadius: 16, display: "flex", flexDirection: "column", overflow: "hidden", boxShadow: "0 6px 24px rgba(5,15,40,.35)" }}>
+                {/* Header */}
+                <div style={{ padding: "13px 13px 10px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#0f172a", lineHeight: 1.25, flex: 1 }}>{p.name}</div>
+                    <div style={{ width: 34, height: 34, borderRadius: 10, background: p.logo.bg, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontSize: 10, fontWeight: 900, color: "#fff" }}>{p.logo.text}</span>
+                    </div>
                   </div>
+                  <div style={{ fontSize: 12, color: "#64748b", marginTop: 5, lineHeight: 1.4 }}>{p.desc}</div>
                 </div>
-                <div style={{ fontSize: 12, color: "#64748b", marginTop: 5, lineHeight: 1.4 }}>{p.desc}</div>
-              </div>
-              <div style={{ height: 1, background: "#f1f5f9", margin: "0 13px" }} />
-              {/* Metrics */}
-              <div style={{ padding: "10px 13px", flex: 1 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: p.statusColor, background: p.statusBg, borderRadius: 999, padding: "4px 11px", display: "inline-block" }}>{p.status}</span>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 8 }}>
+                <div style={{ height: 1, background: "#f1f5f9", margin: "0 13px" }} />
+                {/* Metrics */}
+                <div style={{ padding: "10px 13px", flex: 1 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: p.statusColor, background: p.statusBg, borderRadius: 999, padding: "4px 11px", display: "inline-block" }}>{p.status}</span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 8 }}>
                     <span style={{ fontSize: 34, fontWeight: 900, color: "#0f172a", letterSpacing: "-.04em", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{p.pct}%</span>
                     <span style={{ fontSize: 12.5, fontWeight: 700, color: p.trendColor }}>↓ {Math.abs(p.trend)} pts</span>
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", marginTop: 5 }}>{p.due}</div>
+                </div>
+                {/* AI comment */}
+                <div style={{ background: "var(--sky-light)", padding: "10px 13px", display: "flex", alignItems: "flex-start", gap: 7 }}>
+                  <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4 }}>{p.ai}</span>
+                </div>
               </div>
-              {/* AI comment */}
-              <div style={{ background: "var(--sky-light)", padding: "10px 13px", display: "flex", alignItems: "flex-start", gap: 7 }}>
-                <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.4 }}>{p.ai}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </Widget>);
