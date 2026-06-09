@@ -1095,57 +1095,67 @@ function RecruitmentList({ onOpen }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// TEAMS · View 4 — Attendance summary (proportional bars)
+// TEAMS · View 4 — Attendance summary (segmented bar + grid cards)
 // ═══════════════════════════════════════════════════════════════
 function TeamsAttendance({ onOpen }) {
   const total = 250, present = 204, leave = 20, notIn = 10, woph = 16;
   const presencePct = Math.round(present / total * 100);
-  const categories = [
-    { label: "Present",  val: present, color: "#22c55e", bg: "#f0fdf4", textColor: "#15803d" },
-    { label: "On Leave", val: leave,   color: "#f97316", bg: "#fff7ed", textColor: "#c2410c" },
-    { label: "Not In",   val: notIn,   color: "#ef4444", bg: "#fef2f2", textColor: "#b91c1c" },
-    { label: "WO / PH",  val: woph,    color: "#94a3b8", bg: "#f8fafc", textColor: "#475569" },
+  const cats = [
+    { label: "Present",  val: present, color: "#3dc93d" },
+    { label: "On Leave", val: leave,   color: "#f97316" },
+    { label: "Not in",   val: notIn,   color: "#ef4444" },
+    { label: "WO/PH",    val: woph,    color: "#c8cdd4" },
   ];
   const TEAL = "#0d5070";
+  const { expanded, ref: sectionRef } = useStackReveal();
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
-      <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
-        {/* ── Section 1: Executive KPI Header ── */}
-        <div style={{ background: TEAL, padding: "20px 18px 24px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start" }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)", letterSpacing: ".02em" }}>Headcount</div>
-              <div style={{ fontSize: 38, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 5, fontVariantNumeric: "tabular-nums" }}>{total}</div>
-            </div>
-            <div style={{ flex: 1, textAlign: "center" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)", letterSpacing: ".02em" }}>Presence rate</div>
-              <div style={{ fontSize: 38, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 5, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
-            </div>
-            <div style={{ flex: 1, textAlign: "right" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,.65)", letterSpacing: ".02em" }}>vs yesterday</div>
-              <div style={{ fontSize: 38, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 5, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
+      <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
+        {/* Peek cards */}
+        <div style={{ position: "absolute", bottom: 0, left: 12, right: 12, height: 22, background: "var(--surface-subtle)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.9 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 280ms, transform .4s ease 280ms", pointerEvents: "none", zIndex: 1 }} />
+        <div style={{ position: "absolute", bottom: 9, left: 6, right: 6, height: 22, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 1px 4px rgba(15,23,42,.06)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.95 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 200ms, transform .4s ease 200ms", pointerEvents: "none", zIndex: 2 }} />
+        {/* Main card */}
+        <div style={{ position: "relative", zIndex: 3, borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
+          {/* ── Section 1: KPI Header ── */}
+          <div style={{ background: TEAL, padding: "20px 18px 26px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Headcount</div>
+                <div style={{ fontSize: 42, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{total}</div>
+              </div>
+              <div style={{ flex: 1, textAlign: "center" }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Presence rate</div>
+                <div style={{ fontSize: 42, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
+              </div>
+              <div style={{ flex: 1, textAlign: "right" }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>vs yesterday</div>
+                <div style={{ fontSize: 42, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.05, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑ 3%</div>
+              </div>
             </div>
           </div>
-        </div>
-        {/* ── Section 2: Attendance Breakdown with proportional bars ── */}
-        <div style={{ background: "#fff", padding: "16px 16px 12px" }}>
-          {categories.map((c, i) => {
-            const pct = Math.round(c.val / total * 100);
-            return (
-              <div key={c.label} style={{ marginBottom: i < categories.length - 1 ? 14 : 4 }}>
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#475569" }}>{c.label}</span>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 5 }}>
-                    <span style={{ fontSize: 20, fontWeight: 900, color: "#0f172a", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{c.val}</span>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: "#94a3b8" }}>{pct}%</span>
-                  </div>
+          {/* ── Section 2: White body ── */}
+          <div style={{ background: "#fff", padding: "18px 14px 16px" }}>
+            {/* Single segmented bar */}
+            <div style={{ display: "flex", gap: 4, height: 12, borderRadius: 999, overflow: "hidden", marginBottom: 16 }}>
+              {cats.map((c) => (
+                <div key={c.label} className="presence-seg" style={{ flex: c.val, background: c.color, borderRadius: 999 }} />
+              ))}
+            </div>
+            {/* 4-card grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+              {cats.map((c, i) => (
+                <div key={c.label} style={{
+                  background: "#f3f4f6", borderRadius: 14, padding: "14px 10px 12px",
+                  display: "flex", flexDirection: "column", alignItems: "center",
+                  opacity: 0, animation: `fadeIn .35s ease ${0.3 + i * 0.07}s both`
+                }}>
+                  <div style={{ fontSize: 26, fontWeight: 900, color: "#0f172a", fontVariantNumeric: "tabular-nums", letterSpacing: "-.03em", lineHeight: 1 }}>{c.val}</div>
+                  <div style={{ fontSize: 11.5, fontWeight: 500, color: "#64748b", marginTop: 5, textAlign: "center" }}>{c.label}</div>
+                  <div style={{ width: 28, height: 4, borderRadius: 999, background: c.color, marginTop: 10 }} />
                 </div>
-                <div style={{ height: 10, borderRadius: 999, background: "#f1f5f9", overflow: "hidden" }}>
-                  <div className="anim-bar" style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: c.color }} />
-                </div>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </Widget>);
