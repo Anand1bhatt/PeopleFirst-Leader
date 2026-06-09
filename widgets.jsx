@@ -1087,7 +1087,7 @@ function RecruitmentList({ onOpen }) {
 // ═══════════════════════════════════════════════════════════════
 function BookingsV2({ onOpen }) {
   const events = [
-    { time: "10:00", ampm: "AM", endTime: "11:30", type: "Meeting", icon: "analytics", title: "Q2 Leadership Review", sub: "You present · 12 attendees", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...", soon: "in 1h 8m", featured: true, avatarColors: ["#c97b38","#c97b38","#c97b38","#c97b38","#c97b38"] },
+    { time: "10:00", ampm: "AM", endTime: "11:30", type: "Meeting", icon: "analytics", title: "Q2 Leadership Review", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore...", soon: "in 1h 8m", featured: true, avatars: ["https://i.pravatar.cc/52?img=47","https://i.pravatar.cc/52?img=44","https://i.pravatar.cc/52?img=48","https://i.pravatar.cc/52?img=45","https://i.pravatar.cc/52?img=49"] },
     { time: "2:30",  ampm: "PM", type: "Meeting", icon: "group", title: "1:1 with Karan Mehta", sub: "Platform team · 30 min" },
     { time: "6:30",  ampm: "PM", type: "Gym",     icon: "time",  title: "Gym slot booked",      sub: "Level 2 · 45 min" },
   ];
@@ -1124,15 +1124,14 @@ function BookingsV2({ onOpen }) {
                     <Icon name={events[0].icon} size={13} color="var(--sky-ink)" />{events[0].type}
                   </span>
                   <div style={{ fontSize: 14.5, fontWeight: 700, color: "#0f172a", letterSpacing: "-.01em", marginTop: 2 }}>{events[0].title}</div>
-                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 2 }}>{events[0].sub}</div>
-                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{events[0].desc}</div>
+                  <div style={{ fontSize: 12.5, color: "#475569", marginTop: 5, lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{events[0].desc}</div>
                 </div>
                 {/* Pill visible on sky-light: white bg + blue text */}
                 <span style={{ fontSize: 11.5, fontWeight: 700, color: "#2563eb", background: "#fff", borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap", flexShrink: 0, boxShadow: "0 1px 4px rgba(37,99,235,.15)" }}>{events[0].soon}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-                {events[0].avatarColors.map((c, j) => (
-                  <div key={j} style={{ width: 26, height: 26, borderRadius: 999, background: `linear-gradient(135deg, ${c} 0%, #a86428 100%)`, border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0 }} />
+                {events[0].avatars.map((src, j) => (
+                  <img key={j} src={src} alt="" style={{ width: 26, height: 26, borderRadius: 999, objectFit: "cover", border: "2px solid var(--sky-light)", marginLeft: j ? -7 : 0, flexShrink: 0, display: "block" }} />
                 ))}
                 <span style={{ fontSize: 12, fontWeight: 700, color: "#2563eb", marginLeft: 7 }}>+7</span>
               </div>
