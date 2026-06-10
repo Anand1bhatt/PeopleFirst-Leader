@@ -1136,20 +1136,20 @@ function TeamsAttendance({ onOpen }) {
   const { expanded, ref: sectionRef } = useStackReveal();
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
-      <div ref={sectionRef} style={{ borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
+      <div ref={sectionRef} style={{ borderRadius: 16, overflow: "hidden", background: TEAL, boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
         {/* ── Section 1: KPI Header — always visible ── */}
-        <div style={{ background: TEAL, padding: "18px 16px 20px" }}>
+        <div style={{ padding: "18px 16px 20px" }}>
           <div style={{ display: "flex", alignItems: "flex-start" }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Headcount</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.7)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
               <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{total}</div>
             </div>
             <div style={{ flex: 1, textAlign: "center" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Presence rate</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.7)", textTransform: "uppercase", letterSpacing: ".04em" }}>Presence rate</div>
               <div style={{ fontSize: 32, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
             </div>
             <div style={{ flex: 1, textAlign: "right" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>vs yesterday</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.7)", textTransform: "uppercase", letterSpacing: ".04em" }}>vs yesterday</div>
               <div style={{ fontSize: 32, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑3%</div>
             </div>
           </div>
