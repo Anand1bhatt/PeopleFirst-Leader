@@ -15,8 +15,10 @@ const ACCENTS = {
   reliance: { "--sky": "var(--reliance-base)", "--sky-ink": "var(--reliance-base)", "--sky-light": "var(--reliance-50)", "--sky-border": "var(--reliance-100)", "--sky-shadow": "oklch(40.1% 0.218 264 / 0.4)" }
 };
 
-// ─────────────────────────────────────────────────────────────
-// Header — greeting + date + avatar (shared)
+// ── App background palettes ──
+const APP_BG_OPTIONS = ["grey", "sky20", "icefog"];
+const APP_BG_VALUES  = { grey: "oklch(93% .012 264)", sky20: "#E5F1F7", icefog: "#F5FCFF" };
+
 // ─────────────────────────────────────────────────────────────
 function Header({ name, initials, onBell, onSearch, onProfile, badge, scrolled }) {
   const ghostBtn = { width: 40, height: 40, borderRadius: 999, border: "none", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
@@ -213,6 +215,11 @@ function App() {
   const wVariant = (key, def) => wCfg[key] || def;
   const [scrolled, setScrolled] = useState(false);
   const onScroll = (e) => setScrolled(e.target.scrollTop > 6);
+
+  // Apply app background colour whenever the tweak changes
+  useEffect(() => {
+    document.body.style.background = APP_BG_VALUES[t.appBg] || APP_BG_VALUES.grey;
+  }, [t.appBg]);
   // Boot sequence: splash → award → skeleton → ready
   const [phase, setPhase] = useState("splash");
   useEffect(() => {
@@ -413,6 +420,8 @@ function App() {
         <TweakRadio label="Accent" value={t.accent} options={["sky", "sparkle", "reliance"]} onChange={(v) => setTweak("accent", v)} />
         <TweakSection label="Layout" />
         <TweakRadio label="Density" value={t.density} options={["calm", "compact"]} onChange={(v) => setTweak("density", v)} />
+        <TweakSection label="App background" />
+        <TweakRadio label="Color" value={t.appBg || "grey"} options={APP_BG_OPTIONS} onChange={(v) => setTweak("appBg", v)} />
         {persona === "leader" && <TweakToggle label="Expand “what AI handled”" value={t.autoExpandHandled} onChange={(v) => setTweak("autoExpandHandled", v)} />}
       </TweaksPanel>
     </React.Fragment>);
