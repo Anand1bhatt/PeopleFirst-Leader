@@ -1154,11 +1154,11 @@ function TeamsAttendance({ onOpen }) {
             </div>
           </div>
         </div>
-        {/* ── Section 2: White body — expands on scroll ── */}
-        <div style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1)" }}>
+        {/* ── Section 2: White card inside blue — expands on scroll ── */}
+        <div style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", padding: expanded ? "0 10px 10px" : "0 10px 0", transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1), padding .5s cubic-bezier(.4,0,.2,1)" }}>
           <div style={{ minHeight: 0, overflow: "hidden" }}>
             <div style={{
-              background: "#fff", padding: "16px 12px 14px",
+              background: "#fff", borderRadius: 16, padding: "16px 12px 14px",
               opacity: expanded ? 1 : 0,
               transform: expanded ? "translateY(0)" : "translateY(-8px)",
               transition: expanded ? "opacity .35s ease .15s, transform .4s cubic-bezier(.4,0,.2,1) .1s" : "opacity .2s ease, transform .25s ease"
