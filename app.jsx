@@ -15,10 +15,8 @@ const ACCENTS = {
   reliance: { "--sky": "var(--reliance-base)", "--sky-ink": "var(--reliance-base)", "--sky-light": "var(--reliance-50)", "--sky-border": "var(--reliance-100)", "--sky-shadow": "oklch(40.1% 0.218 264 / 0.4)" }
 };
 
-// ── App background palettes ──
-const APP_BG_OPTIONS = ["grey", "sky20", "icefog"];
-const APP_BG_VALUES  = { grey: "oklch(93% .012 264)", sky20: "#E5F1F7", icefog: "#F5FCFF" };
-
+// ─────────────────────────────────────────────────────────────
+// Header — greeting + date + avatar (shared)
 // ─────────────────────────────────────────────────────────────
 function Header({ name, initials, onBell, onSearch, onProfile, badge, scrolled }) {
   const ghostBtn = { width: 40, height: 40, borderRadius: 999, border: "none", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 };
@@ -215,11 +213,6 @@ function App() {
   const wVariant = (key, def) => wCfg[key] || def;
   const [scrolled, setScrolled] = useState(false);
   const onScroll = (e) => setScrolled(e.target.scrollTop > 6);
-
-  // Apply app background colour whenever the tweak changes
-  useEffect(() => {
-    document.body.style.background = APP_BG_VALUES[t.appBg] || APP_BG_VALUES.grey;
-  }, [t.appBg]);
   // Boot sequence: splash → award → skeleton → ready
   const [phase, setPhase] = useState("splash");
   useEffect(() => {
@@ -302,6 +295,7 @@ function App() {
   if (persona === "leader") {
     if (screen === "home") body =
     <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
+        {/* Scroll fills full height — content starts at top, padded to clear glass header */}
         <div onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
           <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap }}>
             {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
@@ -323,6 +317,7 @@ function App() {
             {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
           </div>
         </div>
+        {/* Glass header floats on top of the scroll area */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 }}>
           <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
         </div>
@@ -418,9 +413,7 @@ function App() {
         <TweakRadio label="Accent" value={t.accent} options={["sky", "sparkle", "reliance"]} onChange={(v) => setTweak("accent", v)} />
         <TweakSection label="Layout" />
         <TweakRadio label="Density" value={t.density} options={["calm", "compact"]} onChange={(v) => setTweak("density", v)} />
-        <TweakSection label="App background" />
-        <TweakRadio label=”Color” value={t.appBg || “grey”} options={APP_BG_OPTIONS} onChange={(v) => setTweak(“appBg”, v)} />
-        {persona === “leader” && <TweakToggle label=”Expand “what AI handled”” value={t.autoExpandHandled} onChange={(v) => setTweak(“autoExpandHandled”, v)} />}
+        {persona === "leader" && <TweakToggle label="Expand “what AI handled”" value={t.autoExpandHandled} onChange={(v) => setTweak("autoExpandHandled", v)} />}
       </TweaksPanel>
     </React.Fragment>);
 
