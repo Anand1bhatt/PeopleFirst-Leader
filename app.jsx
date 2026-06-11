@@ -22,43 +22,53 @@ const APP_BG_VALUES  = { grey: "oklch(93% .012 264)", sky20: "#E5F1F7", icefog: 
 // ─────────────────────────────────────────────────────────────
 // Pull-to-Refresh — blue overlay with PF logo + spinning ring
 // ─────────────────────────────────────────────────────────────
-function PullToRefresh({ enabled, onScroll: parentOnScroll, children }) {
+function PullToRefresh({ enabled, scrollRef }) {
   const THRESHOLD = 78;
   const [pullY, setPullY] = React.useState(0);
   const [phase, setPhase] = React.useState("idle");
-  const startY   = React.useRef(0);
-  const scrollEl = React.useRef(null);
+  const startY = React.useRef(0);
 
-  const onTouchStart = (e) => {
-    if (!enabled) return;
-    startY.current = e.touches[0].clientY;
-  };
-  const onTouchMove = (e) => {
-    if (!enabled || phase === "refreshing") return;
-    const el = scrollEl.current;
-    if (!el || el.scrollTop > 2) return;
-    const dy = e.touches[0].clientY - startY.current;
-    if (dy <= 0) return;
-    e.preventDefault();
-    setPullY(Math.min(dy * 0.48, THRESHOLD * 1.35));
-    setPhase("pulling");
-  };
-  const onTouchEnd = () => {
-    if (!enabled || phase !== "pulling") return;
-    if (pullY >= THRESHOLD) {
-      setPhase("refreshing");
-      setPullY(THRESHOLD);
-      setTimeout(() => {
-        setPhase("snapping");
-        setPullY(0);
-        setTimeout(() => setPhase("idle"), 420);
-      }, 1500);
-    } else {
-      setPhase("snapping");
-      setPullY(0);
-      setTimeout(() => setPhase("idle"), 420);
-    }
-  };
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onStart = (e) => {
+      if (!enabled) return;
+      startY.current = e.touches[0].clientY;
+    };
+    const onMove = (e) => {
+      if (!enabled) return;
+      if (el.scrollTop > 2) return;
+      const dy = e.touches[0].clientY - startY.current;
+      if (dy <= 0) return;
+      e.preventDefault();
+      setPullY(Math.min(dy * 0.48, THRESHOLD * 1.35));
+      setPhase("pulling");
+    };
+    const onEnd = () => {
+      if (!enabled) return;
+      setPullY(prev => {
+        if (prev >= THRESHOLD) {
+          setPhase("refreshing");
+          setTimeout(() => { setPhase("snapping"); setTimeout(() => { setPullY(0); setPhase("idle"); }, 420); }, 1500);
+          return THRESHOLD;
+        } else {
+          setPhase("snapping");
+          setTimeout(() => { setPullY(0); setPhase("idle"); }, 420);
+          return 0;
+        }
+      });
+    };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+    };
+  }, [enabled, scrollRef]);
+
+  if (!enabled && pullY === 0) return null;
 
   const progress = Math.min(pullY / THRESHOLD, 1);
   const spinning = phase === "refreshing";
@@ -66,59 +76,41 @@ function PullToRefresh({ enabled, onScroll: parentOnScroll, children }) {
   const loaderH  = spinning ? THRESHOLD : pullY;
 
   return (
-    <React.Fragment>
-      {/* Blue loader panel — revealed as user pulls */}
+    <div style={{
+      position: "absolute", top: 0, left: 0, right: 0, zIndex: 8,
+      height: loaderH,
+      background: "#0d5070",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      transition: snapping ? "height .42s cubic-bezier(.4,0,.2,1)" : "none",
+      overflow: "hidden",
+      pointerEvents: "none",
+    }}>
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, zIndex: 4,
-        height: loaderH,
-        background: "#0d5070",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        transition: snapping ? "height .42s cubic-bezier(.4,0,.2,1)" : "none",
-        overflow: "hidden",
+        opacity: progress,
+        transform: `scale(${0.55 + 0.45 * progress})`,
+        transition: spinning ? "none" : "opacity .12s, transform .12s",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
       }}>
-        <div style={{
-          opacity: progress,
-          transform: `scale(${0.55 + 0.45 * progress})`,
-          transition: spinning ? "none" : "opacity .12s, transform .12s",
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-        }}>
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <svg width="52" height="52" viewBox="0 0 52 52" style={{ position: "absolute", inset: 0, animation: spinning ? "ptr-spin 0.85s linear infinite" : "none" }}>
-              <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="3.5" />
-              <circle cx="26" cy="26" r="22" fill="none" stroke="#4ade80" strokeWidth="3.5"
-                strokeLinecap="round"
-                strokeDasharray={spinning ? "36 102" : `${progress * 102} 102`}
-                strokeDashoffset="26"
-                style={{ transition: spinning ? "none" : "stroke-dasharray .12s" }} />
-            </svg>
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="22" height="22" viewBox="0 0 22 22">
-                  <text x="11" y="16.5" textAnchor="middle" fontFamily="system-ui,sans-serif" fontWeight="900" fontSize="12" fill="#fff" letterSpacing="-0.3">PF</text>
-                </svg>
-              </div>
+        <div style={{ position: "relative", width: 52, height: 52 }}>
+          <svg width="52" height="52" viewBox="0 0 52 52" style={{ position: "absolute", inset: 0, animation: spinning ? "ptr-spin 0.85s linear infinite" : "none" }}>
+            <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="3.5" />
+            <circle cx="26" cy="26" r="22" fill="none" stroke="#4ade80" strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeDasharray={spinning ? "36 102" : `${progress * 102} 102`}
+              strokeDashoffset="26"
+              style={{ transition: spinning ? "none" : "stroke-dasharray .12s" }} />
+          </svg>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="22" height="22" viewBox="0 0 22 22">
+                <text x="11" y="16.5" textAnchor="middle" fontFamily="system-ui,sans-serif" fontWeight="900" fontSize="12" fill="#fff">PF</text>
+              </svg>
             </div>
           </div>
-          {spinning && <div style={{ color: "rgba(255,255,255,.75)", fontSize: 11.5, fontWeight: 600, letterSpacing: ".03em" }}>Refreshing…</div>}
         </div>
+        {spinning && <div style={{ color: "rgba(255,255,255,.75)", fontSize: 11.5, fontWeight: 600, letterSpacing: ".03em" }}>Refreshing…</div>}
       </div>
-
-      {/* Scroll container — pushed down as user pulls */}
-      <div ref={scrollEl}
-        onScroll={parentOnScroll}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        style={{
-          position: "absolute", inset: 0, overflow: "auto",
-          background: "var(--surface-subtle)",
-          transform: (pullY > 0 || snapping || spinning) ? `translateY(${loaderH}px)` : "none",
-          transition: snapping ? "transform .42s cubic-bezier(.4,0,.2,1)" : "none",
-          zIndex: 5,
-        }}>
-        {children}
-      </div>
-    </React.Fragment>
+    </div>
   );
 }
 
@@ -318,6 +310,7 @@ function App() {
   const wVariant = (key, def) => wCfg[key] || def;
   const [scrolled, setScrolled] = useState(false);
   const onScroll = (e) => setScrolled(e.target.scrollTop > 6);
+  const ptrRef = React.useRef(null);
 
   // Apply app background colour whenever the tweak changes
   useEffect(() => {
@@ -405,7 +398,7 @@ function App() {
   if (persona === "leader") {
     if (screen === "home") body =
     <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
-        <PullToRefresh enabled={wOn("pull_to_refresh", false)} onScroll={onScroll}>
+        <div ref={ptrRef} onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
           <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap }}>
             {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
             {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
@@ -425,8 +418,8 @@ function App() {
             {wOn("upcoming_v2", false) && <BookingsV2 onOpen={() => flash("Opening calendar")} />}
             {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
           </div>
-        </PullToRefresh>
-        {/* Glass header floats on top of the scroll area */}
+        </div>
+        <PullToRefresh enabled={wOn("pull_to_refresh", false)} scrollRef={ptrRef} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 }}>
           <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
         </div>
