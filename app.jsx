@@ -22,10 +22,10 @@ const APP_BG_VALUES  = { grey: "oklch(93% .012 264)", sky20: "#E5F1F7", icefog: 
 // ─────────────────────────────────────────────────────────────
 // Pull-to-Refresh — blue overlay with PF logo + spinning ring
 // ─────────────────────────────────────────────────────────────
-function PullToRefresh({ enabled, children }) {
+function PullToRefresh({ enabled, onScroll: parentOnScroll, children }) {
   const THRESHOLD = 78;
   const [pullY, setPullY] = React.useState(0);
-  const [phase, setPhase] = React.useState("idle"); // idle | pulling | refreshing | snapping
+  const [phase, setPhase] = React.useState("idle");
   const startY   = React.useRef(0);
   const scrollEl = React.useRef(null);
 
@@ -60,21 +60,21 @@ function PullToRefresh({ enabled, children }) {
     }
   };
 
-  const progress  = Math.min(pullY / THRESHOLD, 1);
-  const spinning  = phase === "refreshing";
-  const snapping  = phase === "snapping";
-  const loaderH   = spinning ? THRESHOLD : pullY;
+  const progress = Math.min(pullY / THRESHOLD, 1);
+  const spinning = phase === "refreshing";
+  const snapping = phase === "snapping";
+  const loaderH  = spinning ? THRESHOLD : pullY;
 
   return (
-    <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
-      {/* Blue loader behind scroll content */}
+    <React.Fragment>
+      {/* Blue loader panel — revealed as user pulls */}
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0,
+        position: "absolute", top: 0, left: 0, right: 0, zIndex: 4,
         height: loaderH,
         background: "#0d5070",
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
         transition: snapping ? "height .42s cubic-bezier(.4,0,.2,1)" : "none",
-        overflow: "hidden", zIndex: 4,
+        overflow: "hidden",
       }}>
         <div style={{
           opacity: progress,
@@ -82,7 +82,6 @@ function PullToRefresh({ enabled, children }) {
           transition: spinning ? "none" : "opacity .12s, transform .12s",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
         }}>
-          {/* Ring + PF badge */}
           <div style={{ position: "relative", width: 52, height: 52 }}>
             <svg width="52" height="52" viewBox="0 0 52 52" style={{ position: "absolute", inset: 0, animation: spinning ? "ptr-spin 0.85s linear infinite" : "none" }}>
               <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="3.5" />
@@ -104,20 +103,22 @@ function PullToRefresh({ enabled, children }) {
         </div>
       </div>
 
-      {/* Scroll container pushed down as user pulls */}
+      {/* Scroll container — pushed down as user pulls */}
       <div ref={scrollEl}
+        onScroll={parentOnScroll}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         style={{
           position: "absolute", inset: 0, overflow: "auto",
+          background: "var(--surface-subtle)",
           transform: (pullY > 0 || snapping || spinning) ? `translateY(${loaderH}px)` : "none",
-          transition: (snapping) ? "transform .42s cubic-bezier(.4,0,.2,1)" : "none",
+          transition: snapping ? "transform .42s cubic-bezier(.4,0,.2,1)" : "none",
           zIndex: 5,
         }}>
         {children}
       </div>
-    </div>
+    </React.Fragment>
   );
 }
 
@@ -404,27 +405,25 @@ function App() {
   if (persona === "leader") {
     if (screen === "home") body =
     <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
-        <PullToRefresh enabled={wOn("pull_to_refresh", false)}>
-          <div onScroll={onScroll} style={{ height: "100%", overflow: "auto", background: "var(--surface-subtle)" }}>
-            <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap }}>
-              {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-              {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-              {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
-              {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
-              {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
-              {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
-              {wOn("projects_dark", false) && <PerformanceDark onOpen={() => go("reports")} />}
-              {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
-              {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-              {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-              {wOn("teams_today", false) && <TeamsToday onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
-              {wOn("teams_attendance", false) && <TeamsAttendance onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
-              {wOn("recruitment", true) && <Recruitment onOpen={() => go("more")} />}
-              {wOn("recruitment_v2", false) && <RecruitmentList onOpen={() => go("more")} />}
-              {wOn("upcoming", true) && <Bookings onOpen={() => flash("Opening calendar")} />}
-              {wOn("upcoming_v2", false) && <BookingsV2 onOpen={() => flash("Opening calendar")} />}
-              {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
-            </div>
+        <PullToRefresh enabled={wOn("pull_to_refresh", false)} onScroll={onScroll}>
+          <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap }}>
+            {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
+            {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
+            {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
+            {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
+            {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
+            {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
+            {wOn("projects_dark", false) && <PerformanceDark onOpen={() => go("reports")} />}
+            {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
+            {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+            {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
+            {wOn("teams_today", false) && <TeamsToday onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
+            {wOn("teams_attendance", false) && <TeamsAttendance onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
+            {wOn("recruitment", true) && <Recruitment onOpen={() => go("more")} />}
+            {wOn("recruitment_v2", false) && <RecruitmentList onOpen={() => go("more")} />}
+            {wOn("upcoming", true) && <Bookings onOpen={() => flash("Opening calendar")} />}
+            {wOn("upcoming_v2", false) && <BookingsV2 onOpen={() => flash("Opening calendar")} />}
+            {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
           </div>
         </PullToRefresh>
         {/* Glass header floats on top of the scroll area */}
