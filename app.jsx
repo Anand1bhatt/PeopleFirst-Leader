@@ -5,7 +5,8 @@
    SplashScreen, HomeSkeleton,
    EmpBrief, Attendance, QuickLinks, BookingsEmp, Tasks, LeaveBalance, PayBenefits, EmpNews, RefersCard,
    TasksScreen, LeaveScreen, PayScreen, AttendanceScreen,
-   useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakToggle */
+   useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakToggle,
+   LeaderHomeV2, V2Nav */
 const { useState, useEffect } = React;
 
 // ── Accent palettes for the AI layer (Sky = JioCloud default) ──
@@ -295,32 +296,14 @@ function App() {
   if (persona === "leader") {
     if (screen === "home") body =
     <div style={{ flex: 1, minHeight: 0, position: "relative", overflow: "hidden" }}>
-        {/* Scroll fills full height — content starts at top, padded to clear glass header */}
-        <div onScroll={onScroll} style={{ position: "absolute", inset: 0, overflow: "auto", background: "var(--surface-subtle)" }}>
-          <div style={{ padding: "76px 16px 120px", display: "flex", flexDirection: "column", gap }}>
-            {wOn("ai_briefing_v1", true) && <AIBriefing variant="v1" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-            {wOn("ai_briefing_v2", false) && <AIBriefing variant="v2" expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />}
-            {wOn("expense_bars", true) && <ExpenseBudgetBars onOpen={() => go("reports")} />}
-            {wOn("expense_v2", false) && <ExpenseBudgetV2 onOpen={() => go("reports")} />}
-            {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
-            {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
-            {wOn("projects_dark", false) && <PerformanceDark onOpen={() => go("reports")} />}
-            {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
-            {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-            {wOn("teams_headcount", false) && <TeamsHeadcount onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
-            {wOn("teams_today", false) && <TeamsToday onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
-            {wOn("teams_attendance", false) && <TeamsAttendance onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f}`); }} />}
-            {wOn("recruitment", true) && <Recruitment onOpen={() => go("more")} />}
-            {wOn("recruitment_v2", false) && <RecruitmentList onOpen={() => go("more")} />}
-            {wOn("upcoming", true) && <Bookings onOpen={() => flash("Opening calendar")} />}
-            {wOn("upcoming_v2", false) && <BookingsV2 onOpen={() => flash("Opening calendar")} />}
-            {wOn("news") && <News onOpen={() => flash("Opening all updates")} onWish={(n) => flash("Wish sent to " + n)} />}
-          </div>
-        </div>
-        {/* Glass header floats on top of the scroll area */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 }}>
-          <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
-        </div>
+        <LeaderHomeV2
+          badge={headerBadge}
+          onOpenAssistant={() => setAssistant(true)}
+          onSearch={() => setSearch(true)}
+          onProfile={() => go("more")}
+          onNav={go}
+          flash={flash}
+        />
       </div>;else
 
     if (screen === "approvals") body = <ApprovalsScreen onBack={() => go("home")} initialFilter={apprFilter} bulkApproved={approve.approved > 0} onBulkApprove={() => setApprove((s) => ({ ...s, approved: s.lowRisk }))} />;else
@@ -387,7 +370,8 @@ function App() {
       <React.Fragment>
         <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>
           {body}
-          <FloatingNav items={navItems} active={screen} onChange={go} />
+          {persona === "employee" && <FloatingNav items={navItems} active={screen} onChange={go} />}
+          {persona === "leader" && screen !== "home" && <FloatingNav items={navItems} active={screen} onChange={go} />}
         </div>
         <Toast toast={toast} />
         {assistant && <AssistantSheet onClose={() => setAssistant(false)} onPick={openChat} prompts={prompts} sub={assistantSub} />}
