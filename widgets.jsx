@@ -1136,29 +1136,29 @@ function TeamsAttendance({ onOpen }) {
   const { expanded, ref: sectionRef } = useStackReveal();
   return (
     <Widget icon="group" title="Teams" action="Team" onAction={() => onOpen()}>
-      <div ref={sectionRef} style={{ borderRadius: 16, overflow: "hidden", border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
+      <div ref={sectionRef} style={{ borderRadius: 16, overflow: "hidden", background: TEAL, boxShadow: "0 2px 10px rgba(15,23,42,.08)" }}>
         {/* ── Section 1: KPI Header — always visible ── */}
-        <div style={{ background: TEAL, padding: "18px 16px 20px" }}>
+        <div style={{ padding: "18px 16px 20px" }}>
           <div style={{ display: "flex", alignItems: "flex-start" }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Headcount</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.7)", textTransform: "uppercase", letterSpacing: ".04em" }}>Headcount</div>
               <div style={{ fontSize: 32, fontWeight: 900, color: "#fff", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{total}</div>
             </div>
             <div style={{ flex: 1, textAlign: "center" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>Presence rate</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.7)", textTransform: "uppercase", letterSpacing: ".04em" }}>Presence rate</div>
               <div style={{ fontSize: 32, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>{presencePct}%</div>
             </div>
             <div style={{ flex: 1, textAlign: "right" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>vs yesterday</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "rgba(255,255,255,.7)", textTransform: "uppercase", letterSpacing: ".04em" }}>vs yesterday</div>
               <div style={{ fontSize: 32, fontWeight: 900, color: "#4ade80", letterSpacing: "-.04em", lineHeight: 1.1, marginTop: 4, fontVariantNumeric: "tabular-nums" }}>↑3%</div>
             </div>
           </div>
         </div>
-        {/* ── Section 2: White body — expands on scroll ── */}
-        <div style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1)" }}>
+        {/* ── Section 2: White card inside blue — expands on scroll ── */}
+        <div style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", padding: expanded ? "0 10px 10px" : "0 10px 0", transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1), padding .5s cubic-bezier(.4,0,.2,1)" }}>
           <div style={{ minHeight: 0, overflow: "hidden" }}>
             <div style={{
-              background: "#fff", padding: "16px 12px 14px",
+              background: "#fff", borderRadius: 16, padding: "16px 12px 14px",
               opacity: expanded ? 1 : 0,
               transform: expanded ? "translateY(0)" : "translateY(-8px)",
               transition: expanded ? "opacity .35s ease .15s, transform .4s cubic-bezier(.4,0,.2,1) .1s" : "opacity .2s ease, transform .25s ease"
