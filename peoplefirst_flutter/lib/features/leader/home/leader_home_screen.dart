@@ -14,6 +14,7 @@ import 'widgets/team_snapshot_widget.dart';
 import 'widgets/recruitment_widget.dart';
 import 'widgets/bookings_widget.dart';
 import 'widgets/news_widget.dart';
+import 'widgets/ai_news_briefing_widget.dart';
 
 class LeaderHomeScreen extends ConsumerWidget {
   const LeaderHomeScreen({super.key});
@@ -60,6 +61,8 @@ class LeaderHomeScreen extends ConsumerWidget {
                 WidgetEntrance(index: 6, child: const RecruitmentWidget()),
                 const SizedBox(height: 20),
                 WidgetEntrance(index: 7, child: const NewsWidget()),
+                const SizedBox(height: 20),
+                WidgetEntrance(index: 8, child: const AiNewsBriefingWidget()),
                 const SizedBox(height: 100),
               ]),
             ),
